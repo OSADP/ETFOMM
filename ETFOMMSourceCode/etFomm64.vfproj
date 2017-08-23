@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectType="typeDynamicLibrary" ProjectCreator="Intel Fortran" Keyword="Dll" Version="11.0" ProjectIdGuid="{A763AF02-6399-4622-B585-38385B388B7A}">
+	<Platforms>
+		<Platform Name="x64"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|x64" OutputDirectory="D:\NGSIM Projects\WorkingDir" TargetName="etfomm64" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/fpe-all:0" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" Preprocess="preprocessYes" PreprocessorDefinitions="WIN64, DebugVersion" UndefineAllPreprocessorDefinitions="true" OpenMPConditionalCompilation="false" DLines="true" FPS4Logicals="true" WarnUnalignedData="false" LocalVariableStorage="localStorageSave" StructMemberAlignment="alignSingleByte" FloatingPointExceptionHandling="fpe0" FlushDenormalResultsToZero="true" FloatingPointSpeculation="fpSpeculationOff" CallingConvention="callConventionCVF" Traceback="true" RuntimeChecks="rtChecksAll" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" DescriptorDataTypeCheck="true" DescriptorDataSizeCheck="true" ArgTempCreatedCheck="true" StackFrameCheck="true" Interfaces="true"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/Qdiag-disable:11077 /ignore:4217 /ignore:4204 /ignore:4049&#xA;" OutputFile="D:\NGSIM Projects\WorkingDir\etfomm64.dll" SuppressStartupBanner="true" AdditionalLibraryDirectories="C:\MinGW\lib\gcc\mingw32\4.6.2\adalib" GenerateDebugInformation="true" ProgramDatabaseFile="D:\workingdir\etfomm64.pdb" SubSystem="subSystemWindows" LinkDLL="true" AdditionalDependencies="txdinterface.lib"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool" Description=""/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|x64" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/libs:static " SuppressStartupBanner="true" Preprocess="preprocessYes" AdditionalIncludeDirectories="Release/" PreprocessorDefinitions="WIN64" UndefineAllPreprocessorDefinitions="true" OpenMP="OpenMPParallelCode" FPS4Logicals="true" LocalVariableStorage="localStorageSave" StructMemberAlignment="alignSingleByte" FloatingPointExceptionHandling="fpe0" FloatingPointModel="strict" FlushDenormalResultsToZero="true" FloatingPointSpeculation="fpSpeculationOff" CallingConvention="callConventionCVF" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/Qdiag-disable:11077 /ignore:4217 /ignore:4204 /ignore:4049" LinkIncremental="linkIncrementalYes" SuppressStartupBanner="true" SubSystem="subSystemWindows" LinkDLL="true"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd">
+		<File RelativePath=".\Alignment_Module.f90"/>
+		<File RelativePath=".\Animation_Modules.f90"/>
+		<File RelativePath=".\API_Modules.f90"/>
+		<File RelativePath=".\ArrayFunctions_Module.f90"/>
+		<File RelativePath=".\Bus_Modules.f90"/>
+		<File RelativePath=".\Datastation_Module.f90"/>
+		<File RelativePath=".\Detector_Module.f90"/>
+		<File RelativePath=".\Diversion_Module.f90"/>
+		<File RelativePath=".\Emergency_Vehicles_Module.f90"/>
+		<File RelativePath=".\Events_Module.f90"/>
+		<File RelativePath=".\Global_Module.f90"/>
+		<File RelativePath=".\Incident_Module.f90"/>
+		<File RelativePath=".\Link_Modules.f90"/>
+		<File RelativePath=".\Node_Modules.f90"/>
+		<File RelativePath=".\NTCIP_Module.f90"/>
+		<File RelativePath=".\Object_Module.f90"/>
+		<File RelativePath=".\Parking_Module.f90"/>
+		<File RelativePath=".\SCOPE_Parameters.f90"/>
+		<File RelativePath=".\Segment_Modules.f90"/>
+		<File RelativePath=".\Signal_Modules.f90"/>
+		<File RelativePath=".\Sim_Modules.f90"/>
+		<File RelativePath=".\Text_Module.f90"/>
+		<File RelativePath=".\Trip_Generator_Modules.f90">
+			<FileConfiguration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" Parallelization="true"/></FileConfiguration></File>
+		<File RelativePath=".\VDATA_Module.f90"/>
+		<File RelativePath=".\Vehicle_Modules.f90"/>
+		<File RelativePath=".\Vehicle_Types_Module.f90"/></Filter>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<File RelativePath=".\ACTAPI.f90"/>
+		<File RelativePath=".\API_Functions.f90"/>
+		<File RelativePath=".\Car_Follow.f90"/>
+		<File RelativePath=".\Control_Delay.f90"/>
+		<File RelativePath=".\Coordination.f90"/>
+		<File RelativePath=".\CORWIN64.f90"/>
+		<File RelativePath=".\DCS.f90"/>
+		<File RelativePath=".\Emergency_Vehicles.f90"/>
+		<File RelativePath=".\Get_Network_Data.f90"/>
+		<File RelativePath=".\Inject_Vehicles.f90"/>
+		<File RelativePath=".\Input_Error_Checking.f90"/>
+		<File RelativePath=".\Lane_Changing.f90"/>
+		<File RelativePath=".\MOE_Functions.f90"/>
+		<File RelativePath=".\MOE_writer.f90"/>
+		<File RelativePath=".\Organize_Freeway_Links.f90"/>
+		<File RelativePath=".\SCOPE.f90"/>
+		<File RelativePath=".\Sort_Vehicle_List.f90">
+			<FileConfiguration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" Parallelization="true"/></FileConfiguration></File>
+		<File RelativePath=".\Step_Simulation.f90">
+			<FileConfiguration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/libs:static /openmp  " Preprocess="preprocessYes"/></FileConfiguration>
+			<FileConfiguration Name="Debug|x64">
+				<Tool Name="VFFortranCompilerTool" Preprocess="preprocessYes"/></FileConfiguration></File>
+		<File RelativePath=".\tfomm.f90"/>
+		<File RelativePath=".\Trip_Generator.f90">
+			<FileConfiguration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" Parallelization="true"/></FileConfiguration></File>
+		<File RelativePath=".\Update_Signals.f90"/>
+		<File RelativePath=".\Update_TurnPcts.f90"/>
+		<File RelativePath=".\Update_Vehicles.f90"/>
+		<File RelativePath=".\Write_Animation_Data.f90"/>
+		<File RelativePath=".\Write_Text_Animation_Data.f90"/></Filter></Files>
+	<Globals/></VisualStudioProject>

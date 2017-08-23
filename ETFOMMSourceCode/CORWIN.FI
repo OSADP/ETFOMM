@@ -1,0 +1,95 @@
+!***********************************************************************
+!
+!    Copyright (c) 2002-4
+!    ITT Industries, Inc., Systems Division
+!  
+!    Original Author: Dave Terhune
+!
+!    Description: Declarations of CORWin Interface routines
+!
+!***********************************************************************
+  INTERFACE
+
+!***********************************************************************
+!     Send a message
+!***********************************************************************
+  SUBROUTINE SendMsg [DLLIMPORT, ALIAS:'_SendMsg@8'](ID, CODE)
+      INTEGER*4 ID   [VALUE] ! MESSAGE ID
+      INTEGER*4 CODE [VALUE] ! STATUS CODE
+  END SUBROUTINE
+
+!***********************************************************************
+!     Output a string
+!***********************************************************************
+  SUBROUTINE OutputString[DLLIMPORT, ALIAS:'_OutputString@16'] (STR, CODE, COLOR)
+      CHARACTER*(*) STR   [REFERENCE] ! MESSAGE STRING
+      INTEGER*4     CODE  [VALUE]     ! COLOR CODE
+      INTEGER*4     COLOR [VALUE]     ! RGB VALUE
+  END SUBROUTINE
+
+  END INTERFACE
+
+!***********************************************************************
+!     Message IDs
+!***********************************************************************
+  INTEGER, PARAMETER :: SIM_YIELD            = 0
+  INTEGER, PARAMETER :: SIM_CALLRTE          = 1
+  INTEGER, PARAMETER :: SIM_GETKEYMESSAGE    = 5
+  INTEGER, PARAMETER :: SIM_ADDVEHICLE       = 8
+  INTEGER, PARAMETER :: SIM_LINKSTATEVALID   = 9
+  INTEGER, PARAMETER :: SIM_STATUS           = 10
+  INTEGER, PARAMETER :: SIM_ADDRAMPMETER     = 11
+  INTEGER, PARAMETER :: SIM_LINKTIDVALID     = 12
+  INTEGER, PARAMETER :: SIM_ADDINCIDENT      = 13
+  INTEGER, PARAMETER :: SIM_SECTIONDATAREADY = 15
+
+!***********************************************************************
+!     Run-Time Extension Call Point Message Codes
+!***********************************************************************
+  INTEGER, PARAMETER :: RT_INITIALIZE          = 1
+  INTEGER, PARAMETER :: RT_BEGINSIMULATION     = 2
+  INTEGER, PARAMETER :: RT_POST_VEHICLE_EMIT   = 3
+  INTEGER, PARAMETER :: RT_PRE_VEHICLEUPDATE   = 4
+  INTEGER, PARAMETER :: RT_PRE_SIGNALUPDATE    = 5
+  INTEGER, PARAMETER :: RT_SHUTDOWN            = 6
+  INTEGER, PARAMETER :: RT_TIMESTEPCOMPLETE    = 7
+  INTEGER, PARAMETER :: RT_INTERVALCOMPLETE    = 8
+  INTEGER, PARAMETER :: RT_TIMEPERIODCOMPLETE  = 9
+  INTEGER, PARAMETER :: RT_SIMULATION_COMPLETE = 10
+
+!***********************************************************************
+!     Run-Time Extension Call Point Names
+!***********************************************************************
+  CHARACTER*(*), PARAMETER :: RT_INITIALIZE_NAME          = 'Initialize'
+  CHARACTER*(*), PARAMETER :: RT_BEGINSIMULATION_NAME     = 'BeginSimulation'
+  CHARACTER*(*), PARAMETER :: RT_POST_VEHICLE_EMIT_NAME   = 'PostVehicleEmit'
+  CHARACTER*(*), PARAMETER :: RT_PRE_VEHICLEUPDATE_NAME   = 'PreVehicleUpdate'
+  CHARACTER*(*), PARAMETER :: RT_PRE_SIGNALUPDATE_NAME    = 'PreSignalUpdate'
+  CHARACTER*(*), PARAMETER :: RT_SHUTDOWN_NAME            = 'Shutdown'
+  CHARACTER*(*), PARAMETER :: RT_TIMESTEPCOMPLETE_NAME    = 'TimeStepComplete'
+  CHARACTER*(*), PARAMETER :: RT_INTERVALCOMPLETE_NAME    = 'TimeIntervalComplete'
+  CHARACTER*(*), PARAMETER :: RT_TIMEPERIODCOMPLETE_NAME  = 'TimePeriodComplete'
+  CHARACTER*(*), PARAMETER :: RT_SIMULATION_COMPLETE_NAME = 'SimulationComplete'
+
+!***********************************************************************
+!     Status Codes
+!***********************************************************************
+  INTEGER, PARAMETER :: SIM_NORMAL                   = 0
+  INTEGER, PARAMETER :: SIM_ABORT                    = 1
+  INTEGER, PARAMETER :: SIM_TIMESTEPCOMPLETE         = 2
+  INTEGER, PARAMETER :: SIM_LINKCOMPLETE             = 3
+  INTEGER, PARAMETER :: SIM_INVARIANTPROCESSCOMPLETE = 4
+  INTEGER, PARAMETER :: SIM_BEGININTERVAL            = 5
+  INTEGER, PARAMETER :: SIM_INTERVALCOMPLETE         = 6
+  INTEGER, PARAMETER :: SIM_BEGINTIMESTEP            = 7
+  INTEGER, PARAMETER :: SIM_COMPLETE                 = 8
+  INTEGER, PARAMETER :: SIM_BEGINSIMULATION          = 9
+  INTEGER, PARAMETER :: SIM_TIMEPERIODCOMPLETE       = 10
+
+!***********************************************************************
+!     Color Codes
+!***********************************************************************
+  INTEGER, PARAMETER :: SIM_COLOR_RGB     = 0
+  INTEGER, PARAMETER :: SIM_COLOR_INFO    = 1
+  INTEGER, PARAMETER :: SIM_COLOR_WARNING = 2
+  INTEGER, PARAMETER :: SIM_COLOR_ERROR   = 3

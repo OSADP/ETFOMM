@@ -1,0 +1,736 @@
+Data Set: INCD1.TRF                                                           00
+Description:                                                                  00
+        This data set shows users how to code data for:                       00
+        1. Surveillance systems (Record Type 28, 42);                         00
+        2. Freeway demand/capacity ramp metering control (Record Type 28,     00
+           37, 38);                                                           00
+        3. Signs and pretimed signal controls (Record Type 35, 36);           00
+        4. Off-line incident detection and point processing                   00 
+           (Record Type 02, 29, 64,67); and                                   00
+        5. Multiple periods (Record Type 04, 210).                            00
+                                                                              00
+        As practical applications, four scenarios have been coded into the    00
+        data set:                                                             00
+        1. Freeway and surface street network                                 00
+        2. Network w/ freeway incident                                        00
+        3. Network w/ freeway incident and diversion upstream of incident     00
+        4. Network w/ freeway incident, incident detection, diversion         00
+           upstream of incident, and adjusted signals on side streets         00
+                                                                              00
+        7:00 Simulation starts                                                00
+        7:10 incidence begins                                                 00
+        7:25 traffic diversion starts; start of time period two               00
+        7:30 signal timing modified; start of time period three               00
+        7:55 traffic diversion ends and original signal timings restored;     00
+             start of time period four.                                       00
+        8:00 end of simulation.                                               00
+                                                                              00
+                              8018                                            00
+                                 |                                            00
+                                18                                            00
+                                 |                                            00
+                   6===7=========8============9==10                           00
+                  /    |         |            |    \                          00
+              7087     |         |            |    7089                       00
+               /       |         |            |       \                       00
+             187       |         |            |       189                     00
+             /         |         |            |          \                    00
+8086---86---87-------------------|-----------------------89---88---8088       00
+8081---81---82-------------------|-----------------------84---85---8085       00
+             \         |         |            |          /                    00
+              \        |         |            |        184                    00
+              182      |         |            |        284                    00
+                \      |         |            |       /                       00
+                7082   |         |            |    7084                       00
+                   \   |         |            |     /                         00
+                    1--2---------3------------4----5                          00
+                                 |                                            00
+                                13                                            00
+                                 |                                            00
+                              8013                                            00
+
+       Record Type 00 must be the first record types.  These
+       records are comment cards that include alphanumeric
+       information that the user wants to print on the first page
+       of the output report.  To insert comment cards in the data
+       set, use blank record types (i.e., Columns 78-80 are
+       blanks).
+
+       Record Type 01 through 05 are called control records.  The
+       five records are required for each data set and coded only
+       in the first time period.
+
+CORSIM USER                           07  252002FHWA                           1
+
+       Record type 01 is the run identification card.  It is used
+       to indicate the name of the user (e.g. CORSIM USER), date of
+       run (7/25/02), name of the agency (e.g. FHWA).
+
+       1   1   2  15     7981                0 0   3 700   1    7781    7581   2
+
+       Record type 02 is the run control card.  The '1' in
+       column 8 indicates that a simulation run will be performed.
+       The '1' in column 12 indicates that off-line incident
+       detection, point processing and MOE estimation are not
+       desired in this run.  '15' is the maximum number of minutes
+       of fill time prior to simulation.  Simulation starts
+       whether equilibrium is attained or not at the end of 15
+       minutes. The '0' in columns 46 and 48 indicates that the
+       units of measurements are English units for both input and
+       output data.  The '3' in column 52 specifies the model
+       whose data appears after record type 02.  The '3' denotes
+       that the model is NETSIM.  The '700' in columns 54-56
+       denotes the clock time in military style at the beginning
+       of the simulation.  The '1' in column 60 indicates that
+       pretimed signal transition algorithm with immediate
+       transition is used.  The values in columns 22-29, 61-68,
+       and 69-76 are random number seeds.
+
+1500 3001500 300                                                              03
+
+       Record type 03 gives the time period specifications.  In
+       this run there are 4 time periods of duration of 1500 sec,
+       300 sec, 1500 sec and 300 sec, respectively.  Up to 19 time
+       periods can be specified for each case.
+
+                 150                                                          04
+
+       Record type 04 indicates the duration of the time step and
+       the time interval per time period.  The '150' is the
+       duration of the time interval.  The time step duration is
+       specified in columns 12 to 16.  Since in this run it is
+       blank, the default value of 1 second is taken.  Notice that
+       when both the NETSIM and FRESIM models are used this entry
+       must be left blank.
+
+                                                                              05
+
+       Record type 05 is the reports and graphics card.  This card
+       can be used to generate cumulative output and intermediate
+       output.
+
+       In this run, the NETSIM subnetwork is coded first.
+       Although the order in which subnetworks are input does not
+       affect the simulation run, all of the records for a
+       subnetwork must be input in numeric order.
+
+7082   1 185         1                     2                      30   11     11
+   1   2 465         2        9        7   3                      30   11     11
+   2   32000         2                 8   4  13                  30   11     11
+   3   42000         2        9        9   5                      30   11     11
+   4   5 500         2                  7084                      30   11     11
+   57084 185         1                                            30   11     11
+   67087 185         1                                            30   11     11
+   7   6 500         2                  7087                      30   11     11
+   7   82000 200     1 1              18   9   3       9          30   11     11
+   8   72000 200     1 1     T         2   6                      30   11     11
+   8   92000         1       4                 4                  30   11     11
+   9   82000 200 200 1 1 1   T         3   7  18       7          30   11     11
+  10   9 465         2        9        4   8                      30   11     11
+7089  10 185         1                     9                      30   11     11
+   2   71171 100     1 1     9         6       8                  30   11     11
+   7   21171 100     1 1     1         3                          30   11     11
+   3   81171 100 100 1 1 1   T         7  18   9      18          30   11     11
+   8   31171 100     1 1               4  13          13          30   11     11
+   4   91171 100     1 1     1         8                          30   11     11
+   9   41171 100     1 1     1         5                          30   11     11
+   8  18 322         1                  8018                      30   11     11
+8018  18             1                     8                           11     11
+  18   8 266  50  50 1 1 1   T         9   3   7       3          30   11     11
+   3  13 300         1                  8013                      30   11     11
+8013  13             1                     3                           11     11
+  13   3 300      50 1   1   9             8   4       8          30   11     11
+
+       Record type 11 is the link description card for NETSIM
+       model.  One record type is required for each link.  The
+       entry and exit nodes are denoted by numbers between 8000
+       and 8999 (both inclusive).  The upstream node number of a
+       link is specified in columns 1-4 and the downstream node
+       number is given in columns 5-8.  Link lengths are indicated
+       in columns 9-12.  If there are any turn pockets, their
+       lengths are specified in columns 13-16 (for left turn) and
+       columns 17-20 (for right turn).  Link lengths are not
+       specified for entry links.  Column 22 indicates the number
+       of lanes in the link.  Columns 24 and 26 indicate the
+       number of lanes in left-turn and right turn pockets.
+       Columns 37-40 indicate the downstream node that receives
+       left-turning traffic from the link.  Columns 41-44 indicate
+       the downstream node that receives through traffic.  Columns
+       45-48 denote the downstream node that receives the right
+       turning traffic.  Columns 49-52 denote the downstream node
+       that receives diagonal traffic.  Columns 53-56 denote the
+       upstream node of the link whose traffic opposes the left
+       turning traffic.  Columns 65-68 give the desired free flow
+       speed in mph.  For entry links, speed is not specified.
+       The '11' in columns 72 and 73 indicate that lane 1 of the
+       link is aligned with lane 1 of the downstream link.  '11'
+       is also the default lane alignment.  Hence if columns 72-73
+       are left blank, it implies that the default lane alignment
+       of '11' is desired.
+
+   1   2  30  70                                                              21
+   2   3  30  40  30                                                          21
+   3   4  60  40                                                              21
+   4   5     100                                                              21
+   57084     100                                                              21
+   7   8  20  60  20                                                          21
+   8   9         100                                                          21
+7089  10     100                                                              21
+  10   9  30  70                                                              21
+   9   8  20  60  20                                                          21
+   8   7  30  70                                                              21
+   7   6     100                                                              21
+   67087     100                                                              21
+   7   2 100                                                                  21
+   2   7  50      50                                                          21
+   8   3  50  50                                                              21
+   3   8  25  50  25                                                          21
+   9   4 100                                                                  21
+   4   9 100                                                                  21
+7082   1     100                                                              21
+   3  13     100                                                              21
+8013  13     100                                                              21
+  13   3      70  30                                                          21
+   8  18     100                                                              21
+8018  18     100                                                              21
+  18   8  20  60  20                                                          21
+
+       Record 21 is the turn movement card for surface streets.
+       The records are required unless traffic assignment is used
+       to generate turn movement.  Columns 1-4 denote the upstream
+       node number of the link, and columns 5-8 represent the
+       downstream node number.  Columns 9-12 gives the percentage
+       of left turning traffic, columns 13-16 denote the through
+       traffic, columns 17-20 give the right turning traffic and
+       columns 21-24 give the percentage of traffic turning
+       diagonally.
+
+       Record Type 35s and 36s specify the sign and pretimed
+       signal control for intersections.
+
+   1    7082                                                                  35
+   2  64   1   7              60   4   1  10   4   1                          35
+   3  39   2   8  13          30   3   1  10   3   1  28   4   1              35
+   4       3   9              60   4   1  10   4   1                          35
+   5       4                                                                  35
+   6       7                                                                  35
+   7  36   8   2              52   3   1  20   3   1                          35
+   9       4  10   8          34   3   1  23   3   1  11   3   1              35
+  10    7089                                                                  35
+  13       38013                                                              35
+  18       88018                                                              35
+
+       Record type 35 defines the sign and pretimed signal control
+       timing at an intersection.  Columns 1-4 denote the node
+       number of the intersection.  Columns 9-12, 13-16, 17-20, 21-
+       24 and 25-28 denote the upstream node numbers of the
+       approach links (maximum of 5 approach links) to the
+       intersection.  Entries in columns 30-32 to 74-76 denote the
+       durations of the various signal intervals.
+
+   1 1                                                                        36
+   2 12   02   22   21   20   22                                              36
+   3 122  022  222  212  202  292  211  200  222                              36
+   4 12   02   22   21   20   22                                              36
+   5 1                                                                        36
+   6 1                                                                        36
+   7 12   02   22   21   20   22                                              36
+   9 212  202  222  221  220  222  122  022  222                              36
+  10 1                                                                        36
+  13 11                                                                       36
+  18 11                                                                       36
+
+       Record type 36 gives the sign or pretimed signal control
+       codes.  The intersection is denoted by the node number and
+       is indicated in columns 1-4.  The approaches are coded
+       sequentially.  For e.g., intersection '1' has only 1
+       approach.  Hence only 1 approach is coded.  A '1'
+       represents an intersection with no control, or a green
+       ball.
+
+  10   9   9     200     1   500  0                                           42
+   1   2   9     200     2   500  0                                           42
+
+       Record type 42 is the surveillance detector specification
+       card.  The '9' in column 12 indicates that a detector spans
+       all lanes including turn pockets.  Columns 16-20 indicate
+       the distance of the trailing edge of the detector from the
+       stop line.  Columns 23-26 give the station number. '500'
+       denotes the sensor length.
+
+   8   7   8   3   8   9   8  18   8                                          43
+
+       Record type 43 indicates the approach configuration for
+       NETSIM actuated controller.  Columns 1-4 specify the
+       internal node that identifies the actuated controlled
+       intersection.  Columns 5-8 and 9-12 define the first
+       upstream and downstream nodes that are designated as an
+       approach to the actuated intersection.  Thus in this run,
+       link (7,8) is the first approach link.  The other entries
+       also represent node numbers for other approach links to
+       intersection 8.
+
+   8   1 22222     22222     12222     22222                                  45
+   8   2 21122     22222     22222     22222                                  45
+   8   3 22222     12222     22222     22222                                  45
+   8   4 22222     22222     22222     21122                                  45
+   8   5 12222     22222     22222     22222                                  45
+   8   6 22222     22222     21122     22222                                  45
+   8   7 22222     22222     22222     12222                                  45
+   8   8 22222     21122     22222     22222                                  45
+
+       Record type 45 defines traffic movements for a NETSIM
+       actuated controller.  The node number is given in columns 1-
+       4.  In this run, the actuated control is for intersection
+       at node 8.  Column 8 specifies the phase being described.
+       Columns 10-14 represent movement specific codes that
+       identify when a discharge movement on approach 1 (in this
+       run, link (7,8)) is serviced during the subject phase for
+       the left, through, right, left-diagonal, and right-diagonal
+       movements, respectively.  A '1' indicates that the movement
+       is permitted and a '2' indicates that the movement is
+       prohibited.  The other entries are similar to that in
+       columns 10-14, but apply to other approaches.  It should be
+       noted that the order of approaches must be consistent to
+       that specified in the Record Type 43.
+
+   8 1 1  37   20      100  0                                                 46
+   8 2 1  11   20      100  0                                                 46
+   8 3 1  27   20      100  0                                                 46
+   8 4 1  41   20      100  0                                                 46
+   8 5 1  17   20      100  0                                                 46
+   8 6 1  31   20      100  0                                                 46
+   8 7 1  47   20      100  0                                                 46
+   8 8 1  21   20      100  0                                                 46
+
+       Record types 46 are a continuation of actuated data and
+       they specify detector data.  Columns 1-4 specify the node
+       number.  Column 6 indicates the phase being described.
+       Column 8 specifies the type of detector group.  Column 11
+       indicates the approach number of the link at which the
+       detectors are located.  Column 12 gives the number of the
+       lane in which the sensor is located.  The '20' in columns
+       16-17 indicates the distance of the trailing edge of the
+       detector from the stop line in tenths of a foot.  The '100'
+       in columns 24-26 specifies the sensor length in tenths of a
+       foot.  The '0' in column 29 represents the detector
+       operation code that indicates a presence detector.
+
+   8 1  21 1020   0 20    10         200 200 30 10 111  11       3            47
+   8 2  23 1520   0 20    15         200 200 30 10 111  10       3            47
+   8 3  10 0520   0 20    05         200 200 30 10 1111 00       3            47
+   8 4  25 1520   0 20    15         200 200 30 10 111  11       3            47
+   8 5  10 0520   0 20    05         200 200 30 10 111  11       3            47
+   8 6  34 1520   0 20    15         200 200 30 10 111  10       3            47
+   8 7  14 0520   0 20    05         200 200 30 10 1111 00       3            47
+   8 8  22 1520   0 20    15         200 200 30 10 111  11       3            47
+
+       Record type 47 describes controller data that are phase
+       specific.  This record can accommodate either Type 170 or
+       NEMA controllers.  The node number is given in Columns 1-4.
+       Column 6 specifies the phase number.  One record is needed
+       for each actuated phase.  The other entries define the
+       control parameters for the detector.
+
+8018  18 350   0   0                                                          50
+8013  13 350   0   0                                                          50
+
+       Record Type 50s define the entry link volumes entering the
+       subnetwork.  The upstream node (Columns 1-4) of an entry
+       link must be the entry node and the downstream node
+       (Columns 5-8) must be an internal node.  For the first
+       record, the '350' in Columns 9-12 is the flow rate
+       (vehicles per hour) entering from entry node 8018, and the
+       '0s' in Columns 16 and 20 indicate the percentages of
+       trucks and carpools entering the link.
+
+   8                                                                         170
+
+       Record Type 170 is the subnetwork delimiter, which
+       indicates the end of the subnetwork data.  The '8' in
+       Column 4 indicates the following records will be FRESIM
+       subnetwork data.
+
+       The following Records specify the data for FRESIM
+       subnetwork.  Record Type 19, 20, and 25 define the
+       geometry, operation, and turn movement in freeway network.
+       Record Type 28, 29, 37, 38, 64, and 67 specify the
+       surveillance detector and ramp metering controls.
+
+8081  81  82     0 2 00    0 00    0 00    0 1 0 0 0                          19
+  81  82  84 20000 2 92  500 00    0 00    0 1 9 0 0                          19
+  82  84  85 53540 2 00    0 00    0 00    0 1 0 0 0                          19
+  84  858085 20000 2 91  500 00    0 00    0 1 0 0 0                          19
+  82 1827082  1851 1 00    0 00    0 00    0 1 0 0 0                          19
+ 1827082      1851 1 00    0 00    0 00    0 1 0 0 0                          19
+7084 284 184   701 1 00    0 00    0 00    0 1 0 0 0                          19
+ 284 184  84  1501 1 00    0 00    0 00    0 1 0 0 0                          19
+ 184  84  85  1351 1 00    0 00    0 00    0 9 0 0 0                          19
+8088  88  89     0 2 00    0 00    0 00    0 1 0 0 0                          19
+  88  89  87 20000 2 92  500 00    0 00    0 1 9 0 0                          19
+  89  87  86 53540 2 00    0 00    0 00    0 1 0 0 0                          19
+  87  868086 20000 2 91  500 00    0 00    0 1 0 0 0                          19
+  89 1897089  1851 1 00    0 00    0 00    0 1 0 0 0                          19
+ 1897089      1851 1 00    0 00    0 00    0 1 0 0 0                          19
+7087 187  87  1851 1 00    0 00    0 00    0 1 0 0 0                          19
+ 187  87  86  1851 1 00    0 00    0 00    0 9 0 0 0                          19
+
+       Record Type 19s describe the freeway link geometry.  One
+       record type 19 is required for each link.  Column 1-4 and 5-
+       8 indicate the upstream node and downstream node for the
+       subject link, and Column 9-12 indicates the downstream node
+       that receives through traffic from the subject link.
+       Entries 4, 5, and 6 represent link length, type, and number
+       of through lanes, respectively.  For example, for link
+       (81,82), its through traffic will go to node 84 (Column 9-
+       12), its length is 2000 ft (Column 13-17); it is a mainline
+       link ('1' in column 18), and it has 2 through lanes.
+       Columns 21-22, 23 and 24-28 represent, respectively, the
+       code, type, and length of the first auxiliary lane.
+       Similar data for a maximum of two more auxiliary lanes can
+       be entered from columns 29-30 (entry 10) to 40-44 (entry
+       15).  For link (81, 82), there is only one auxiliary lane.
+       The '9' in Column 22 indicates it is the first auxiliary
+       right lane.  The '2' in Column 23 indicates it is a
+       deceleration lane.  Columns 24-28 show its length to be 500
+       feet.  Since link (81, 82) has only one auxiliary lane,
+       blanks or zeros can be input in entries 10 through 15.  The
+       '1' in Columns 45-46 indicates the identification number of
+       the lane on the immediate downstream link that receives
+       through traffic from lane 1 of the subject link.  The '9'
+       in Columns 47-48 show lane 9 of this link feeds the lane 1
+       of downstream link.  Entries 18 and 19 specify the lane
+       barriers.  If no barriers are specified, blanks or zeros
+       are entered.
+
+8081  81 0 0   0 12265 0 0 0    0                                             20
+  81  82 0 0   0 12265 0 0 0 1500  999                                        20
+  82  84 0 0   0 12265 0 0 0    0    0                                        20
+  84  85 0 0   0 12265 0 0 0    0    0                                        20
+  82 182 0 0   0 12235 0 0 0    0    0                                        20
+ 1827082 0 0   0 12235 0 0 0    0    0                                        20
+7084 284 0 0   0 12235 0 0 0    0    0                                        20
+ 284 184 0 0   0 1  35 0 0 0    0    0                                        20
+ 184  84 0 0   0 12235 0 0 0    0    0                                        20
+8088  88 0 0   0 12265 0 0 0    0                                             20
+  88  89 0 0   0 12265 0 0 0 1500    0                                        20
+  89  87 0 0   0 12265 0 0 0    0    0                                        20
+  87  86 0 0   0 12265 0 0 0    0    0                                        20
+  89 189 0 0   0 12235 0 0 0    0    0                                        20
+ 1897089 0 0   0 12235 0 0 0    0    0                                        20
+7087 187 0 0   0 12235 0 0 0    0    0                                        20
+ 187  87 0 0   0 12235 0 0 0    0    0                                        20
+
+       Record Type 20s represent freeway link operations.  A
+       Record Type 20 is required for each link specified with a
+       Record Type 19.  Columns 1-4 and 5-8 include the link's
+       upstream and the downstream node number, respectively.
+       Other columns indicate the freeway operation
+       specifications.  For link (81, 82), the following are
+       specified:
+
+       Column 9-10:     0 grade
+       Column 11-12:    0 superelevation
+       Column 13-16:    0 radius of curvature
+       Column 18:       '1' means dry concrete pavement
+       Column 19-20:    2.2 sec. start-up delay
+       Column 21-22:    65 mph free-flow speed
+       Column 24:       '0' means truck movement not restricted
+       Column 26:       blank/0, since Column 24 is 0
+       Column 28:       '0' means trucks not restricted to right-
+                         hand lane.
+       Column 29-33:    1500 ft. from the warning sign to the
+                         downstream end of this link
+       Column 34-38:    999 ft. from the data station to the
+                         upstream node of this link
+
+  81  82  84  80 182  20                                                      25
+  88  89  87  80 189  20                                                      25
+
+       Record Type 25s specify freeway turn movements.  Columns 1-
+       4 and 5-8 indicate the link's upstream node number and the
+       downstream node number, respectively.  Columns 9-12 and 13-
+       16 show the downstream node number that receives through
+       traffic from the subject link and the percentage of
+       vehicles that make the through movement.  Columns 17-20 and
+       21-24 show the downstream off-ramp node number and the
+       percentage of vehicles that go to the off-ramp.  For link
+       (81, 82), 80% of the vehicles on the freeway link are going
+       through to the node 84, and the remainder (20%) will exit
+       to node 182.  Note that the links with 100% through traffic
+       are not coded in the dataset because CORSIM assumes that
+       all freeway links have 100% through movement, unless
+       otherwise specified in Record Type 25.  It is not necessary
+       therefore to code a Record Type 25 for all freeway links.
+
+       Record Type 28s, 29s, 37s, 38s, 64s, and 67s specify
+       freeway surveillance system and ramp metering controls.
+
+  81  82   11000   6       1   1                                              28
+  81  82   21000   6       1   1                                              28
+  82  84   11000   6       1   2                                              28
+  82  84   21000   6       1   2                                              28
+  82  84   11600   6       1   3                                              28
+  82  84   21600   6       1   3                                              28
+  82  84   12300   6       1   4                                              28
+  82  84   22300   6       1   4                                              28
+  82  84   12900   6       1   5                                              28
+  82  84   22900   6       1   5                                              28
+
+  84  85   11000           0                                                  28
+  84  85   21000           0                                                  28
+
+       Record Type 28 specifies freeway surveillance.  These
+       record types are optional, and they allow for the
+       simulation of a surveillance system.  In this example, only
+       three links have freeway surveillance.  A record type is
+       needed for each lane to specify the location of the
+       detectors.  Columns 1-4 include the link's upstream node
+       number, and columns 5-8 include the downstream node number.
+       Column 12 indicates the lane identification number.  Note
+       that the only difference between the first two records
+       shown is the '1' and '2' in column 12.  Columns 13-16
+       specify the location of the detector (in feet) from the
+       upstream node.  Column 20 specifies the length of the loop
+       detector, and column 28 specifies the type of loop.  For
+       example, for the first two records, the detectors are
+       located 1000 feet from node 81; they are all 6 feet long;
+       and each is a short loop, represented by the number '1' in
+       column 28.  Column 32 shows the station number for that
+       detector.  Note that for link (84,85), there is a '0' in
+       column 28 which indicates a doppler radar.  For a doppler
+       radar, length is not specified and so columns 17-20 are
+       left blank.  These two detectors are used for ramp 
+       metering at node 184.
+
+  82  84 1 1                     1200    500    600 1800      40              29
+  82  84 2 1                     1700    300    600 1800      70 1000         29
+  82  84 1 1                     2000    500    600 1800      40              29
+  82  84 1 1                     1400    800   2400  300      40              29
+
+       Record Type 29s specify incidents on a freeway link.
+       Columns 1-4 and 5-8 represent the link's upstream node
+       number and the downstream node number, respectively.  Other
+       entries specify the location, time, and duration of a
+       incident, respectively.  This incident is made up of many
+       smaller incidents.  In the first incident specified on
+       link (82, 84), the '1' in Column 10 and 12 indicates that the 
+       incident will reduce lane 1's capacity by 40% (Column 61-64), 
+       On the second incident card the '2' in Column 10 indicates lane 1
+       will be blocked for the duration of the incident.
+       This incident occurs at 1700 ft (Columns 33-37) from the
+       upstream node and affects 300 ft (Columns 40-44) of the roadway.
+       The incident starts at 600 s (Columns 48-51) from the beginning
+       of the simulation and lasts for 1800 s (Columns 52-56).
+       Note that the incident continues beyond the end of the first
+       time period (1500).  A warning sign is located at
+       1000 ft before the incident site (columns 65-69). There is a 
+       rubbernecking incident upstream of the blockage incident and another
+       one downstream.  These rubbernecking incidents will reduce the 
+       capacity by 40% over a larger distance than the actual blockage 
+       distance.  There is also a rubbernecking incident that lasts 5 minutes 
+       after the blockage incident terminates to simulate a shoulder incident
+       resulting from cleanup of the original incident.
+
+ 184   2  60    2000                                                          37
+
+       Record Type 37s specify freeway metering.  The '184' in
+       Columns 1-4 indicates the node number at which the metering
+       signal is located.  The '2' in Column 8 indicates a
+       Demand/Capacity metering control.  The '60' in Columns 9-12
+       indicates that the metering control should start at 60
+       seconds from the beginning of the simulation.  The '2000'
+       in Columns 17-20 specifies the freeway capacity (in vphpl).
+
+ 184  84  85   11000   21000                                                  38
+
+       Record Type 38s specify freeway detectors.  The '184' in
+       Column 1-4 indicates the node number at which the metering
+       signal is located.  The '84' and '85' in Column 4-8 and 9-
+       12 represent the freeway link which has the detectors
+       associated with the metering signal.  The detectors in lane
+       1 and 2 (Columns 15-16 and 23-24) are located 1000 ft from
+       the upstream node(Columns 17-20 and 25-28).  Both detectors
+       provide surveillance information to the metering
+       controller.
+
+8081  812000                                                                  50
+8088  882000                                                                  50
+
+       Record Type 50s define the entry link volumes entering the
+       subnetwork.  The upstream node (Columns 1-4) of an entry
+       link must be the entry node and the downstream node
+       (Columns 5-8) must be an internal node.  For the first
+       record, the '2000' in Columns 9-12 is the flow rate
+       (vehicles per hour) entering from entry node 8081.
+
+   0                                                                         170
+
+       Record Type 170 is the subnetwork delimiter, which
+       indicates, in this case, the end of the FRESIM subnetwork
+       data.  The '0' in Column 4 indicates that all of the
+       subnetwork data (FRESIM and NETSIM) has been entered for
+       this time period.
+
+   1    2312    2964                                                         195
+   2    2777    2964                                                         195
+   3    4777    2964                                                         195
+   4    6777    2964                                                         195
+   5    7242    2964                                                         195
+   6    2312    4135                                                         195
+   7    2777    4135                                                         195
+   8    4777    4135                                                         195
+   9    6777    4135                                                         195
+  10    7242    4135                                                         195
+  13    4777    2664                                                         195
+  18    4777    4435                                                         195
+  81     100    3476                                                         195
+  82    2100    3476                                                         195
+  84    7454    3476                                                         195
+  85    9454    3476                                                         195
+  86     100    3623                                                         195
+  87    2100    3623                                                         195
+  88    9454    3623                                                         195
+  89    7454    3623                                                         195
+ 182    2186    3311                                                         195
+ 184    7385    3338                                                         195
+ 187    2184    3794                                                         195
+ 189    7369    3790                                                         195
+ 284    7360    3181                                                         195
+7082    2241    3135                                                         195
+7084    7340    3120                                                         195
+7089    7313    3964                                                         195
+7087    2241    3964                                                         195
+8013    4777    2500                                                         195
+8018    4777    4635                                                         195
+8081       0    3476                                                         195
+8085    9554    3476                                                         195
+8086       0    3623                                                         195
+8088    9554    3623                                                         195
+
+       Record type 195, defines the node coordinates.  This record
+       is used only if a graphics file is needed.  Columns 1-4
+       denote the intersection node number.  Columns 7-12 refer to
+       the X coordinate and columns 15-20 indicate the Y
+       coordinate.
+
+   8   3   0  89  87  82  84                                                 196
+   3   8   0  89  87  82  84                                                 196
+  89  87   0   7   2   2   7   9   4   4   9                                 196
+  82  84   0   7   2   2   7   9   4   4   9                                 196
+
+       Record Type 196s specify the optional geometric data.
+       These records are needed to graphically depict curved links
+       and overpasses.  Columns 1-4 and 5-8 define the upstream
+       and downstream node numbers, respectively.  Column 12
+       defines the link curvature in the direction of flow along
+       that link.  A '1' indicates a clockwise curvature; a '2'
+       indicates a counterclockwise curvature; and a '0' indicates
+       no curvature.  The other entries define the links that are
+       crossed by the link defined by the two nodes in Columns 1-4
+       and 5-8 (i.e., its underpasses.)
+
+   0   8                                                                     210
+
+       Record Type 210 is the time period delimiter.  The '0' in
+       Column 4 indicates that another time period will follow the
+       time period.  The '8' in Column 8 indicates that the
+       following are FRESIM data.
+
+       The data of the first time period have been completed.  The
+       following records are specified for the subsequent time
+       periods.  Data on these record types will overwrite the
+       previous records.
+
+  81  82  84  50 182  50                                                      25
+
+       For the second period, the Record 25 for link (81,82)
+       overwrites the old one.  The information indicated in all
+       other record types will remain the same.  The turn
+       percentages given in Record Type 25 for links other than
+       (81,82) will also remain unchanged.  The effect of the new turn
+	percentages is to divert more traffic to the off-ramp instead of 
+	allowing it to continue on the FRESIM segment with the downstream 
+	incident. 
+
+   0                                                                         170
+
+       The '0' in Column 4 indicates that all of the subnetwork
+       data (FRESIM and NETSIM) have been entered for this time
+       period (the second time period, in this case).
+
+   0   3                                                                     210
+
+       The '0' and '3' in Record 210 indicates another time period
+       follows, and the records are for the NETSIM subnetwork.
+
+       The following are for the third time period.
+
+   2   0   1   7              71   3   1  11   3   1                        4035
+   3  62   2   8  13          45   3   1  11   3   1  22   3   1            4035
+   4  20   3   9              57   3   1  25   3   1                        4035
+   7   0   8   2              71   3   1  11   3   1                        4035
+   9  53   4  10   8          64   3   1  18   3   1                        4035
+   2 12   02   22   21   20   22                                              36
+   3 122  022  222  212  202  292  211  200  222                              36
+   4 12   02   22   21   20   22                                              36
+   7 12   02   22   21   20   22                                              36
+   9 212  202  222  121  020  222                                             36
+
+       For this period, multiple Record Type 35s and 36s are
+       overwritten by new specifications.  The '40' in Column 77-
+       78 of Record Type 35s specifies the minimum main-street-
+       green duration during transition.
+
+   0                                                                         170
+
+       The '0' in Column 4 indicates that all of the subnetwork
+       data (FRESIM and NETSIM) have been entered for this time
+       period (the third time period, in this case).
+
+   0   3                                                                     210
+
+       The '0' and '3' in Record 210 indicates another time period
+       follows, and the records are for the NETSIM subnetwork.
+
+       The following are for the fourth time period.
+
+   2  64   1   7              60   4   1  10   4   1                        3035
+   3  39   2   8  13          30   3   1  10   3   1  28   4   1            3035
+   4   0   3   9              60   4   1  10   4   1                        3035
+   7  36   8   2              52   3   1  20   3   1                        3035
+   9   0   4  10   8          34   3   1  23   3   1  11   3   1            3035
+   2 12   02   22   21   20   22                                              36
+   3 122  022  222  212  202  292  211  200  222                              36
+   4 12   02   22   21   20   22                                              36
+   7 12   02   22   21   20   22                                              36
+   9 212  202  222  221  220  222  122  022  222                              36
+
+       For this period, multiple Record Type 35s and 36s are
+       overwritten by new specifications.  The '30' in Column 77-
+       78 of Record Type 35s specifies the minimum main-street-
+       green duration during transition.
+
+   8                                                                         170
+
+       The '8' in Column 4 indicates that the following records
+       are for FRESIM subnetwork for the same time period (i.e.,
+       fourth time period).
+
+  81  82  84  80 182  20                                                      25
+
+       For the fourth time period, the Record 25 for link (81,82)
+       overwrites the old one.  The information indicated in all
+       other record types will remain the same.
+
+   0                                                                         170
+
+       The '0' in Column 4 indicates that all of the subnetwork
+       data (FRESIM and NETSIM) have been entered for this time
+       period (the fourth time period).
+
+   1                                                                         210
+
+       Record type 210 is the time period delimiter.  The '1'
+       indicates that this is the final time period and all
+       simulation data have been entered.

@@ -1,0 +1,88 @@
+! Copyright © 2014
+! New Global Systems for Intelligent Transportation Management Corp.
+  
+! This file is part of ETFOMM.
+!
+! This program is free software: you can redistribute it and/or modify
+! it under the terms of the GNU Affero General Public License as
+! published by the Free Software Foundation, either version 3 of the
+! License, or (at your option) any later version.
+!
+! This program is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU Affero General Public License for more details.
+!
+! You should have received a copy of the GNU Affero General Public License
+! along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  MODULE ANIMATION_DATA
+    USE GLOBAL_DATA
+    TYPE LINKDATA
+      INTEGER*1 MODELTYPE
+      INTEGER*2 USN
+      INTEGER*2 DSN
+      INTEGER*2 NUMVEHICLES
+      INTEGER*1 LTURNMOVECODE
+      INTEGER*1 LDIAGMOVECODE
+      INTEGER*1 THRUMOVECODE
+      INTEGER*1 RDIAGMOVECODE
+      INTEGER*1 RTURNMOVECODE
+      INTEGER*1 SIGNALIZED
+      INTEGER*2 NUMMETERS
+      INTEGER*1 SIGNALSTATE
+    END TYPE
+    TYPE VEHICLEDATA
+      INTEGER*4 VEHICLEGLOBALID
+      INTEGER*1 FLEET
+      INTEGER*1 TYPEVEH
+      INTEGER*1 VEHICLELENGTH
+      INTEGER*1 DRIVERTYPE
+      INTEGER*1 LANENUMBER
+      INTEGER*4 DISTANCEFROMUSN
+      INTEGER*2 USNPREVLINK
+      INTEGER*1 TURNCODE
+      INTEGER*1 QUEUECODE
+      INTEGER*1 ACCELERATION
+      INTEGER*1 VELOCITY
+      INTEGER*1 LANECHANGESTATUS
+      INTEGER*1 TARGETLANE
+      INTEGER*2 DESTINATION
+      INTEGER*4 LEADVEHICLEID
+      INTEGER*4 FOLLOWVEHICLEID
+      INTEGER*1 PREVLANE
+    END TYPE
+    TYPE LKINCDATA
+      INTEGER*4 INCIDENTID
+      INTEGER*4 LINKID
+      INTEGER*2 INCIDENTTYPE
+      REAL*4    INCIDENTPOSITION
+      REAL*4    INCIDENTLENGTH
+      INTEGER*4 STARTTIME
+      INTEGER*4 DURATION
+      REAL*4    REACTIONPOINT
+      REAL*4    RUBBERNECKFACTOR
+      INTEGER*2 MODELTYPE
+      INTEGER*2 MSTATE
+      INTEGER*2 NUMAFFECTEDLANES
+      INTEGER*4 AFFECTEDLANEIDARRAY(N_FREEWAY_LANES)
+      INTEGER*2 LANEINCIDENTCODES(N_FREEWAY_LANES)
+    END TYPE
+    TYPE API_LKINCDATA
+      INTEGER :: INCIDENTID
+      INTEGER :: LINKID
+      INTEGER :: INCIDENTTYPE
+      REAL    :: INCIDENTPOSITION
+      REAL    :: INCIDENTLENGTH
+      INTEGER :: STARTTIME
+      INTEGER :: DURATION
+      REAL    :: REACTIONPOINT
+      REAL    :: RUBBERNECKFACTOR
+      INTEGER :: MODELTYPE
+      INTEGER :: MSTATE
+      INTEGER :: NUMAFFECTEDLANES
+      INTEGER :: AFFECTEDLANEIDARRAY(N_FREEWAY_LANES)
+      INTEGER :: LANEINCIDENTCODES(N_FREEWAY_LANES)
+    END TYPE
+  END MODULE
+  
