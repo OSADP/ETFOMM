@@ -29,6 +29,7 @@
 #include "DataStruct.h"
 #include "../include/WCFClientState.h"
 #include "etFommInterface.h"
+#include "DTALiteDLL.h"
 
 #using <System.ServiceModel.dll>
 
@@ -66,6 +67,16 @@ enum RunnerState
 };
 #endif
 
+struct AddedVehicle
+{
+	float timestep;
+	int id;
+	int srcNode;
+	int dstNode;
+	int type;
+	int fleet;
+	int pathID;
+};
 
 void DisplayArrayFVehicles(array<WCF_VFData> ^vehicle_data);
 void DisplayArraySVehicles(array<WCF_VSData> ^vehicle_data);
@@ -174,4 +185,13 @@ void UpdateCoordinationData(IService1^ proxy, etFommInterface *etFommIF);
 
 void ProcessHITLSACData(IService1^ proxy, etFommInterface *etFommIF);
 
+void ConvertPaths(etFommInterface *etFommIF, DTALiteNameSpace::CDTALiteDLL* pDTALite, 
+				  float& minTimeStep, std::vector<std::vector<int> >& paths, std::vector<AddedVehicle>& vehicles);
+int FindFreewayLinkIdx(int nLinks, FREEWAY_LINK* links, int usn, int dsn);
+int FindStreetLinkIdx(int nLinks, STREET_LINK* links, int usn, int dsn);
+void CreateLinkConnections(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks,
+						   std::map<std::pair<int, int>, int >& connections);
+bool InsertConnections(int usn, int dsn, int nusn, int ndsn, std::map<std::pair<int, int>, int >& connections);
+bool IsEntryNode(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks, int node);
+bool IsExitNode(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks, int node);
 #endif

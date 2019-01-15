@@ -225,10 +225,10 @@
 
   !--  initialize pedestrian data
   
-  AC_SIGNALS(IACT)%SDP%PED_WALK_TIME = AC_SIGNALS(IACT)%GUI_NEW_PED_WALK_TIMES
-  AC_SIGNALS(IACT)%SDP%PED_CLEARANCE_TIME = AC_SIGNALS(IACT)%GUI_NEW_PED_CLEARANCE_TIMES
-  AC_SIGNALS(IACT)%SDP%PED_OMIT = AC_SIGNALS(IACT)%GUI_NEW_PED_OMIT
-  AC_SIGNALS(IACT)%SDP%PED_DETECT_ASSIGN = AC_SIGNALS(IACT)%GUI_NEW_PED_DETECTOR_ASSIGNMENTS
+  AC_SIGNALS(IACT)%SDP%PED_WALK_TIME = AC_SIGNALS(IACT)%NEW_PED_WALK_TIMES
+  AC_SIGNALS(IACT)%SDP%PED_CLEARANCE_TIME = AC_SIGNALS(IACT)%NEW_PED_CLEARANCE_TIMES
+  AC_SIGNALS(IACT)%SDP%PED_OMIT = AC_SIGNALS(IACT)%NEW_PED_OMIT
+  AC_SIGNALS(IACT)%SDP%PED_DETECT_ASSIGN = AC_SIGNALS(IACT)%NEW_PED_DETECTOR_ASSIGNMENTS
 
   AC_SIGNALS(IACT)%SDP%ADJUSTMENT = AC_SIGNALS(IACT)%GUI_EXTENSION_TIME_INCREMENT
         
@@ -374,7 +374,7 @@ endif
   INTEGER :: FIRST_RING, SECOND_RING
   LOGICAL :: CALLS_ON_NEXT_BARRIER
   REAL :: REMAINING_GREEN_TIME
-  INTEGER :: OTHER_PHASE, MASTER_PHASE
+  INTEGER :: OTHER_PHASE, MASTER_PHASE, I, N1, N2
   LOGICAL :: MUST_TERMINATE, FORCE_YELLOW, START_FLAG
 ! ---------------------------------------------------------------------- 
   !!Determine if it is the beginning of a coordination cycle
@@ -735,12 +735,7 @@ endif
               ENDIF
             ENDIF
           ENDIF
-          !experimental code to prevent unnecessary yellow and red when signal should stay green
-          !if(new_phase .eq. 0) then
-          !  if(ac_signals(iact)%ring_index(the_other_ring(ring)) .lt. ac_signals(iact)%ring_index(ring)) then
-          !    new_phase = phase
-          !  endif
-          !endif
+
           IF(NEW_PHASE .EQ. PHASE) THEN
             !!!IF(AC_SIGNALS(IACT)%RED_REVERT_TIME(PHASE) .NE. 0) THEN
             !!!  AC_SIGNALS(IACT)%NEXT_PHASE(RING) = NEW_PHASE
@@ -920,13 +915,23 @@ endif
         IF(REMAINING_GREEN_TIME .GE. 3.0) THEN
           CALL START_ACTUATED_PHASE(IACT, RING, NEXT_PHASE)
           IF(AC_SIGNALS(IACT)%SERVED_THIS_CYCLE(NEXT_PHASE)) THEN
-            !Do not allow the new phase to run longer than the current phase.
-            !Define the running phase to be the master of the new phase.
-            AC_SIGNALS(IACT)%SDP%MASTER_PHASE(NEXT_PHASE) = OTHER_PHASE
-            AC_SIGNALS(IACT)%SDP%SLAVE_PHASE(OTHER_PHASE) = NEXT_PHASE
-            IF(.NOT. AC_SIGNALS(IACT)%READY_TO_CROSS(RING)) THEN
-              AC_SIGNALS(IACT)%READY_TO_CROSS(RING) = AC_SIGNALS(IACT)%READY_TO_CROSS(IRING)
+            !Determine the index of each phase within its ring.
+            !If the new phase doesn't lag the active phase, set the master/slave relationship.
+            !If the new phase lags the active phase it can continue running after the active phase terminates.
+            N1 = 0
+            N2 = 0
+            DO I = 1, 4
+              IF(AC_SIGNALS(IACT)%RING_PHASE_SEQUENCE(IRING, I) .EQ. OTHER_PHASE) N1 = I
+              IF(AC_SIGNALS(IACT)%RING_PHASE_SEQUENCE(RING, I) .EQ. NEXT_PHASE) N2 = I
+            ENDDO
+            IF(N2 .LE. N1) THEN
+              AC_SIGNALS(IACT)%SDP%MASTER_PHASE(NEXT_PHASE) = OTHER_PHASE
+              AC_SIGNALS(IACT)%SDP%SLAVE_PHASE(OTHER_PHASE) = NEXT_PHASE
+              IF(.NOT. AC_SIGNALS(IACT)%READY_TO_CROSS(RING)) THEN
+                AC_SIGNALS(IACT)%READY_TO_CROSS(RING) = AC_SIGNALS(IACT)%READY_TO_CROSS(IRING)
+              ENDIF
             ENDIF
+            
           ENDIF
         ENDIF
       ENDIF
@@ -939,16 +944,16 @@ endif
   ENDIF
   
   IF(USE_DCS) THEN
-    GREEN_PHASES(IACT) = 0
-    YELLOW_PHASES(IACT) = 0
+    GREEN_PHASES(1) = 0
+    YELLOW_PHASES(1) = 0
     DO RING = RING_1, RING_2  
-      PHASE = AC_SIGNALS(IACT)%CURRENT_PHASES(RING)
+      PHASE = AC_SIGNALS(1)%CURRENT_PHASES(RING)
       IF(PHASE .NE. 0) THEN
         IF(USE_DCS .AND. .NOT. INITMODE) THEN
-          IF(AC_SIGNALS(IACT)%SDP%CURRENT_COLORS(RING) .EQ. GREEN) THEN      
-            GREEN_PHASES(IACT) = IBSET(GREEN_PHASES(IACT), PHASE-1)
-          ELSEIF(AC_SIGNALS(IACT)%SDP%CURRENT_COLORS(RING) .EQ. YELLOW) THEN      
-            YELLOW_PHASES(IACT) = IBSET(YELLOW_PHASES(IACT), PHASE-1)
+          IF(AC_SIGNALS(1)%SDP%CURRENT_COLORS(RING) .EQ. GREEN) THEN      
+            GREEN_PHASES(1) = IBSET(GREEN_PHASES(1), PHASE-1)
+          ELSEIF(AC_SIGNALS(1)%SDP%CURRENT_COLORS(RING) .EQ. YELLOW) THEN      
+            YELLOW_PHASES(1) = IBSET(YELLOW_PHASES(1), PHASE-1)
           ENDIF
         ENDIF
       ENDIF
@@ -1634,7 +1639,7 @@ endif
                         
         AC_SIGNALS(IACT)%SDP%GREEN_TIME(PHASE) = TOTAL_PED_TIME
         AC_SIGNALS(IACT)%SDP%PEDESTRIAN_ACTIVE(PHASE) = .TRUE.
-        AC_SIGNALS(IACT)%PEDESTRIAN_DETECTOR_STATE = 0
+        AC_SIGNALS(IACT)%PEDESTRIAN_DETECTOR_STATE(PHASE) = 0
 
 #ifdef DebugVersion
 if(verbose) then
@@ -2192,7 +2197,7 @@ endif
   INTEGER, INTENT(IN) :: IACT, ENDING_PHASE, ACTIVE_RING, ACTIVE_PHASE
   LOGICAL, INTENT(IN) :: START_FLAG
   INTEGER, INTENT(OUT) :: NEW_PHASE
-  INTEGER :: I, IP, PHASE1, PHASE2, INDEX, THIS_RING
+  INTEGER :: I, IP, PHASE1, PHASE2, INDEX, THIS_RING, N1, N2
   REAL :: REMAINING_GREEN_TIME
   LOGICAL :: RESTART, ALL_SERVED, GAPOUT1, GAPOUT2, QUEUED1, QUEUED2, HAS_DEMAND
 !-------------------------------------------------------------------------
@@ -2334,13 +2339,24 @@ endif
       THIS_RING = THE_OTHER_RING(ACTIVE_RING)
       CALL START_ACTUATED_PHASE(IACT, THIS_RING, NEW_PHASE)
       IF(AC_SIGNALS(IACT)%SDP%PHASE_TIMER(ACTIVE_PHASE) .NE. 0.0 .OR. RESTART) THEN
-        !Do not allow the new phase to run longer than the current phase.
-        !Define the running phase to be the master of the new phase.
-        AC_SIGNALS(IACT)%SDP%MASTER_PHASE(NEW_PHASE) = ACTIVE_PHASE
-        AC_SIGNALS(IACT)%SDP%SLAVE_PHASE(ACTIVE_PHASE) = NEW_PHASE
-        IF(.NOT. AC_SIGNALS(IACT)%READY_TO_CROSS(THIS_RING)) THEN
-          AC_SIGNALS(IACT)%READY_TO_CROSS(THIS_RING) = AC_SIGNALS(IACT)%READY_TO_CROSS(ACTIVE_RING)
+        !Determine the index of each phase within its ring.
+        !If the new phase doesn't lag the active phase, set the master/slave relationship.
+        !If the new phase lags the active phase it can continue running after the active phase terminates.
+        
+        N1 = 0
+        N2 = 0
+        DO I = 1, 4
+          IF(AC_SIGNALS(IACT)%RING_PHASE_SEQUENCE(ACTIVE_RING, I) .EQ. ACTIVE_PHASE) N1 = I
+          IF(AC_SIGNALS(IACT)%RING_PHASE_SEQUENCE(THIS_RING, I) .EQ. NEW_PHASE) N2 = I
+        ENDDO
+        IF(N2 .LE. N1) THEN
+          AC_SIGNALS(IACT)%SDP%MASTER_PHASE(NEW_PHASE) = ACTIVE_PHASE
+          AC_SIGNALS(IACT)%SDP%SLAVE_PHASE(ACTIVE_PHASE) = NEW_PHASE
+          IF(.NOT. AC_SIGNALS(IACT)%READY_TO_CROSS(THIS_RING)) THEN
+            AC_SIGNALS(IACT)%READY_TO_CROSS(THIS_RING) = AC_SIGNALS(IACT)%READY_TO_CROSS(ACTIVE_RING)
+          ENDIF
         ENDIF
+        
       ENDIF
       IF(NEW_PHASE .EQ. AC_SIGNALS(IACT)%RING_PHASE_SEQUENCE(THIS_RING, 1)) THEN
         AC_SIGNALS(IACT)%RING_INDEX(THIS_RING) = 1
@@ -2365,17 +2381,28 @@ endif
 !-------------------------------------------------------------------------
   USE ACTUATED_CONTROLLERS
   USE SIMPARAMS
+  USE SEEDS
+  USE STREET_VEHICLES
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IACT
   INTEGER :: PHASE
+  REAL :: RNDNUM
 !-------------------------------------------------------------------------
   DO PHASE = 1, 8
-    IF(AC_SIGNALS(IACT)%GUI_PED_PHASE(PHASE)) THEN
-    !Get the type code and time of arrival
+    IF(AC_SIGNALS(IACT)%PED_PHASE(PHASE)) THEN
+      IF(AC_SIGNALS(IACT)%PED_RECALL_CODE(PHASE) .EQ. 1) THEN
+        AC_SIGNALS(IACT)%PEDESTRIAN_DETECTOR_STATE(PHASE) = 1  
+      ELSEIF(SIMTIME .GE. AC_SIGNALS(IACT)%NEXT_PED_ARRIVAL(PHASE)) THEN
+        AC_SIGNALS(IACT)%PEDESTRIAN_DETECTOR_STATE(PHASE) = 1  
+        IF(AC_SIGNALS(IACT)%PED_TYPE(PHASE) .EQ. 1) THEN
+          CALL STREET_RANDOM(SSEED, RNDNUM)  
+          AC_SIGNALS(IACT)%NEXT_PED_ARRIVAL(PHASE) = SIMTIME + (3600.0 / AC_SIGNALS(IACT)%PED_INTENSITY(PHASE)) * (-LOG(RNDNUM))
+        ELSEIF(AC_SIGNALS(IACT)%PED_TYPE(PHASE) .EQ. 2) THEN
+          AC_SIGNALS(IACT)%NEXT_PED_ARRIVAL(PHASE) = SIMTIME + AC_SIGNALS(IACT)%PED_HEADWAY(PHASE)
+        ENDIF
+      ENDIF
     ENDIF
   ENDDO
-  !for testing
-  !if(simtime .eq. 75) ac_signals(iact)%pedestrian_detector_state(2) = 1
   RETURN
   END
 

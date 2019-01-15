@@ -66,7 +66,6 @@ FREEWAY_NETWORK_INPUTS Host_Default_Network_define_FREEWAY_NETWORK_INPUTS(void)
 	//Freeway_Network_Inputs.zfoll[9] = 0.35;
 	Freeway_Network_Inputs.freeway_pct_coop = 0.2;
 	Freeway_Network_Inputs.lc_time = 2.0;
-	Freeway_Network_Inputs.dlc_mult = 0.5;
 	return Freeway_Network_Inputs;
 }
 STREET_NETWORK_INPUTS Host_Default_Network_define_STREET_NETWORK_INPUTS(void)
@@ -92,8 +91,6 @@ STREET_NETWORK_INPUTS Host_Default_Network_define_STREET_NETWORK_INPUTS(void)
 	Street_Network_Inputs.amber_decel[7] = -5;
 	Street_Network_Inputs.amber_decel[8] = -4;
 	Street_Network_Inputs.amber_decel[9] = -4;
-	Street_Network_Inputs.lt_speed = 22;
-	Street_Network_Inputs.rt_speed = 13;
 	Street_Network_Inputs.pdelay_weak[0] = 0;
 	Street_Network_Inputs.pdelay_weak[1] = 0;
 	Street_Network_Inputs.pdelay_weak[2] = 0;
@@ -270,7 +267,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 14;
 	Vehicle_Type_Inputs[i].headway_factor = 1.0;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.3;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_auto = 25;
 	Vehicle_Type_Inputs[i].fleet_street_auto = 25;
 
@@ -278,7 +275,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 16;
 	Vehicle_Type_Inputs[i].headway_factor = 1.0;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.3;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_auto = 75;
 	Vehicle_Type_Inputs[i].fleet_street_auto = 75;
 
@@ -286,7 +283,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 35;
 	Vehicle_Type_Inputs[i].headway_factor = 1.2;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.2;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_truck = 31;
 	Vehicle_Type_Inputs[i].fleet_street_truck = 31;
 
@@ -294,7 +291,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 53;
 	Vehicle_Type_Inputs[i].headway_factor = 1.2;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.2;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_truck = 36;
 	Vehicle_Type_Inputs[i].fleet_street_truck = 36;
 
@@ -302,7 +299,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 53;
 	Vehicle_Type_Inputs[i].headway_factor = 1.2;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.2;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_truck = 24;
 	Vehicle_Type_Inputs[i].fleet_street_truck = 24;
 
@@ -310,7 +307,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 64;
 	Vehicle_Type_Inputs[i].headway_factor = 1.2;
 	Vehicle_Type_Inputs[i].average_occupancy = 1.2;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_truck = 9;
 	Vehicle_Type_Inputs[i].fleet_street_truck = 9;
 
@@ -318,7 +315,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 40;
 	Vehicle_Type_Inputs[i].headway_factor = 1.2;
 	Vehicle_Type_Inputs[i].average_occupancy = 25.0;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_bus = 100;
 	Vehicle_Type_Inputs[i].fleet_street_bus = 100;
 
@@ -326,7 +323,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 14;
 	Vehicle_Type_Inputs[i].headway_factor = 1.0;
 	Vehicle_Type_Inputs[i].average_occupancy = 2.5;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_carpool = 25;
 	Vehicle_Type_Inputs[i].fleet_street_carpool = 25;
 
@@ -334,7 +331,7 @@ void Host_Default_Network_define_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_
 	Vehicle_Type_Inputs[i].length = 16;
 	Vehicle_Type_Inputs[i].headway_factor = 1.0;
 	Vehicle_Type_Inputs[i].average_occupancy = 2.5;
-	Vehicle_Type_Inputs[i].emergency_decel = -15.0;
+	Vehicle_Type_Inputs[i].non_emergency_decel = -15.0;
 	Vehicle_Type_Inputs[i].fleet_freeway_carpool = 75;
 	Vehicle_Type_Inputs[i].fleet_street_carpool = 75;
 }
@@ -1749,7 +1746,8 @@ void Host_Default_Network_define_busstation_inputs(BUSSTATION_DATA* busstation_i
 }
 void Host_Default_Network_define_incident_data_inputs(INCIDENT_DATA* incident_data_inputs)
 {
-	incident_data_inputs[0].link = 3; //(103,104)
+	incident_data_inputs[0].usn = 103; //(103,104)
+	incident_data_inputs[0].dsn = 104;
 	incident_data_inputs[0].begin_point = 50;
 	incident_data_inputs[0].begin_time = 120;
 	incident_data_inputs[0].code[0] = 2; //blockage in lane 1
@@ -1923,7 +1921,8 @@ void Host_Default_Network_define_rampmeter_inputs(RM_DATA* rampmeter_inputs)
 void Host_Default_Network_define_parking_zone_inputs(PARKING_DATA* parking_zone_inputs)
 {
 	int i = 0;
-	parking_zone_inputs[i].link = 9;
+	parking_zone_inputs[i].usn = 5;
+	parking_zone_inputs[i].usn = 1;
 	parking_zone_inputs[i].right_start = 10;
 	parking_zone_inputs[i].right_len = 600;
 	parking_zone_inputs[i].freq = 20;
@@ -1936,7 +1935,8 @@ void Host_Default_Network_define_event_inputs(EVENT_DATA* event_inputs)
 	event_inputs[i].begin_time = 10;
 	event_inputs[i].end_time= 110;
 	event_inputs[i].lane = 1;
-	event_inputs[i].link = 9;
+	event_inputs[i].usn = 5;
+	event_inputs[i].usn = 1;
 	event_inputs[i].location = 225;
 	//event_inputs[i].type = 4;
 }

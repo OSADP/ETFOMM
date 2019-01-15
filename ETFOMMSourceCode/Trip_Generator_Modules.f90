@@ -121,6 +121,7 @@
     REAL, DIMENSION(MAXENTRYNODES) :: RSPEC
     INTEGER, DIMENSION(MAXENTRYNODES) :: NEMITD
     INTEGER :: NUMBER_OF_ENTRYNODES = 0
+    INTEGER :: NUMBER_OF_SSNODES = 0
     TYPE(FLOWDATA), DIMENSION(MAXENTRYNODES) :: ENTRYLINK
     LOGICAL :: WRITE50(8000:8999, 19) = .FALSE.
     LOGICAL :: WRITE53(8000:8999, 19) = .FALSE.
@@ -194,6 +195,7 @@
       INTEGER :: NETFLOW = 0
       INTEGER :: OVRSPD = 0
       INTEGER :: RANGE = 0
+      INTEGER :: CFM = 0
   END TYPE VEHICLE
   END MODULE 
 
@@ -296,9 +298,29 @@
     INTEGER, ALLOCATABLE :: PATH_NODES(:,:)
     INTEGER :: MXNODESINPATH = 100
     INTEGER :: NPATHS = 0
+    INTEGER :: NUMBER_OF_PATHS = 100
         
     CONTAINS
       
+! ==================================================================================================
+    SUBROUTINE ALLOCATE_PATH_ARRAYS
+    ALLOCATE(PATH_NODES(NUMBER_OF_PATHS, MXNODESINPATH))
+    ALLOCATE(NNODES(NUMBER_OF_PATHS))
+    PATH_NODES = 0
+    NNODES = 0
+    END SUBROUTINE
+    
+! ==================================================================================================
+    SUBROUTINE REALLOCATE_PATH_ARRAYS
+    USE ARRAY_FUNCTIONS
+    INTEGER :: I1, I2
+    I1 = NUMBER_OF_PATHS
+    I2 = NUMBER_OF_PATHS + 100
+    NUMBER_OF_PATHS = I2
+    CALL REALLOCATE_INTEGER_X(PATH_NODES, I1, I2, MXNODESINPATH)
+    CALL REALLOCATE_INTEGER(NNODES, I1, I2)
+    END SUBROUTINE
+        
 ! ==================================================================================================
     SUBROUTINE SAVE_PATH_MOD(FILE)
     INTEGER, INTENT(IN) :: FILE

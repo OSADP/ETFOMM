@@ -753,14 +753,14 @@
     I = 1
     DO IOBJ = 1, NOBJ
       TEMP = GETNUMMOEOBJECTS('ENTRYLINK', ARGS, IOBJ)
-      WRITE(STRING(1:4), '(I4)') ARGS(1)
-      WRITE(STRING(5:5), '(A)') ','
-      WRITE(STRING(6:9), '(I4)') ARGS(2)
-      WRITE(STRING(10:10), '(A)') ','
-      I = 11
+      WRITE(STRING(1:8), '(I8)') ARGS(1)
+      WRITE(STRING(9:9), '(A)') ','
+      WRITE(STRING(10:17), '(I8)') ARGS(2)
+      WRITE(STRING(18:18), '(A)') ','
+      I = 19
       DO IMOE = 1, N_ENTRYLINK_MOES
         DO ITPC = 1, ITP
-          WRITE(STRING(I:I+9), '(F10.2)') ENTRYLINK_MOE(IOBJ, IMOE, ITPC)
+          WRITE(STRING(I:I+9), '(G10.2)') ENTRYLINK_MOE(IOBJ, IMOE, ITPC)
           WRITE(STRING(I+10:I+10), '(A)') ','
           I = I + 11
         ENDDO
@@ -1089,14 +1089,14 @@
       I = 1
       DO IOBJ = 1, NOBJ
         TEMP = GETNUMMOEOBJECTS('LINK_STREET', ARGS, IOBJ)
-        WRITE(STRING(1:4), '(I4)') ARGS(1)
-        WRITE(STRING(5:5), '(A)') ','
-        WRITE(STRING(6:9), '(I4)') ARGS(2)
-        WRITE(STRING(10:10), '(A)') ','
-        I = 11
+        WRITE(STRING(1:8), '(I8)') ARGS(1)
+        WRITE(STRING(9:9), '(A)') ','
+        WRITE(STRING(10:17), '(I8)') ARGS(2)
+        WRITE(STRING(18:18), '(A)') ','
+        I = 19
         DO IMOE = 1, N_LINK_STREET_MOES
           DO ITPC = 1, ITP
-            WRITE(STRING(I:I+9), '(F10.2)') LINK_STREET_MOE(IOBJ, IMOE, ITPC)
+            WRITE(STRING(I:I+9), '(G10.2)') LINK_STREET_MOE(IOBJ, IMOE, ITPC)
             WRITE(STRING(I+10:I+10), '(A)') ','
             I = I + 11
           ENDDO
@@ -1138,16 +1138,16 @@
       I = 1
       DO IOBJ = 1, NOBJ
         TEMP = GETNUMMOEOBJECTS('LANE_STREET', ARGS, IOBJ)
-        WRITE(STRING(1:4), '(I4)') ARGS(1)
-        WRITE(STRING(5:5), '(A)') ','
-        WRITE(STRING(6:9), '(I4)') ARGS(2)
-        WRITE(STRING(10:10), '(A)') ','
-        WRITE(STRING(11:11), '(I1)') ARGS(3)
-        WRITE(STRING(12:12), '(A)') ','
-        I = 13
+        WRITE(STRING(1:8), '(I8)') ARGS(1)
+        WRITE(STRING(9:9), '(A)') ','
+        WRITE(STRING(10:17), '(I8)') ARGS(2)
+        WRITE(STRING(18:18), '(A)') ','
+        WRITE(STRING(19:20), '(I2)') ARGS(3)
+        WRITE(STRING(21:21), '(A)') ','
+        I = 22
         DO IMOE = 1, N_LANE_STREET_MOES
           DO ITPC = 1, ITP
-            WRITE(STRING(I:I+9), '(F10.2)') LANE_STREET_MOE(IOBJ, IMOE, ITPC)
+            WRITE(STRING(I:I+9), '(G10.2)') LANE_STREET_MOE(IOBJ, IMOE, ITPC)
             WRITE(STRING(I+10:I+10), '(A)') ','
             I = I + 11
           ENDDO
@@ -1188,11 +1188,11 @@
       I = 1
       DO IOBJ = 1, NOBJ
         TEMP = GETNUMMOEOBJECTS('STREET_DETECTOR', ARGS, IOBJ)
-        WRITE(STRING(1:4), '(I4)') ARGS(1)
-        WRITE(STRING(5:5), '(A)') ','
-        WRITE(STRING(6:9), '(I4)') ARGS(2)
-        WRITE(STRING(10:10), '(A)') ','
-        I = 11
+        WRITE(STRING(1:8), '(I8)') ARGS(1)
+        WRITE(STRING(9:9), '(A)') ','
+        WRITE(STRING(10:17), '(I8)') ARGS(2)
+        WRITE(STRING(18:18), '(A)') ','
+        I = 19
         DO IMOE = 1, N_STREET_DETECTOR_MOES
           DO ITPC = 1, ITP
             WRITE(STRING(I:I+8), '(F9.2)') STREET_DETECTOR_MOE(IOBJ, IMOE, ITPC)
@@ -1236,11 +1236,11 @@
       I = 1
       DO IOBJ = 1, NOBJ
         TEMP = GETNUMMOEOBJECTS('SIGNALPHASES', ARGS, IOBJ)
-        WRITE(STRING(1:4), '(I4)') ARGS(1)
-        WRITE(STRING(5:5), '(A)') ','
-        WRITE(STRING(6:9), '(I4)') ARGS(2)
-        WRITE(STRING(10:10), '(A)') ','
-        I = 11
+        WRITE(STRING(1:8), '(I8)') ARGS(1)
+        WRITE(STRING(9:9), '(A)') ','
+        WRITE(STRING(10:17), '(I8)') ARGS(2)
+        WRITE(STRING(18:18), '(A)') ','
+        I = 19
         DO IMOE = 1, N_SIGNALPHASES_MOES
           DO ITPC = 1, ITP
             WRITE(STRING(I:I+8), '(F9.2)') SIGNALPHASES_MOE(IOBJ, IMOE, ITPC)
@@ -1284,13 +1284,13 @@
       I = 1
       DO IOBJ = 1, NOBJ
         TEMP = GETNUMMOEOBJECTS('VEHICLETYPE_LINK_STREET', ARGS, IOBJ)
-        WRITE(STRING(1:4), '(I4)') ARGS(1)
-        WRITE(STRING(5:5), '(A)') ','
-        WRITE(STRING(6:9), '(I4)') ARGS(2)
-        WRITE(STRING(10:10), '(A)') ','
-        WRITE(STRING(11:14), '(I4)') ARGS(3)
-        WRITE(STRING(15:15), '(A)') ','
-        I = 16
+        WRITE(STRING(1:8), '(I8)') ARGS(1)
+        WRITE(STRING(9:9), '(A)') ','
+        WRITE(STRING(10:17), '(I8)') ARGS(2)
+        WRITE(STRING(18:18), '(A)') ','
+        WRITE(STRING(19:27), '(I8)') ARGS(3)
+        WRITE(STRING(28:28), '(A)') ','
+        I = 29
         DO IMOE = 1, N_VTYPE_LINK_STREET_MOES
           DO ITPC = 1, ITP
             WRITE(STRING(I:I+8), '(F9.2)') VTYPE_LINK_STREET_MOE(IOBJ, IMOE, ITPC)

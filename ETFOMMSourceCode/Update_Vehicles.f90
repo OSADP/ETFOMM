@@ -679,6 +679,26 @@
         IF(ISTOPL .LE. IFRSPD ** 2 / 7 .OR. ISTOPL .LE. SSPEED(IV) + 5) THEN
           IF(NODE_TYPE(SUSN(IL1)) .NE. NT_EXTERN) VEHICD0(IV) = 1
           CALL CHECK_DISCHARGE(IV, ACCEL, WSTOP, DISCHARGE_TRAVEL, DISCHARGE_SPEED)
+        ELSE
+          !If the vehicle is not close enough to consider discharging, determine
+          !if it must car follow the last vehicle discharged.
+          IF(SLAST_VEHICLE_OUT(IL1, ILANE) .NE. 0) THEN
+            ILD = SLAST_VEHICLE_OUT(IL1, ILANE)
+            IF(SLINK(ILD) .NE. LEFT_LINK(IL1) .AND.          &
+                SLINK(ILD) .NE. STHRU_LINK(IL1) .AND.        &
+                SLINK(ILD) .NE. RIGHT_LINK(IL1) .AND.        &
+                SLINK(ILD) .NE. LEFT_DIAG_LINK(IL1) .AND.    &
+                SLINK(ILD) .NE. RIGHT_DIAG_LINK(IL1)) THEN
+              ILD = 0
+              SLAST_VEHICLE_OUT(IL1, ILANE) = 0
+            ENDIF
+            IF(ILD .NE. 0) THEN
+              IF(SLOCATION(ILD) .LT. SVLENGTH(ILD)) THEN
+                CALL STREET_CAR_FOLLOW(IV, ILD, ACCEL)
+                ACCEL = MIN(ACCEL, 0.0)
+              ENDIF
+            ENDIF
+          ENDIF
         ENDIF
       ELSE
  
@@ -738,13 +758,14 @@
         
       IF(SLINK(IV) .NE. 0) THEN
         TRAVEL = 0.
-        SACCELERATION(IV) = ACCEL
         IF(WSTOP) THEN
+          SACCELERATION(IV) = -SSPEED(IV)
           SSPEED(IV) = 0.
           SLOCATION(IV) = SLENGTH(SLINK(IV))
           IF(IN_TURNING_WAY(IV)) ARC_LOCATION(IV) = ARC_LENGTH(IV)
           QSTATE(IV) = QS_STOPPED
         ELSE
+          SACCELERATION(IV) = ACCEL
           IF(DISCHARGE_TRAVEL .GT. 0.) THEN
             TRAVEL = DISCHARGE_TRAVEL
             SSPEED(IV) = DISCHARGE_SPEED
@@ -987,6 +1008,11 @@
   INTEGER :: IFLV, N
   REAL :: RSPD, RMAX
 ! ----------------------------------------------------------------------
+#ifdef DebugVersion
+  integer :: temp
+  temp = fid(iv)
+#endif
+
   A = 0.
   RSPD = FDESIREDSPEED(IV)
   IF(FWILL_COOP_EV(IV) .AND. FFOLLOWER(IV) .NE. 0) THEN
@@ -1050,31 +1076,40 @@
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV
   REAL, INTENT(OUT) :: A
-  REAL :: RSPD
+  REAL :: RSPD, DIST
   INTEGER :: IFLV, N, IL
 ! ----------------------------------------------------------------------
 #ifdef DebugVersion
   integer :: temp
   temp = sid(iv)
 #endif
+
   A = 0.
   RSPD = SDESIREDSPEED(IV)
   IL = SLINK(IV)
  
-! --- If the vehicle is close to performing a turn limit the target
-! --- speed to the turning speed.
- 
-  IF(SLENGTH(IL) - SLOCATION(IV) .LE. 25) THEN
-    IF(STURNCODE(IV) .EQ. TC_LEFT) THEN
-      RSPD = LT_SPEED(IL)
-    ELSEIF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
-      IF(.NOT. IN_TURNING_WAY(IV) .AND. ROUNDABOUT_ID(IL) .EQ. 0) THEN
-        RSPD = RT_SPEED(IL)
+! --- If the vehicle is close to initiating a turn
+! --- limit the target speed to the turning speed for this link.
+  
+  IF(STURNCODE(IV) .EQ. TC_LEFT .OR. STURNCODE(IV) .EQ. TC_RIGHT) THEN
+    IF(SLENGTH(IL) - SLOCATION(IV) .LE. RSPD ** 2 / 7) THEN
+      DIST = SLENGTH(IL) - SLOCATION(IV)
+      IF(DIST .GT. 0.0) THEN
+        IF(STURNCODE(IV) .EQ. TC_LEFT) THEN
+          RSPD = SQRT(8 * DIST + LT_SPEED(IL) ** 2)
+        ELSEIF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
+          IF(.NOT. IN_TURNING_WAY(IV) .AND. ROUNDABOUT_ID(IL) .EQ. 0) THEN
+            RSPD = SQRT(8 * DIST + RT_SPEED(IL) ** 2)
+          ENDIF
+        ENDIF
       ENDIF
     ENDIF
   ENDIF
   
-  IF(SLOCATION(IV) .LT. UP_INT_WIDTH(IL) .AND. SPREVLINK(IV) .NE. 0) THEN
+! --- If the vehicle is in the process of completing a turn 
+! --- limit the target speed to the turning speed of the previous link.
+ 
+  IF(ARC_LENGTH(IV) .NE. 0 .AND. ARC_LOCATION(IV) .LT. LIMITED_SPEED_DIST(IV)) THEN
     IF(PREV_TURNCODE(IV) .EQ. TC_LEFT) THEN
       RSPD = LT_SPEED(SPREVLINK(IV))
     ELSEIF(PREV_TURNCODE(IV) .EQ. TC_RIGHT) THEN
@@ -1116,6 +1151,7 @@
 ! --- vehicle type at the current speed and grade.
  
     A = MAX(A, MAX_DECEL(SVTYPE(IV), SSPEED(IV), SGRADE(IL)))
+    
   ENDIF
   SSPEED_ADJ(IV) = 0.
   RETURN
@@ -1262,6 +1298,17 @@
 ! --- Datastation.
  
             IF(.NOT. INITMODE) CALL STORE_DATASTAT(OBJECT_LIST(IOBJ)%VALUE, IV)
+            
+          ELSEIF(OBJECT_LIST(IOBJ)%ITYPE .EQ. M_HOV_BEGIN) THEN
+
+! --- Beginning of an HOV lane. Reset the flag that indicates that the vehicle must enter 
+! --- the exclusive HOV lane at the beginning of the facility, and reset the lanecodes.
+            
+            HOV_URGENT(IV) = .FALSE.
+            DO I = 1, N_FREEWAY_LANES
+              IF(FLANECODES(IV, I) .EQ. LC_AVOIDHOV) FLANECODES(IV, I) = LC_GOOD
+            ENDDO
+
           ELSEIF(OBJECT_LIST(IOBJ)%ITYPE .EQ. M_HOV_WARN_EXIT) THEN
  
 ! --- HOV exit warning sign. Set turn code and define lane codes for carpool vehicles and buses.
@@ -1574,21 +1621,7 @@
                 EXIT
               ENDIF
             ENDDO
-            IF(WTEST .AND. HOV_TYPE(ILH) .EQ. 1) THEN
- 
-! --- If the vehicle is within the HOV exit warning sign distance for the exit
-! --- that it is assigned to, ignore this warning.
- 
-              IF(DESTINATION(IV) .NE. 0) THEN
-                DO ILNK = 1, N_FREEWAY_LINKS
-                  IF(OFFRAMP_LINK(ILNK) .EQ. DESTINATION(IV)) THEN 
-                    IF(VLOC - (USN_TO_SEG_END(ILNK) - FLENGTH(ILNK)) .LT. HOV_OFFRAMP_WARN_DISTANCE(ILNK)) THEN
-                      WTEST = .FALSE.
-                    ENDIF
-                  ENDIF
-                ENDDO
-              ENDIF
-            ENDIF
+            
             IF(WTEST) THEN
               IF(FTURNCODE(IV) .EQ. TC_THRU) THEN
                 IF(HOV_VIOLATOR(IV)) THEN
@@ -1660,7 +1693,8 @@
                 IF(RNDNUM .LE. HOV_PCT(ILH)) THEN
  
 ! --- Set lanecodes to use the lane.
- 
+                  
+                  IF(HOV_TYPE(ILH) .EQ. 1) HOV_URGENT(IV) = .TRUE.
                   IF(HOV_SIDE(ILH) .EQ. 0) THEN
                     DO ILANE = 1, N_FREEWAY_LANES
                       IF(FLANECODES(IV, ILANE) .EQ. LC_GOOD .OR. &
@@ -1725,7 +1759,10 @@
 ! --- The vehicle is not allowed to use the HOV lane.
 ! --- Set lanecodes to avoid the lane.
  
-                IF(HOV_TYPE(ILH) .EQ. 1) REMAINING_DIST(IV) = HOV_WARN(ILH)
+                IF(HOV_TYPE(ILH) .EQ. 1) THEN
+                  REMAINING_DIST(IV) = HOV_WARN(ILH) - USN_TO_SEG_END(ILH) + HOV_BEGIN(ILH)
+                  HOV_URGENT(IV) = .TRUE.
+                ENDIF
                 IF(HOV_SIDE(ILH) .EQ. 0) THEN
                   HLANE = FNUMLANES(ILH)
                   DO IAUX = 1, N_AUXLANES
@@ -1850,13 +1887,14 @@
   USE SEGMENTS
   USE CAR_FOLLOWING
   USE NODE_TABLE
+  USE INCIDENTS
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV
   REAL, INTENT(INOUT) :: ACCEL
   INTEGER :: IL, ILANE, VLOC, IOBJ, I, IRL, ILD, ISEG
   INTEGER :: INODE, ILN, IVN, ILNE
   REAL :: DECEL, CF_DATA(7), RSTOP, RSPEED, RMAX, DIST, OFFSET
-  INTEGER :: LTYPE, IVX, NODE, NOBJ
+  INTEGER :: LTYPE, IVX, NODE, NOBJ, INC
   LOGICAL :: WATCH
 ! ----------------------------------------------------------------------
 #ifdef DebugVersion
@@ -1867,7 +1905,7 @@
   IL = FLINK(IV)
   LTYPE = LINKTYPE(FLINK(IV))
   ILANE = FLANE(IV)
-  VLOC = DISTANCE_TO_SEGMENT_END(IV) - 250
+  VLOC = DISTANCE_TO_SEGMENT_END(IV) - 750
   OFFSET = 0.
  
 ! --- Start with the first object ahead of the vehicle.
@@ -1883,11 +1921,45 @@
 ! --- Beginning of an incident.
                   
             IF(INCIDENT_NUM(IV) .EQ. OBJECT_LIST(IOBJ)%VALUE) THEN
-              REMAINING_DIST(IV) = DISTANCE_TO_SEGMENT_END(IV) - OBJECT_LIST(IOBJ)%LOCATION
-              IF(FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_GOOD .OR. FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_VACATE) THEN
-                DECEL = - (FSPEED(IV) ** 2) / (2 * REMAINING_DIST(IV))
-                ACCEL = MIN(ACCEL, DECEL)
+              INC = INCIDENT_NUM(IV)
+              IF(SIMTIME .GE. INCIDENT_BEGIN_TIME(INC) .AND. &
+                 SIMTIME .LE. INCIDENT_END_TIME(INC)) THEN
+                REMAINING_DIST(IV) = DISTANCE_TO_SEGMENT_END(IV) - OBJECT_LIST(IOBJ)%LOCATION
+                IF(FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_GOOD .OR. FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_VACATE) THEN
+                  DECEL = - (FSPEED(IV) ** 2) / (2 * REMAINING_DIST(IV))
+                  ACCEL = MIN(ACCEL, DECEL)
+                ENDIF
               ENDIF
+                 
+            ELSE
+ 
+! --- If there is a blockage set lanecodes.
+ 
+              ISEG = OBJECT_LIST(IOBJ)%SEGMENT
+              INC = OBJECT_LIST(IOBJ)%VALUE
+              DO ILANE = 1, N_FREEWAY_LANES
+                IF(INCIDENT_CODE(INC, ILANE) .EQ. INC_BLOCK) THEN
+                  REMAINING_DIST(IV) = DISTANCE_TO_SEGMENT_END(IV) - OBJECT_LIST(IOBJ)%LOCATION
+                  IF(FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_GOOD .OR. FLANECODES(IV, FLANE(IV)) .EQ. LC_INC_VACATE) THEN
+                    DECEL = - (FSPEED(IV) ** 2) / (2 * REMAINING_DIST(IV))
+                    ACCEL = MIN(ACCEL, DECEL)
+                  ENDIF
+                  INCIDENT_NUM(IV) = INC
+                  I = ILANE
+ 
+! --- Find the lane that leads to the incident.
+ 
+                  CALL TRACE_LANE_BACK(IL, I, ISEG, IOBJ, VLOC)
+                  IF(I .NE. 0) THEN
+                    IF(FLANECODES(IV, I) .EQ. LC_GOOD .OR. FLANECODES(IV, I) .EQ. LC_ANTICIP) THEN
+                      FLANECODES(IV, I) = LC_INC_GOOD
+                    ELSEIF(FLANECODES(IV, I) .EQ. LC_VACATE) THEN
+                      FLANECODES(IV, I) = LC_INC_VACATE
+                    ENDIF
+                  ENDIF
+                ENDIF
+              ENDDO
+              
             ENDIF
               
           ELSEIF(OBJECT_LIST(IOBJ)%ITYPE .EQ. M_AUX_END) THEN
@@ -2150,6 +2222,7 @@
                 IF(FSPEED(IV) .GT. 20.) THEN          !!!ARBITRARY CONSTANT
                   DECEL = -(FSPEED(IV) ** 2) /(2 * REMAINING_DIST(IV))
                   DECEL = MAX(DECEL, RMAX)
+                  IF(.NOT. HOV_URGENT(IV)) DECEL = MAX(DECEL, -4.0)
                   ACCEL = MIN(ACCEL, DECEL)
                 ENDIF
               ENDIF
@@ -2328,9 +2401,6 @@
       FLAST_VEHICLE(IL, FLANE(IV)) = 0
       FXCODE(IV) = 1
       FLINK(IV) = FTHRU_LINK(IL)
-      !Give the vehicle a randomly chosen starting location.
-      CALL FREEWAY_RANDOM(FSEED, RNDNUM)
-      FLOCATION(IV) = RNDNUM * TIMESTEP * 10.
       IF(FLEADER(IV) .NE. 0) THEN
         ILD = FLEADER(IV)
         FLOCATION(IV) = MIN(FLOCATION(IV), FLOCATION(ILD) - FVLENGTH(ILD) - 3.0)
@@ -2789,9 +2859,6 @@
       SXCODE(IV) = 1
       FIRST_VEHICLE(SLINK(IV), SLANE(IV)) = 0
       SLINK(IV) = STHRU_LINK(IL)
-      !Give the vehicle a randomly chosen starting location.
-      CALL STREET_RANDOM(SSEED, RNDNUM)
-      SLOCATION(IV) = RNDNUM * TIMESTEP * 10.
       IF(SLEADER(IV) .NE. 0) THEN
         ILD = SLEADER(IV)
         SLOCATION(IV) = MIN(SLOCATION(IV), SLOCATION(ILD) - SVLENGTH(ILD) - 3.0)
@@ -2822,18 +2889,18 @@
 ! --- This is a vehicle on a street.
  
       SLINK(IV) = ILINK
-      ITURN = STURNCODE(IV)
-      IF(ITURN .EQ. TC_LEFT) THEN
-        IREC = LEFT_LINK(IL)
-      ELSEIF(ITURN .EQ. TC_THRU) THEN
-        IREC = STHRU_LINK(IL)
-      ELSEIF(ITURN .EQ. TC_RIGHT) THEN
-        IREC = RIGHT_LINK(IL)
-      ELSEIF(ITURN .EQ. TC_LDIAG) THEN
-        IREC = LEFT_DIAG_LINK(IL)
-      ELSEIF(ITURN .EQ. TC_RDIAG) THEN
-        IREC = RIGHT_DIAG_LINK(IL)
-      ENDIF 
+      !ITURN = STURNCODE(IV)
+      !IF(ITURN .EQ. TC_LEFT) THEN
+      !  IREC = LEFT_LINK(IL)
+      !ELSEIF(ITURN .EQ. TC_THRU) THEN
+      !  IREC = STHRU_LINK(IL)
+      !ELSEIF(ITURN .EQ. TC_RIGHT) THEN
+      !  IREC = RIGHT_LINK(IL)
+      !ELSEIF(ITURN .EQ. TC_LDIAG) THEN
+      !  IREC = LEFT_DIAG_LINK(IL)
+      !ELSEIF(ITURN .EQ. TC_RDIAG) THEN
+      !  IREC = RIGHT_DIAG_LINK(IL)
+      !ENDIF 
       IF(IREC .NE. 0) THEN
         IF(NODE_TYPE(SDSN(IREC)) .EQ. NT_EXTERN) THEN
           IF(SFLEET(IV) .EQ. FLEET_BUS .AND. .NOT. INITMODE) THEN
@@ -3570,7 +3637,7 @@
   END
 
 ! ==================================================================================================
-  SUBROUTINE CHECK_SIGNAL(IV, WPERM, WPROT, REDLIGHT)
+  SUBROUTINE CHECK_SIGNAL(IV, IRL, WPERM, WPROT, REDLIGHT)
 ! ----------------------------------------------------------------------
 ! --- Determine if the signal will allow the vehicle to discharge.
 ! ----------------------------------------------------------------------
@@ -3583,9 +3650,9 @@
   USE SIMPARAMS
   USE VDATA
   IMPLICIT NONE
-  INTEGER, INTENT(IN) :: IV
+  INTEGER, INTENT(IN) :: IV, IRL
   LOGICAL, INTENT(OUT) :: WPERM, WPROT, REDLIGHT
-  INTEGER :: IL, ITURN, ISIG, ILAG, IACT
+  INTEGER :: IL, ITURN, ISIG, ILAG, IACT, ILANE, IVX
   INTEGER :: ICODE, NL, NT, NR, ND, PHASE
   LOGICAL :: AMBER
   REAL :: RNDNUM, DIST
@@ -3632,6 +3699,19 @@
       ELSEIF(ICODE .EQ. S_YIELD) THEN
         IF(ROUNDABOUT_ID(IL) .EQ. 0) WILL_YIELD(IV) = .TRUE.
         WPERM = .TRUE.
+        IF(ROUNDABOUT_APPROACH_NUM(IL) .NE. 0) THEN
+          DO ILANE = 1, SNUMLANES(IRL)
+            IVX = SLAST_VEHICLE(IRL, ILANE)
+            IF(IVX .NE. 0) THEN
+              IF(SPREVLINK(IVX) .NE. IL) THEN
+                IF(SLOCATION(IVX) - SVLENGTH(IVX) .LT. UP_INT_WIDTH(IRL)) THEN
+                  WPERM = .FALSE.
+                  EXIT
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDDO
+        ENDIF
       ELSEIF(ICODE .EQ. S_STOP) THEN
         IF(SDRIVERTYPE(IV) .LE. 5 .AND. SSPEED(IV) .GT. 0.0) THEN
           WPERM = .FALSE.
@@ -4059,7 +4139,7 @@
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV, IRL, IRLANE
   LOGICAL, INTENT(OUT) :: WGO
-  INTEGER :: I, IL, ILINK, IVX, ILANE, NLANES
+  INTEGER :: I, IL, ILINK, IVX, ILANE, NLANES, RLANE
   INTEGER :: J, XWIDTH, YWIDTH, I1, I2, I3
   REAL :: RDIST, TTC, TTCMIN, XDIST, YDIST
   LOGICAL :: WPERM, WPROT, REDLIGHT
@@ -4083,7 +4163,7 @@
       ENDIF
       IF(ILINK .NE. 0) THEN
         I1 = FIRST_FULL_LANE(ILINK)
-        IF(STURNCODE(IV) .EQ. TC_RIGHT .OR. ROUNDABOUT_APPROACH_NUM(IL) .NE. 0) THEN
+        IF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
           IF(STHRU_LINK(ILINK) .NE. 0) THEN
             I2 = IRLANE - FIRST_FULL_LANE(ILINK) + FIRST_FULL_LANE(STHRU_LINK(ILINK)) &
                         + SALIGNMENT_LANE(ILINK) - STHRU_ALIGNMENT_LANE(ILINK)
@@ -4117,7 +4197,19 @@
         IVX = FIRST_VEHICLE(ILINK, ILANE)
         IF(IVX .NE. 0) THEN
           IF(SLINK(IVX) .EQ. 0) CYCLE
+          !Special cases for roundabouts
           IF(STURNCODE(IVX) .EQ. TC_RIGHT .AND. ROUNDABOUT_ID(ILINK) .EQ. 0) CYCLE
+          IF(STURNCODE(IVX) .EQ. TC_THRU .AND. ROUNDABOUT_ID(ILINK) .NE. 0 .AND. ILANE .GT. SLANE(IV)) THEN
+            IF(TURN_LINK(IVX) .NE. STHRU_LINK(ILINK)) CYCLE
+          ENDIF
+          IF(STURNCODE(IVX) .EQ. TC_THRU .AND. ROUNDABOUT_ID(ILINK) .NE. 0) THEN
+            IF(ILANE .EQ. SLANE(IV)) THEN
+              CALL FIND_RECEIVING_LANE(IVX, IRL, ILANE, RLANE)
+              IF(RLANE .GT. SLANE(IV)) THEN
+                IF(TURN_LINK(IVX) .NE. STHRU_LINK(ILINK)) CYCLE
+              ENDIF
+            ENDIF
+          ENDIF
  
 ! --- If the subject vehicle is an EV and the conflicting vehicle is
 ! --- cooperating, ignore the conflict.
@@ -4127,7 +4219,7 @@
           IF(SIGNAL_CODE(ILINK) .EQ. S_STOP .AND. WAIT_TIME(IV) .GT. WAIT_TIME(IVX)) THEN
             WPERM = .FALSE.
           ELSE
-            CALL CHECK_SIGNAL(IVX, WPERM, WPROT, REDLIGHT)
+            CALL CHECK_SIGNAL(IVX, IRL, WPERM, WPROT, REDLIGHT)
           ENDIF
  
 ! --- If the conflicting vehicle is permitted to enter the intersection
@@ -4219,7 +4311,7 @@
     ! --- cooperating, ignore the conflict.
  
           IF(SWILL_COOP_EV(IVX) .AND. SEV_WATCH(IVX) .EQ. IV) CYCLE
-          CALL CHECK_SIGNAL(IVX, WPERM, WPROT, REDLIGHT)
+          CALL CHECK_SIGNAL(IVX, IRL, WPERM, WPROT, REDLIGHT)
  
     ! --- If the conflicting vehicle is permitted to enter the intersection
     ! --- compute the time to the collision point.
@@ -4263,7 +4355,7 @@
   INTEGER, INTENT(IN) :: IV, IRLANE
   LOGICAL, INTENT(OUT) :: WGO
   INTEGER :: IL, ILINK, IVX, ILANE, XDIST
-  INTEGER :: I1, I2, I3
+  INTEGER :: I1, I2, IRL
   REAL :: TTC, TTCMIN
   LOGICAL :: WPERM, WPROT, REDLIGHT
   !INTEGER :: LOOP_COUNTER
@@ -4272,81 +4364,75 @@
   integer :: temp
   temp = sid(iv)
 #endif
-  TTC = 1000.
+
+  WGO = .TRUE.
+
+  !Look at the last vehicle in the first lane on the receiving link.
   IL = SLINK(IV)
-  ILINK = NEAR_CROSSLINK(IL)
-  IF(ILINK .NE. 0) THEN
-    I1 = FIRST_FULL_LANE(ILINK)
-    I2 = IRLANE + STHRU_ALIGNMENT_LANE(ILINK) - SALIGNMENT_LANE(ILINK) 
-    IF(I2 .LT. 1) THEN !No lane feeds the receiving lane.
-      ILINK = 0 
-    ENDIF
-    I3 = 1
+  ILINK = RIGHT_LINK(IL)
+  ILANE = FIRST_FULL_LANE(ILINK)
+  I1 = FIRST_FULL_LANE(ILINK)
+  I2 = IRLANE + STHRU_ALIGNMENT_LANE(ILINK) - SALIGNMENT_LANE(ILINK) 
+  IF(I2 .LT. 1) THEN !No lane feeds the receiving lane.
+    ILINK = 0 
+  ENDIF
+  DO ILANE = I1, I2
+    IF(FIRST_VEHICLE(ILINK, ILANE) .NE. 0) THEN
+      IVX = SLAST_VEHICLE(ILINK, ILANE)
+      IF(IVX .NE. 0) THEN
+        IF(SLOCATION(IVX) - SVLENGTH(IVX) .LT. UP_INT_WIDTH(ILINK)) THEN
+          WGO = .FALSE.
+          EXIT
+        ENDIF
+      ENDIF
+    ENDIF 
+  ENDDO
+  
+  IF(WGO) THEN
+    !Look for vehicles on the near crosslink.
+    IRL = 0
+    TTC = 1000.
+    ILINK = NEAR_CROSSLINK(IL)
     IF(ILINK .NE. 0) THEN
-      DO ILANE = I1, I2, I3
-        IF(FIRST_VEHICLE(ILINK, ILANE) .NE. 0) THEN
-          IVX = FIRST_VEHICLE(ILINK, ILANE)
-          IF(IVX .NE. 0) THEN
-            IF(STURNCODE(IVX) .EQ. TC_RIGHT .AND. ROUNDABOUT_NUMBER(IVX) .EQ. 0) CYCLE
+      I1 = FIRST_FULL_LANE(ILINK)
+      I2 = IRLANE + STHRU_ALIGNMENT_LANE(ILINK) - SALIGNMENT_LANE(ILINK) 
+      IF(I2 .LT. 1) THEN !No lane feeds the receiving lane.
+        ILINK = 0 
+      ENDIF
+      IF(ILINK .NE. 0) THEN
+        DO ILANE = I1, I2
+          IF(FIRST_VEHICLE(ILINK, ILANE) .NE. 0) THEN
+            IVX = FIRST_VEHICLE(ILINK, ILANE)
+            IF(IVX .NE. 0) THEN
+              IF(STURNCODE(IVX) .EQ. TC_RIGHT) CYCLE
             
-            IF(SIGNAL_CODE(ILINK) .EQ. S_STOP .AND. WAIT_TIME(IV) .GT. WAIT_TIME(IVX)) THEN
-              WPERM = .FALSE.
-            ELSE
-              CALL CHECK_SIGNAL(IVX, WPERM, WPROT, REDLIGHT)
-            ENDIF
- 
-! --- If the conflicting vehicle is permitted to enter the intersection
-! --- compute the time to collision point.
- 
-            IF(WPERM) THEN
-              XDIST = SLENGTH(ILINK) - SLOCATION(IVX) + UP_INT_WIDTH(RIGHT_LINK(IL)) 
-              IF(SXCODE(IVX) .EQ. 0) XDIST = MAX(XDIST - SSPEED(IVX), 0.)
-              IF(SSPEED(IVX) .NE. 0) THEN
-                TTC = MIN(TTC, XDIST / SSPEED(IVX))
+              IF(SIGNAL_CODE(ILINK) .EQ. S_STOP .AND. WAIT_TIME(IV) .GT. WAIT_TIME(IVX)) THEN
+                WPERM = .FALSE.
               ELSE
-                IF(.NOT. WILL_YIELD(IVX)) TTC = 0
+                CALL CHECK_SIGNAL(IVX, IRL, WPERM, WPROT, REDLIGHT)
+              ENDIF
+ 
+  ! --- If the conflicting vehicle is permitted to enter the intersection
+  ! --- compute the time to collision point.
+ 
+              IF(WPERM) THEN
+                XDIST = SLENGTH(ILINK) - SLOCATION(IVX) + UP_INT_WIDTH(RIGHT_LINK(IL)) 
+                IF(SXCODE(IVX) .EQ. 0) XDIST = MAX(XDIST - SSPEED(IVX), 0.)
+                IF(SSPEED(IVX) .NE. 0) THEN
+                  TTC = MIN(TTC, XDIST / SSPEED(IVX))
+                ELSE
+                  IF(.NOT. WILL_YIELD(IVX)) TTC = 0
+                ENDIF
               ENDIF
             ENDIF
           ENDIF
-        ENDIF
-      ENDDO
+        ENDDO
+      ENDIF
     ENDIF
+   
+    TTCMIN = ACCEPTABLE_RTG(SDRIVERTYPE(IV))
+    IF(TTC .LT. TTCMIN) WGO = .FALSE.
   ENDIF
-  ILINK = RIGHT_LINK(IL)
-  I1 = 1
-  I2 = IRLANE
-  I3 = 1
-  DO ILANE = I1, I2, I3
-    IF(FIRST_VEHICLE(ILINK, ILANE) .NE. 0) THEN
-      IVX = FIRST_VEHICLE(ILINK, ILANE)
-      !LOOP_COUNTER = 0
-      DO WHILE(IVX .NE. 0)
-        !LOOP_COUNTER = LOOP_COUNTER + 1
-        !IF(LOOP_COUNTER .GT. 1000) THEN
-        !  WRITE(MSGTEXT, '(A)') 'CHECK_RTOR: INFINITE LOOP'
-        !  CALL SENDTEXTMSG(M_ERROR)
-        !  EXIT
-        !ENDIF
-        IF(SLOCATION(IVX) .LT. UP_INT_WIDTH(ILINK)) THEN
-          XDIST = UP_INT_WIDTH(ILINK) - SLOCATION(IVX)
-          IF(SXCODE(IVX) .EQ. 0) XDIST = MAX(XDIST - SSPEED(IVX), 0.)
-          IF(SSPEED(IVX) .NE. 0) THEN
-            TTC = MIN(TTC, XDIST / SSPEED(IVX))
-          ELSE
-            IF(.NOT. WILL_YIELD(IVX)) TTC = 0
-          ENDIF
-          EXIT
-        ELSEIF(SLOCATION(IVX) - SVLENGTH(IVX) .LT. UP_INT_WIDTH(ILINK) + 12) THEN
-          WGO = .FALSE.
-          RETURN
-        ENDIF
-        IVX = SFOLLOWER(IVX)
-      ENDDO
-    ENDIF
-  ENDDO       
-  WGO = .TRUE.
-  TTCMIN = ACCEPTABLE_RTG(SDRIVERTYPE(IV))
-  IF(TTC .LT. TTCMIN) WGO = .FALSE.
   RETURN
   END   
   
@@ -4497,7 +4583,7 @@
           IF(SIGNAL_CODE(ILINK) .EQ. S_STOP .AND. WAIT_TIME(IV) .GT. WAIT_TIME(IVX)) THEN
             WPERM = .FALSE.
           ELSE
-            CALL CHECK_SIGNAL(IVX, WPERM, WPROT, REDLIGHT)
+            CALL CHECK_SIGNAL(IVX, IRL, WPERM, WPROT, REDLIGHT)
           ENDIF
  
 ! --- If the conflicting vehicle is permitted to enter the intersection
@@ -4665,7 +4751,7 @@
     ENDIF
   ENDIF
   RETURN
-  END            
+  END          
 
 ! ==================================================================================================
   SUBROUTINE CHECK_DISCHARGE(IV, ACCEL, WSTOP, DISCHARGE_TRAVEL, DISCHARGE_SPEED)
@@ -4713,11 +4799,31 @@
   IF(SFLEET(IV) .EQ. FLEET_BUS .OR. SFLEET(IV) .EQ. FLEET_EV) THEN
     IF(ILANE .EQ. 0) RETURN
   ENDIF
+
+! --- Determine receiving link and lane.
+
+  ITURN = STURNCODE(IV)
+  IF(ITURN .EQ. TC_LEFT) THEN
+    IRL = LEFT_LINK(IL)
+  ELSEIF(ITURN .EQ. TC_THRU) THEN
+    IRL = STHRU_LINK(IL)
+  ELSEIF(ITURN .EQ. TC_RIGHT) THEN
+    IRL = RIGHT_LINK(IL)
+  ELSEIF(ITURN .EQ. TC_LDIAG) THEN
+    IRL = LEFT_DIAG_LINK(IL)
+  ELSEIF(ITURN .EQ. TC_RDIAG) THEN
+    IRL = RIGHT_DIAG_LINK(IL)
+  ENDIF
  
 ! --- If the vehicle is cooperating with an EV do not discharge,
 ! --- unless the EV is stopped behind the vehicle.
  
   WEV = SWILL_COOP_EV(IV)
+  IF(WEV .AND. IRL .NE. 0) THEN
+    IF(NODE_TYPE(SDSN(IRL)) .EQ. NT_EXTERN) THEN
+      WEV = .FALSE.
+    ENDIF
+  ENDIF
   IF(WEV .AND. SEV_WATCH(IV) .NE. 0) THEN
     SFL = SFOLLOWER(IV)
     DO WHILE(SFL .NE. 0)
@@ -4732,23 +4838,10 @@
       ENDIF
     ENDDO
   ENDIF
-  IF(.NOT. WEV) THEN
-    ITURN = STURNCODE(IV)
+  IF(WEV) THEN
+    WSTOP = .TRUE.
+  ELSE
     IRLANE = 0
-
-! --- Determine receiving link and lane.
-
-    IF(ITURN .EQ. TC_LEFT) THEN
-      IRL = LEFT_LINK(IL)
-    ELSEIF(ITURN .EQ. TC_THRU) THEN
-      IRL = STHRU_LINK(IL)
-    ELSEIF(ITURN .EQ. TC_RIGHT) THEN
-      IRL = RIGHT_LINK(IL)
-    ELSEIF(ITURN .EQ. TC_LDIAG) THEN
-      IRL = LEFT_DIAG_LINK(IL)
-    ELSEIF(ITURN .EQ. TC_RDIAG) THEN
-      IRL = RIGHT_DIAG_LINK(IL)
-    ENDIF
     ILD = 0
     IF(NODE_TYPE(SDSN(IL)) .NE. NT_INTERN) THEN
       ILD = SLAST_VEHICLE_OUT(IL, ILANE)
@@ -4796,14 +4889,16 @@
         WRITE(MSGTEXT, '(A)') '  Turn movement is Right Diagonal'
       ENDIF
       CALL SENDTEXTMSG(M_ERROR)
+      WRITE(MSGTEXT, '(A,I8, A, I8)') '  Vehicle # ', SID(IV), '; Path # ', SPATHID(IV)
+      CALL SENDTEXTMSG(M_ERROR)
       EXITFLG = 1
       RETURN
     ENDIF
     IF(IRLANE .NE. 0) THEN
  
-! --- Check the signal state.
+! --- Check the signal state unless the vehicle must be forced to stop.
        
-      IF(SLANECODES(IV, ILANE) .EQ. LC_GOOD) THEN
+      IF(SLANECODES(IV, ILANE) .EQ. LC_GOOD .AND. .NOT. FORCE_STOP(IV)) THEN
  
 ! --- If the vehicle is an EV allow it to proceed even if the signal
 ! --- is red, after slowing to a stop.
@@ -4812,7 +4907,7 @@
           IF(SGO_THRU_SIGNAL(IV)) THEN
             WPERM = .TRUE.
           ELSE
-            CALL CHECK_SIGNAL(IV, WPERM, WPROT, REDLIGHT)
+            CALL CHECK_SIGNAL(IV, IRL, WPERM, WPROT, REDLIGHT)
             IF(SSPEED(IV) .LE. STOP_SPD) WPERM = .TRUE.    !EV can proceed
             IF(SGO_THRU_SIGNAL(IV)) WPERM = .TRUE.
           ENDIF
@@ -4843,7 +4938,7 @@
               ENDIF
             ENDIF
           ELSEIF(IN_TURNING_WAY(IV)) THEN
-            CALL CHECK_SIGNAL(IV, WPERM, WPROT, REDLIGHT)
+            CALL CHECK_SIGNAL(IV, IRL, WPERM, WPROT, REDLIGHT)
           ELSEIF(WILL_JUMP(IV)) THEN
 
 ! --- If the vehicle is a left turn jumper allow it to discharge immediately.
@@ -4857,7 +4952,7 @@
             ELSEIF(SGO_THRU_SIGNAL(IV)) THEN
               WPERM = .TRUE.
             ELSE
-              CALL CHECK_SIGNAL(IV, WPERM, WPROT, REDLIGHT)
+              CALL CHECK_SIGNAL(IV, IRL, WPERM, WPROT, REDLIGHT)
               IF(SGO_THRU_SIGNAL(IV)) WPERM = .TRUE.
               IF(SIGNAL_CODE(IL) .EQ. S_YIELD) ACCEL = MIN(ACCEL, 5.0)
             ENDIF
@@ -4988,7 +5083,7 @@
         IF(WPERM .AND. .NOT. VINRABT) THEN
           IF(IRL .NE. 0) THEN
             IF(UP_INT_WIDTH(IRL) .NE. 0) THEN
-              CALL CHECK_SPILLBACK(IV, WPERM, IRL, IRLANE, ACCEL)
+              CALL CHECK_SPILLBACK(IV, WPERM, IRL, IRLANE)
               IF(.NOT. WPERM .AND. ROUNDABOUT_ID(IL) .EQ. 0) WILL_YIELD(IV) = .TRUE.
             ENDIF
           ENDIF
@@ -5054,11 +5149,6 @@
           ! --- or car follow the last vehicle in the receiving lane
           IF(ILD .NE. SLAST_VEHICLE(IRL, IRLANE)) THEN
             ILD = SLAST_VEHICLE(IRL, IRLANE)
-            IF(ILD .NE. 0) THEN
-              IF(ROUNDABOUT_ID(IRL) .NE. 0 .AND. SLOCATION(ILD) .LT. UP_INT_WIDTH(IRL)) THEN
-                ILD = 0
-              ENDIF
-            ENDIF
             IF(ILD .NE. 0) THEN
               CALL STREET_CAR_FOLLOW(IV, ILD, ACCEL)
             ENDIF
@@ -5137,7 +5227,10 @@
       ENDIF
       DISCHARGE_SPEED = MAX(DISCHARGE_SPEED, 0.)
       DISCHARGE_TRAVEL = MAX(DISCHARGE_TRAVEL, 0.)
-
+      IF(SLANECODES(IV, ILANE) .NE. LC_GOOD) THEN
+        DISCHARGE_SPEED = 0.
+        DISCHARGE_TRAVEL = 0.
+      ENDIF
       IF(SLOCATION(IV) + DISCHARGE_TRAVEL .LT. SLENGTH(IL)) THEN
         WPERM = .FALSE.
       ENDIF
@@ -5157,6 +5250,12 @@
             ARC_DIRECTION(IV) = TC_LEFT
             ARC_LOCATION(IV) = SLOCATION(IV) - SLENGTH(IL)
             ARC_LENGTH(IV) = LT_ARC_LENGTH(IL, ILANE, IRLANE)
+            IF(LT_LIMITED_SPEED_DIST(IL) .NE. 0.) THEN
+              LIMITED_SPEED_DIST(IV) = LT_LIMITED_SPEED_DIST(IL)
+            ELSE
+              !LIMITED_SPEED_DIST(IV) = LT_ARC_LENGTH(IL, SNUMLANES(IL), LAST_FULL_LANE(IRL))
+              LIMITED_SPEED_DIST(IV) = ARC_LENGTH(IV)
+            ENDIF
           ENDIF
         ELSEIF(ITURN .EQ. TC_THRU) THEN
           IF(THRU_ARC_LENGTH(IL, ILANE, IRLANE) .NE. 0.) THEN
@@ -5173,6 +5272,12 @@
             ARC_DIRECTION(IV) = ITURN
             ARC_LOCATION(IV) = SLOCATION(IV) - SLENGTH(IL)
             ARC_LENGTH(IV) = RT_ARC_LENGTH(IL, ILANE, IRLANE)
+            IF(RT_LIMITED_SPEED_DIST(IL) .NE. 0.) THEN
+              LIMITED_SPEED_DIST(IV) = RT_LIMITED_SPEED_DIST(IL)
+            ELSE
+              !LIMITED_SPEED_DIST(IV) = RT_ARC_LENGTH(IL, 1, FIRST_FULL_LANE(IRL))
+              LIMITED_SPEED_DIST(IV) = ARC_LENGTH(IV)
+            ENDIF
           ENDIF
         ELSEIF(ITURN .EQ. TC_LDIAG) THEN
           IF(LD_ARC_LENGTH(IL, ILANE, IRLANE) .NE. 0.) THEN
@@ -5367,7 +5472,7 @@
 #endif
 
   IL = SLINK(IV)
-  IF(STURNCODE(IV) .EQ. TC_LEFT) THEN
+  IF(STURNCODE(IV) .EQ. TC_LEFT .OR. STURNCODE(IV) .EQ. TC_LDIAG) THEN
  
 ! --- Turning left. Account for any full lanes to the left plus any
 ! --- left turn pocket lanes.
@@ -5386,7 +5491,7 @@
 
   ELSEIF(STURNCODE(IV) .EQ. TC_THRU) THEN
  
-! --- Going through. Account for lane alignment.
+! --- Going through. Account for lane alignment. 
  
     RLANE = ILANE + STHRU_ALIGNMENT_LANE(IL) - SALIGNMENT_LANE(IL)
     IF(RLANE .GT. 0) THEN
@@ -5412,7 +5517,7 @@
       ENDIF
     ENDIF
 
-  ELSEIF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
+  ELSEIF(STURNCODE(IV) .EQ. TC_RIGHT .OR. STURNCODE(IV) .EQ. TC_RDIAG) THEN
  
 ! --- Turning right. Account for any full lanes to the right plus any
 ! --- right turn pocket lanes.
@@ -5430,10 +5535,7 @@
         IF(RLANE .GT. LAST_FULL_LANE(IRL)) RLANE = 0
       ENDIF
     ENDIF
-  ELSEIF(STURNCODE(IV) .GT. TC_RIGHT) THEN
- 
-! --- Diagonal.
-    RLANE = FIRST_FULL_LANE(IRL) - FIRST_FULL_LANE(IL) + ILANE
+    
   ENDIF
   
   IF(RLANE .LT. 0) RLANE = 0
@@ -5469,10 +5571,11 @@
   END
 
 ! ==================================================================================================
-  SUBROUTINE CHECK_SPILLBACK(IV, WPERM, IRL, IRLANE, ACCEL)
+  SUBROUTINE CHECK_SPILLBACK(IV, WPERM, IRL, IRLANE)
 ! ----------------------------------------------------------------------
 ! --- Check for spillback on the receiving link.
 ! ----------------------------------------------------------------------
+  USE SIMPARAMS
   USE STREET_VEHICLES
   USE STREET_LINKS
   USE GLOBAL_DATA
@@ -5481,54 +5584,47 @@
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV, IRL, IRLANE
   LOGICAL, INTENT(INOUT) :: WPERM
-  REAL, INTENT(INOUT) :: ACCEL
-  INTEGER :: IL, IVX, NV, IVXL
-  REAL :: BACK_BUMPER, RNDNUM
+  INTEGER :: IL, IVX, NV, IVXL, VLEN, LASTV, SPACE_AHEAD
+  REAL :: BACK_BUMPER, RNDNUM, ACCEL, LOCATION
   LOGICAL :: WSPILL
-  !INTEGER :: LOOP_COUNTER
 ! ----------------------------------------------------------------------
 #ifdef DebugVersion
   integer :: temp
   temp = sid(iv)
 #endif
 
-  BACK_BUMPER = 0
-  IL = SLINK(IV)
-  IVX = SLAST_VEHICLE(IRL, IRLANE)
-  IF(IVX .NE. 0) THEN
- 
-! --- Determine if the lead vehicle is in spillback.
- 
+  IF(SFLEET(IV) .NE. FLEET_BIKE) THEN
+
     WSPILL = .FALSE.
-    IF(SFLEET(IV) .NE. FLEET_BIKE) THEN
-      IF(QSTATE(IVX) .NE. QS_NOTINQ .OR. SSPEED(IVX) .LE. STOP_SPD) THEN
-        WSPILL = .TRUE.
-      ELSEIF(UP_INT_WIDTH(IRL) .GT. 0 .AND. SLOCATION(IVX) - SVLENGTH(IVX) .LT. UP_INT_WIDTH(IRL)) THEN
-        IVXL = SLEADER(IVX)
-        NV = 0
-        !LOOP_COUNTER = 0
-        DO WHILE(IVXL .NE. 0) 
-          !LOOP_COUNTER = LOOP_COUNTER + 1
-          !IF(LOOP_COUNTER .GT. 1000) THEN
-          !  WRITE(MSGTEXT, '(A)') 'CHECK_SPILLBACK: INFINITE LOOP'
-          !  CALL SENDTEXTMSG(M_ERROR)
-          !  EXIT
-          !ENDIF
-          NV = NV + 1
-          IF(NV .EQ. 4) EXIT
-          IF(SSPEED(IVXL) .LE. STOP_SPD .OR. SACCELERATION(IVXL) .LT. -1.0) THEN
-            CALL STREET_CAR_FOLLOW(IVX, IVXL, ACCEL)
-            IF(ACCEL .LT. 0.) THEN
-              WSPILL = .TRUE.
-              EXIT
-            ENDIF
-          ENDIF
-        ENDDO
+    BACK_BUMPER = 0
+    VLEN = 0
+    LASTV = 0
+    IVX = SLAST_VEHICLE(IRL, IRLANE)
+    
+   !Find the last vehicle that is stopped on the receiving link
+    DO WHILE(IVX .NE. 0)
+      VLEN = VLEN + SVLENGTH(IVX)
+      IF(SLOCATION(IVX) - VLEN .GT. UP_INT_WIDTH(IRL) + SVLENGTH(IV)) EXIT
+      IF(SSPEED(IVX) .LE. STOP_SPD .OR. (SSPEED(IVX) .LE. 10 .AND. SACCELERATION(IVX) .LT. 0.0)) THEN
+        LASTV = IVX
+        EXIT
       ENDIF
+      IVX = SLEADER(IVX)
+    ENDDO
+    
+    IF(LASTV .NE. 0) THEN
+      !Determine how much open space is ahead of the vehicle.
+      IF(SLEADER(LASTV) .NE. 0) THEN
+        SPACE_AHEAD = SLOCATION(SLEADER(LASTV)) - SVLENGTH(SLEADER(LASTV))
+      ELSE
+        SPACE_AHEAD = SLENGTH(IRL) - SLOCATION(LASTV)
+      ENDIF
+      WSPILL = SLOCATION(LASTV) + SPACE_AHEAD - VLEN .LT. SVLENGTH(IV)
     ENDIF
+    
     IF(WSPILL) THEN
-      BACK_BUMPER = SLOCATION(IVX) - SVLENGTH(IVX) - UP_INT_WIDTH(IRL)
-      IF(SLOCATION(IVX) - SVLENGTH(IVX) .LT. 0.) THEN
+      BACK_BUMPER = LOCATION - SVLENGTH(IVX) - UP_INT_WIDTH(IRL)
+      IF(LOCATION - SVLENGTH(IVX) .LT. 0.) THEN
         WPERM = .FALSE.
       ELSEIF(BACK_BUMPER .LT. 0.0) THEN
         IF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
@@ -5539,14 +5635,6 @@
           NV = MAX(NV, 1)
           NV = MIN(NV, 4)
           IF(RNDNUM .LT. 1.0 - SPILLBACK_PROB(NV)) WPERM = .FALSE.
-        ENDIF
-      ELSE
- 
-! --- Determine if the subject vehicle will be in spillback.
- 
-        IF(SLOCATION(IVX) - SVLENGTH(IVX) .LT. UP_INT_WIDTH(IRL) + SVLENGTH(IV)) THEN
-          CALL STREET_RANDOM(SSEED, RNDNUM)
-          IF(RNDNUM .LT. 1.0 - SPILLBACK_PROB(1)) WPERM = .FALSE.
         ENDIF
       ENDIF
     ENDIF
@@ -5686,7 +5774,7 @@
 
   IL = SLINK(IV)
   !If the right receiving link is the same as the thru link disregard any blockage
-  IF(IRL .NE. STHRU_LINK(IL) .OR. ROUNDABOUT_ID(IRL) .NE. 0) THEN
+  IF(IRL .NE. STHRU_LINK(IL)) THEN
     BLOCKDIST = UP_INT_WIDTH(IRL) - (SLANE(IV) - 1) * SLANE_WIDTH(IL, 1) + 3
     IF(ROUNDABOUT_ID(IL) .NE. 0) BLOCKDIST = MIN(BLOCKDIST, TOTAL_LANES(IL) * 12 - 6)
     DO ILN = FIRST_FULL_LANE(IRL), LAST_FULL_LANE(IRL)
@@ -5702,7 +5790,7 @@
               WPERM = .FALSE.
               EXIT
             ENDIF
-          ELSE
+          ELSEIF(SSPEED(IVX) .LE. STOP_SPD) THEN
             WPERM = .FALSE.
             EXIT
           ENDIF
@@ -5761,6 +5849,7 @@
       QPOS = 0
       DO WHILE(IV .NE. 0)
         IF(SID(IV) .EQ. 0) EXIT
+        FORCE_STOP(IV) = .FALSE.
         SDISCH_TIMER(IV) = 0.
         IF(QSTATE(IV) .EQ. QS_NOTINQ) EXIT
         IF(QSTATE(IV) .NE. QS_DWELL) THEN
@@ -5944,6 +6033,7 @@
 #endif      
       IF(SID(IV) .EQ. 0) EXIT
       SDISCH_TIMER(IV) = 0.
+      FORCE_STOP(IV) = .FALSE.
       IF(QSTATE(IV) .EQ. QS_NOTINQ) EXIT
       IF(QSTATE(IV) .NE. QS_DWELL) THEN
         ITYPE = SVTYPE(IV)
@@ -6568,7 +6658,7 @@
                   ALLOW_LANE = .TRUE.
                 ENDIF
                 IF(.NOT. ALLOW_LANE) THEN
-                  FLANECODES(IV, I) = LC_VACATE
+                  IF(FLANECODES(IV, I) .EQ. LC_GOOD) FLANECODES(IV, I) = LC_VACATE
                   EXIT
                 ENDIF
               ENDIF
@@ -7677,7 +7767,9 @@
  
   IF(INCIDENT_NUM(IV) .NE. 0 .AND. FTURNCODE(IV) .EQ. TC_THRU) THEN
     DO I = 1, N_FREEWAY_LANES
-      IF(CURRENT(I) .GE. 4) FLANECODES(IV, RECEIVING_LANE(NLINK, I)) = CURRENT(I)
+      IF(RECEIVING_LANE(NLINK, I) .NE. 0) THEN
+        IF(CURRENT(I) .GE. 4) FLANECODES(IV, RECEIVING_LANE(NLINK, I)) = CURRENT(I)
+      ENDIF
     ENDDO
   ENDIF
   RETURN
@@ -7793,6 +7885,8 @@
   USE FREEWAY_VEHICLES
   USE FREEWAY_LINKS
   USE SEGMENTS
+  USE TEXT
+  USE SIMPARAMS
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV
   INTEGER :: IOBJ, IL, VLOC, ISEG
@@ -7805,6 +7899,12 @@
   VLOC = DISTANCE_TO_SEGMENT_END(IV) + FVLENGTH(IV)
   NEXT_OBJECT(IV) = 0
   ISEG = ISEGMENT(IV)
+  IF(ISEG .EQ. 0) THEN
+    WRITE(MSGTEXT, '(A)') 'INTERNAL ERROR - VEHICLE NOT ASSIGNED TO ANY SEGMENT'
+    CALL SENDTEXTMSG(M_ERROR)
+    EXITFLG = 1
+    RETURN
+  ENDIF
   DO IOBJ = LAST_OBJECT(ISEG), FIRST_OBJECT(ISEG), -1
     IF(LINKTYPE(OBJECT_LIST(IOBJ)%LINK) .EQ. LINKTYPE(IL)) THEN
       IF(VLOC .GE. OBJECT_LIST(IOBJ)%LOCATION) THEN
@@ -8045,9 +8145,9 @@
 ! --- Alignment at an off-ramp.
  
           ELSEIF(OBJECT_LIST(IOBJ)%ITYPE .EQ. M_ALIGN_OFF) THEN
-            IF(DESTINATION(IV) .EQ. IL .OR. RECEIVING_LANE(OBJECT_LIST(IOBJ)%LINK, ILANE) .EQ. 0) THEN
+            IF(RECEIVING_LANE(OBJECT_LIST(IOBJ)%LINK, ILANE) .EQ. 0) THEN
               ILANE = EXIT_LANE(OBJECT_LIST(IOBJ)%LINK, ILANE)
-              ISEG = SEGMENT(OBJECT_LIST(IOBJ)%LINK)
+              ISEG = SEGMENT(OFFRAMP_LINK(OBJECT_LIST(IOBJ)%LINK))
               ITYPE = LINKTYPE(OFFRAMP_LINK(OBJECT_LIST(IOBJ)%LINK))
             ENDIF
             IF(ILANE .EQ. 0) EXIT
@@ -8438,6 +8538,8 @@
     IF(DIST / SSPEED(IV) .LE. DECISION_TIME .OR. DIST .LT. STOPDIST) THEN
       WPERM = .TRUE.
       SGO_THRU_SIGNAL(IV) = .TRUE.
+    ELSE
+      FORCE_STOP(IV) = .TRUE.
     ENDIF
   ENDIF
   RETURN
@@ -8506,15 +8608,19 @@
     IF(DIST .GT. 0.) THEN
       !Map the location along the arc into SLOCATION
       IF(TRAVEL .GT. 0.) THEN
-        SLOCATION(IV) = MAX(SLOCATION(IV), LANE_CENTER(ARC_ENTRYLINK(IV), ARC_ENTRYLANE(IV)) + FRAC * DIST)
+        IF(FRAC .GE. 1.0) THEN
+          SLOCATION(IV) = SLOCATION(IV) + TRAVEL
+        ELSE
+          SLOCATION(IV) = MAX(SLOCATION(IV), LANE_CENTER(ARC_ENTRYLINK(IV), ARC_ENTRYLANE(IV)) + FRAC * DIST)
+        ENDIF
       ENDIF
     ELSE
       SLOCATION(IV) = SLOCATION(IV) + TRAVEL
     ENDIF
   ENDIF
-  
+
   !If the vehicle is outside of the intersection clear the arc settings
-  IF(SLOCATION(IV) .GT. UP_INT_WIDTH(IL)) THEN
+  IF(ARC_LOCATION(IV) .GT. ARC_LENGTH(IV)) THEN
     ARC_ENTRYLINK(IV) = 0
     ARC_LOCATION(IV) = 0.
     ARC_LENGTH(IV) = 0.
@@ -8526,6 +8632,7 @@
       CALL WRITE_VEHICLE_TEXT_ARC(IV)
     ENDIF
   ENDIF
+  
   RETURN
   END
 
@@ -8591,16 +8698,16 @@
   FIRST_RIGHT(IV) = .FALSE.
   IF(RNDNUM .LE. PCT(1)) THEN
     ROUNDABOUT_EXIT(IV) = ROUNDABOUT(IRND)%DEPARTING_LINKS(IEXIT(1))
-    IF(IAP .EQ. 1) FIRST_RIGHT(IV) = .TRUE.
+    IF(IAP .EQ. IEXIT(1)) FIRST_RIGHT(IV) = .TRUE.
   ELSEIF(RNDNUM .LE. PCT(2)) THEN
     ROUNDABOUT_EXIT(IV) = ROUNDABOUT(IRND)%DEPARTING_LINKS(IEXIT(2))
-    IF(IAP .EQ. 2) FIRST_RIGHT(IV) = .TRUE.
+    IF(IAP .EQ. IEXIT(2)) FIRST_RIGHT(IV) = .TRUE.
   ELSEIF(RNDNUM .LE. PCT(3)) THEN
     ROUNDABOUT_EXIT(IV) = ROUNDABOUT(IRND)%DEPARTING_LINKS(IEXIT(3))
-    IF(IAP .EQ. 3) FIRST_RIGHT(IV) = .TRUE.
+    IF(IAP .EQ. IEXIT(3)) FIRST_RIGHT(IV) = .TRUE.
   ELSEIF(RNDNUM .LE. PCT(4)) THEN
     ROUNDABOUT_EXIT(IV) = ROUNDABOUT(IRND)%DEPARTING_LINKS(IEXIT(4))
-    IF(IAP .EQ. 4) FIRST_RIGHT(IV) = .TRUE.
+    IF(IAP .EQ. IEXIT(4)) FIRST_RIGHT(IV) = .TRUE.
   ELSE
     ROUNDABOUT_EXIT(IV) = ROUNDABOUT(IRND)%DEPARTING_LINKS(IEXIT(5))
     IF(IAP .EQ. 5) FIRST_RIGHT(IV) = .TRUE.

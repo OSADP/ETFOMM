@@ -229,6 +229,12 @@ private:
 	FPTR_OutProcFunction GETSTREETLANEMOEDATA;
 	FPTR_OutProcFunction2 GETSTREETLINKMOEDATA;
 
+	FPTR_INT SET_NUMBER_OF_ROUNDABOUTS;
+	FPTR_RABT DEFINE_ROUNDABOUTS, GET_ROUNDABOUTS;
+	FPTR_INT SET_NUMBER_OF_TURNING_WAYS;
+	FPTR_VOID GET_NUMBER_OF_TURNING_WAYS;
+	FPTR_TW DEFINE_TURNING_WAYS, GET_TURNING_WAYS;
+
 	int m_status;
 	std::string appPath, DefaultRnsFile, DefaultTrfFile, TRFFile;
 	int use_dcs, use_ntcip, external_detectors, write_trf;
@@ -331,6 +337,11 @@ public:
 	void SetIncidents(INCIDENT_DATA *incident_data_inputs);
 	void SetNodeCoordinates(NODE_LOCATION_DATA *xy_coord_inputs);
 	void SetIntersectionData(std::vector<IntersectionDimensions>& intersection_inputs);
+	void SetNumberOfRoundabouts(int n_rabts);
+	void SetRoundabouts(RABT_API_DATA* roundabout_inputs);
+	void SetNumberOfTurningWays(int n_rtws);
+	void SetTurningWays(TURNING_WAY* turningway_inputs);
+	
 	void ProcessFreewayInputs(void);
 	void ProcessStreetInputs(void);
 
@@ -338,7 +349,9 @@ public:
 	int SetFVehicle(VFData *vfdata);
 	int SetSVehicle(VSData *vsdata);
 	int AddPath(int NofNodes, int *nodes);
-	
+	int AddVehicle(float timeStep, int srcNode, int pathID, int driverType, int fleet, int type, int overSpeed, int range);
+
+
 	int GetNumberOfVehicleTypes(void);
 	int GetNumberOfFreewayLinks(void);
 	int GetFreewayLinks(FREEWAY_LINK *freeway_link_data);
@@ -431,7 +444,11 @@ public:
 	int SetETFOMMPhaseStates(int iact, int* greens, int* yellows);
 	int GetPhaseCalls(int iact, int* phase_calls);
 	
-
+	int GetNumberOfRoundabouts();
+	void GetRoundabouts(RABT_API_DATA* roundabout_inputs);
+	int GetNumberOfTurningWays();
+	void GetTurningWays(TURNING_WAY* turningway_inputs);
+	
 private:
 	// check return status of ETFOMM function and throw error messagex
 	void CheckStatus(const std::string &fName, int status);

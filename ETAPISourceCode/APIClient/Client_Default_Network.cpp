@@ -2047,7 +2047,8 @@ void Client_Default_Network_define_incident_data_inputs(array<WCF_INCIDENT_DATA>
 	{
 		wcf_incident_data_inputs[i].code = gcnew array<int>(0);
 	}
-	wcf_incident_data_inputs[0].link = 3;
+	wcf_incident_data_inputs[0].usn = 103;
+	wcf_incident_data_inputs[0].dsn = 104;
 	wcf_incident_data_inputs[0].begin_point = 50;
 	wcf_incident_data_inputs[0].begin_time = 120;
 	System::Array::Resize(wcf_incident_data_inputs[0].code, 1);
@@ -2184,7 +2185,8 @@ void Client_Default_Network_define_rampmeter_inputs(array<WCF_RM_DATA>^ wcf_ramp
 void Client_Default_Network_define_parking_zone_inputs(array<WCF_PARKING_DATA>^ wcf_parking_zone_inputs)
 {
 	int i = 0;
-	wcf_parking_zone_inputs[i].link = 9;
+	wcf_parking_zone_inputs[i].usn = 5;
+	wcf_parking_zone_inputs[i].dsn = 1;
 	wcf_parking_zone_inputs[i].right_start = 10;
 	wcf_parking_zone_inputs[i].right_len = 600;
 	wcf_parking_zone_inputs[i].freq = 20;
@@ -2197,7 +2199,8 @@ void Client_Default_Network_define_event_inputs(array<WCF_EVENT_DATA>^ wcf_event
 	wcf_event_inputs[i].begin_time = 10;
 	wcf_event_inputs[i].end_time= 110;
 	wcf_event_inputs[i].lane = 1;
-	wcf_event_inputs[i].link = 9;
+	wcf_event_inputs[i].usn = 5;
+	wcf_event_inputs[i].dsn = 1;
 	wcf_event_inputs[i].location = 225;
 	//wcf_event_inputs[i].type = 4;
 }

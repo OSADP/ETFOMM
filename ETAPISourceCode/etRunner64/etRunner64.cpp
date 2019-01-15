@@ -42,6 +42,7 @@ namespace argnames
 	const std::string runs    = "runs";
 	const std::string rnsfile = "rnsfile";
 	const std::string trffile = "trffile";
+	const std::string dtafile = "dtafile"; // DTALite project file
 	const std::string h		  = "-h";
 	const std::string help	  = "-help";
 	const std::string txt	  = "txt";
@@ -62,6 +63,7 @@ void usage()
 	std::cout << "Recognized Options:" << std::endl << std::endl;
 	std::cout << tsd << "       - generate animation TXT file" << std::endl;
 	std::cout << trffile << "=\"c:\\full path to\\trffile.trf\"" << std::endl;
+	std::cout << dtafile << "=\"c:\\full path to\\dtafile.tnp\"" << std::endl;
 	std::cout << std::endl << "options may be specified in any order." << std::endl;
 	std::cout << std::endl;
 }
@@ -105,6 +107,9 @@ int main(int argc, char* argv[])
 
 	std::string rnsFile = "rnsfile.dat";
 	std::string trfFILE = "C:\\coordination_test_new_format.trf";
+	std::string DTAFolder;
+	int DTAFlag = 0;
+	DTALiteNameSpace::CDTALiteDLL* pDTALite = NULL;
 	
 	for(int i = 1; i < argc; i++)
 	{
@@ -140,6 +145,14 @@ int main(int argc, char* argv[])
 		{
 			trfFILE = argument.substr(trffile.size() + 1).c_str();
 			TRFInputFlag = 1;
+		}
+		else if(argument.substr(0, dtafile.size()) == dtafile)
+		{
+			std::string tmpStr = argument.substr(dtafile.size() + 1);
+			std::size_t pos = tmpStr.find_last_of("\\");
+			DTAFolder = tmpStr.substr(0, pos ) + "\\";
+			DTAFlag = 1;
+			pDTALite = new DTALiteNameSpace::CDTALiteDLL(std::string( DTAFolder));
 		}
 		else if(argument == help || argument == h)
 		{
@@ -852,6 +865,51 @@ int main(int argc, char* argv[])
 				std::cin.get();
 				return 1;
 			}
+
+			NETWORK_INPUTS Network_Inputs;
+			etFommIF.GetNetworkInputs(Network_Inputs);
+
+			float minTimeStep = 0;
+			std::vector<std::vector<int> > paths; 
+			std::vector<AddedVehicle> vehicles;
+			if (DTAFlag == 1)
+			{
+				std::cout << std::endl << "Running DTALite...\nDTALite Folder: " << DTAFolder << std::endl;
+				try
+				{
+					pDTALite->RunDTALiteFromFile(DTAFolder);
+					ConvertPaths(&etFommIF, pDTALite, minTimeStep, paths, vehicles);
+					delete pDTALite;
+				} catch (DTALiteNameSpace::DTALiteException &e)
+				{
+					std::cout << std::endl << "Error in running DTALite: " << e.what() << std::endl;
+					delete pDTALite;
+				}
+
+				std::cout << std::endl << "Adding paths..." << std::endl;
+				for (std::vector<std::vector<int> >::iterator ipath = paths.begin(); ipath != paths.end(); ++ipath)
+				{
+					status = etFommIF.AddPath(ipath->size(), &((*ipath)[0]));
+				}
+
+				if(Network_Inputs.run_init)
+				{
+					std::cout << std::endl << "Initialization: Adding vehicles..." << std::endl;
+					for (std::vector<AddedVehicle>::iterator ivp = vehicles.begin(); ivp != vehicles.end(); ++ivp)
+					{
+						float timestep = int((ivp->timestep-minTimeStep)*60.0*float(Network_Inputs.timestep)+0.5) / float(Network_Inputs.timestep);
+						if (timestep > Network_Inputs.initialization_end)
+							break;
+						int vehID = etFommIF.AddVehicle(timestep, ivp->srcNode, ivp->pathID, ivp->pathID % 10, 0, 1, 0, 0);
+						
+					}
+
+
+				}
+			}
+
+			
+
 			
 #if DISPLAY_DEFAULT_NETWORK_FLAG
 			DisplayFreewayLinks(&etFommIF);
@@ -1106,6 +1164,17 @@ int main(int argc, char* argv[])
 			QueryPerformanceCounter(&litmp);
 			QStop = litmp.QuadPart;
 #endif
+			if (DTAFlag == 1)
+			{
+				std::cout << std::endl << "Adding vehicles..." << std::endl;
+
+				for (std::vector<AddedVehicle>::iterator ivp = vehicles.begin(); ivp != vehicles.end(); ++ivp)
+				{
+					float timestep = int((ivp->timestep-minTimeStep)*60.0*float(Network_Inputs.timestep)+0.5) / float(Network_Inputs.timestep);
+					int vehID = etFommIF.AddVehicle(timestep, ivp->srcNode, ivp->pathID, ivp->pathID % 10, 0, 1, 0, 0);
+
+				}
+			}
 			while(status == 0)
 			{
 #if _UseController
@@ -1624,9 +1693,8 @@ int main(int argc, char* argv[])
 		std::cout << "############################" << std::endl << std::endl;
 	}
 
-	char terminate;
 	std::cout << "hit any key to terminate" << std::endl;
-	std::cin>>terminate;
+	std::cin.get();
 	return 0;
 }
 
@@ -1895,7 +1963,6 @@ FREEWAY_NETWORK_INPUTS WCF_to_HOST_freeway_network_input_data(array<WCF_FREEWAY_
 	
 	Freeway_Network_Inputs.freeway_pct_coop = wcf_freeway_network_inputs[0].freeway_pct_coop;
 	Freeway_Network_Inputs.lc_time = wcf_freeway_network_inputs[0].lc_time;
-	Freeway_Network_Inputs.dlc_mult = wcf_freeway_network_inputs[0].dlc_mult;
 	}
 	return Freeway_Network_Inputs;
 }
@@ -1912,8 +1979,6 @@ STREET_NETWORK_INPUTS WCF_to_HOST_street_network_input_data(array<WCF_STREET_NET
 	{
 		Street_Network_Inputs.amber_decel[i] = wcf_street_network_inputs[0].amber_decel[i];
 	}
-	Street_Network_Inputs.lt_speed = wcf_street_network_inputs[0].lt_speed;
-	Street_Network_Inputs.rt_speed = wcf_street_network_inputs[0].rt_speed;
 	for (int i = 0; i < wcf_street_network_inputs[0].pdelay_weak->Length; i++)
 	{
 		Street_Network_Inputs.pdelay_weak[i] = wcf_street_network_inputs[0].pdelay_weak[i];
@@ -1986,13 +2051,12 @@ void WCF_to_HOST_Vehicle_Type_Inputs(VEHICLE_TYPE_DATA* Vehicle_Type_Inputs, arr
 		Vehicle_Type_Inputs[i].length = wcf_vdi[i].length;
 		Vehicle_Type_Inputs[i].headway_factor = wcf_vdi[i].headway_factor;
 		Vehicle_Type_Inputs[i].average_occupancy = wcf_vdi[i].average_occupancy;
-		Vehicle_Type_Inputs[i].emergency_decel = wcf_vdi[i].emergency_decel;
+		Vehicle_Type_Inputs[i].non_emergency_decel = wcf_vdi[i].emergency_decel;
 		Vehicle_Type_Inputs[i].fleet_freeway_auto = wcf_vdi[i].fleet_freeway_auto;
 		Vehicle_Type_Inputs[i].fleet_freeway_truck = wcf_vdi[i].fleet_freeway_truck;
 		Vehicle_Type_Inputs[i].fleet_freeway_carpool = wcf_vdi[i].fleet_freeway_carpool;
 		Vehicle_Type_Inputs[i].fleet_freeway_bus = wcf_vdi[i].fleet_freeway_bus;
 		Vehicle_Type_Inputs[i].fleet_freeway_ev = wcf_vdi[i].fleet_freeway_ev;
-		Vehicle_Type_Inputs[i].fleet_freeway_bike = wcf_vdi[i].fleet_freeway_bike;
 		Vehicle_Type_Inputs[i].fleet_street_auto = wcf_vdi[i].fleet_street_auto;
 		Vehicle_Type_Inputs[i].fleet_street_truck = wcf_vdi[i].fleet_street_truck;
 		Vehicle_Type_Inputs[i].fleet_street_carpool = wcf_vdi[i].fleet_street_carpool;
@@ -2077,11 +2141,6 @@ void WCF_to_HOST_freeway_link_data(FREEWAY_LINK* freeway_link_data, array<Wcf_fr
 		for (int iaux = 0; iaux < wcf_fwl[il].auxlanelength->Length; iaux ++)
 		{
 			freeway_link_data[il].auxlanelength[iaux] = wcf_fwl[il].auxlanelength[iaux];
-		}
-
-		for (int ihov = 0; ihov < wcf_fwl[il].hov_lanes->Length; ihov ++)
-		{
-			freeway_link_data[il].hov_lanes[ihov] = wcf_fwl[il].hov_lanes[ihov];
 		}
 
 		for (int i = 0; i < wcf_fwl[il].lane_width->Length; i++)
@@ -2218,8 +2277,6 @@ void WCF_to_HOST_entry_node_data(ENTRYNODES_DATA* entrynode_inputs, array<WCF_EN
 		entrynode_inputs[in].flowrate = wcf_entry_node[in].flowrate;
 		entrynode_inputs[in].truck_pct = wcf_entry_node[in].truck_pct;
 		entrynode_inputs[in].hov_violators_per10000 = wcf_entry_node[in].hov_violators_per10000;
-		entrynode_inputs[in].SS_USN = wcf_entry_node[in].SS_USN;
-		entrynode_inputs[in].SS_DSN = wcf_entry_node[in].SS_DSN;
 		for (int ip = 0; ip < wcf_entry_node[in].lane_pct->Length; ip++)
 		{
 			entrynode_inputs[in].lane_pct[ip] = wcf_entry_node[in].lane_pct[ip];
@@ -2440,7 +2497,8 @@ void WCF_to_Host_incident_data_inputs(INCIDENT_DATA* incident_data_inputs, array
 {
 	for (int i = 0; i < wcf_incident_data_inputs->Length; i++)
 	{
-		incident_data_inputs[i].link = wcf_incident_data_inputs[i].link;
+		incident_data_inputs[i].usn = wcf_incident_data_inputs[i].usn;
+		incident_data_inputs[i].dsn = wcf_incident_data_inputs[i].dsn;
 		incident_data_inputs[i].begin_point = wcf_incident_data_inputs[i].begin_point;
 		incident_data_inputs[i].begin_time = wcf_incident_data_inputs[i].begin_time;
 		incident_data_inputs[i].end_point = wcf_incident_data_inputs[i].end_point;
@@ -2458,7 +2516,8 @@ void WCF_to_Host_parking_data_inputs(PARKING_DATA* parking_data_inputs, array<WC
 {
 	for (int i = 0; i < wcf_parking_data_inputs->Length; ++i) 
 	{
-		parking_data_inputs[i].link = wcf_parking_data_inputs[i].link;
+		parking_data_inputs[i].usn = wcf_parking_data_inputs[i].usn;
+		parking_data_inputs[i].dsn = wcf_parking_data_inputs[i].dsn;
 		parking_data_inputs[i].duration = wcf_parking_data_inputs[i].duration;
 		parking_data_inputs[i].freq = wcf_parking_data_inputs[i].freq;
 		parking_data_inputs[i].left_start = wcf_parking_data_inputs[i].left_start;
@@ -2475,7 +2534,8 @@ void WCF_to_Host_event_data_inputs(EVENT_DATA* event_data_inputs, array<WCF_EVEN
 		event_data_inputs[i].begin_time = wcf_event_data_inputs[i].begin_time;
 		event_data_inputs[i].end_time = wcf_event_data_inputs[i].end_time;
 		event_data_inputs[i].lane = wcf_event_data_inputs[i].lane;
-		event_data_inputs[i].link = wcf_event_data_inputs[i].link;
+		event_data_inputs[i].usn = wcf_event_data_inputs[i].usn;
+		event_data_inputs[i].dsn = wcf_event_data_inputs[i].dsn;
 		event_data_inputs[i].location = wcf_event_data_inputs[i].location;
 		
 	}
@@ -2793,10 +2853,6 @@ void ProcessFreewayLinksData(std::ofstream &outputFile, IService1^ proxy, etFomm
 			wcf_fwl[il].hov_code = freeway_link_data[il].hov_code;
 
 			wcf_fwl[il].hov_lanes = gcnew array<int>(MAX_HOV_LANE);
-			for (int j = 0; j < MAX_HOV_LANE; j++)
-			{
-				wcf_fwl[il].hov_lanes[j] = freeway_link_data[il].hov_lanes[j];
-			}
 			wcf_fwl[il].hov_offramp_warn_distance = freeway_link_data[il].hov_offramp_warn_distance;
 			wcf_fwl[il].hov_side = freeway_link_data[il].hov_side;
 			wcf_fwl[il].hov_warn = freeway_link_data[il].hov_warn;
@@ -3214,8 +3270,6 @@ void ProcessEntryNodes(std::ofstream &outputFile, IService1 ^proxy, etFommInterf
 			}
 			wcf_entrynode_data[i].Node_ID = entrynode_data[i].Node_ID;
 			wcf_entrynode_data[i].truck_pct = entrynode_data[i].truck_pct;
-			wcf_entrynode_data[i].SS_USN = entrynode_data[i].SS_USN;
-			wcf_entrynode_data[i].SS_DSN = entrynode_data[i].SS_DSN;
 		}
 		proxy->SetServerEntryNodeDataSize(wcf_entrynode_data->Length);
 		proxy->SetServerEntryNodeData(wcf_entrynode_data);
@@ -3786,8 +3840,7 @@ void ProcessFNetworkInputs(std::ofstream &outputFile, IService1 ^proxy, etFommIn
 	wcf_fnetwork_inputs[0].idm_sep = FNetwork_Inputs.idm_sep;
 	wcf_fnetwork_inputs[0].freeway_pct_coop = FNetwork_Inputs.freeway_pct_coop;
 	wcf_fnetwork_inputs[0].lc_time = FNetwork_Inputs.lc_time;
-	wcf_fnetwork_inputs[0].dlc_mult = FNetwork_Inputs.dlc_mult;
-
+	
 	proxy->SetServerFreewayNetworkInput(wcf_fnetwork_inputs);
 }
 
@@ -3894,8 +3947,6 @@ void ProcessSNetworkInputs(std::ofstream &outputFile, IService1 ^proxy, etFommIn
 		wcf_snetwork_inputs[0].turnsignal_prob[i] = SNetwork_Inputs.turnsignal_prob[i];
 	}
 
-	wcf_snetwork_inputs[0].lt_speed = SNetwork_Inputs.lt_speed;
-	wcf_snetwork_inputs[0].rt_speed = SNetwork_Inputs.rt_speed;
 	wcf_snetwork_inputs[0].pitt_sep = SNetwork_Inputs.pitt_sep;
 	wcf_snetwork_inputs[0].idm_sep = SNetwork_Inputs.idm_sep;
 	wcf_snetwork_inputs[0].lc_time = SNetwork_Inputs.lc_time;
@@ -3926,13 +3977,12 @@ void ProcessVTypeInputs(std::ofstream &outputFile, IService1 ^proxy, etFommInter
 			wcf_vtype_inputs[i].length = VType_Inputs[i].length;
 			wcf_vtype_inputs[i].headway_factor = VType_Inputs[i].headway_factor;
 			wcf_vtype_inputs[i].average_occupancy = VType_Inputs[i].average_occupancy;
-			wcf_vtype_inputs[i].emergency_decel = VType_Inputs[i].emergency_decel;
+			wcf_vtype_inputs[i].emergency_decel = VType_Inputs[i].non_emergency_decel;
 			wcf_vtype_inputs[i].fleet_freeway_auto = VType_Inputs[i].fleet_freeway_auto;
 			wcf_vtype_inputs[i].fleet_freeway_truck = VType_Inputs[i].fleet_freeway_truck;
 			wcf_vtype_inputs[i].fleet_freeway_carpool = VType_Inputs[i].fleet_freeway_carpool;
 			wcf_vtype_inputs[i].fleet_freeway_bus = VType_Inputs[i].fleet_freeway_bus;
 			wcf_vtype_inputs[i].fleet_freeway_ev = VType_Inputs[i].fleet_freeway_ev;
-			wcf_vtype_inputs[i].fleet_freeway_bike = VType_Inputs[i].fleet_freeway_bike;
 			wcf_vtype_inputs[i].fleet_street_auto = VType_Inputs[i].fleet_street_auto;
 			wcf_vtype_inputs[i].fleet_street_truck = VType_Inputs[i].fleet_street_truck;
 			wcf_vtype_inputs[i].fleet_street_carpool = VType_Inputs[i].fleet_street_carpool;
@@ -4072,7 +4122,8 @@ void ProcessIncidentInputs(std::ofstream &outputFile, IService1 ^proxy, etFommIn
 
 		for (int i = 0; i < n_incidents; ++i)
 		{
-			wcf_incident[i].link = incident_inputs[i].link;
+			wcf_incident[i].usn = incident_inputs[i].usn;
+			wcf_incident[i].dsn = incident_inputs[i].dsn;
 			wcf_incident[i].begin_point = incident_inputs[i].begin_point;
 			wcf_incident[i].begin_time = incident_inputs[i].begin_time;
 			wcf_incident[i].end_point = incident_inputs[i].end_point;
@@ -4135,7 +4186,8 @@ void ProcessParkingZones(std::ofstream &outputFile, IService1 ^proxy, etFommInte
 
 		for (int i = 0; i < n_parkingzones; ++i)
 		{
-			wcf_parking_data_input[i].link = parkingzone_inputs[i].link;
+			wcf_parking_data_input[i].usn = parkingzone_inputs[i].usn;
+			wcf_parking_data_input[i].dsn = parkingzone_inputs[i].dsn;
 			wcf_parking_data_input[i].duration = parkingzone_inputs[i].duration;
 			wcf_parking_data_input[i].freq = parkingzone_inputs[i].freq;
 			wcf_parking_data_input[i].left_start = parkingzone_inputs[i].left_start;
@@ -4168,7 +4220,8 @@ void ProcessEvents(std::ofstream &outputFile, IService1 ^proxy, etFommInterface 
 			wcf_event[i].begin_time = event_inputs[i].begin_time;
 			wcf_event[i].end_time = event_inputs[i].end_time;
 			wcf_event[i].lane = event_inputs[i].lane;
-			wcf_event[i].link = event_inputs[i].link;
+			wcf_event[i].usn = event_inputs[i].usn;
+			wcf_event[i].dsn = event_inputs[i].dsn;
 			wcf_event[i].location = event_inputs[i].location;
 			wcf_event[i].speed_reduction = event_inputs[i].speed_reduction;
 			wcf_event[i].length = event_inputs[i].length;
@@ -4816,4 +4869,275 @@ void ProcessHITLSACData(IService1^ proxy, etFommInterface *etFommIF)
 		}
 	}
 	proxy->SetServerACData(wcf_acl);
+}
+
+void ConvertPaths(etFommInterface *etFommIF, DTALiteNameSpace::CDTALiteDLL* pDTALite, 
+				  float& minTimeStep, std::vector<std::vector<int> >& paths, std::vector<AddedVehicle>& vehicles)
+{
+	paths.clear();
+	vehicles.clear();
+	if (pDTALite == NULL || pDTALite->m_VehiclePaths.empty())
+	{
+		std::cout << "WARNING: No vehicle path generated from DTALite" << std::endl;
+		return;
+	}
+
+	STREET_LINK* streetLinks;
+	int n_street_links = etFommIF->GetNumberOfStreetLinks();
+	if (n_street_links > 0)
+	{
+		streetLinks = (STREET_LINK*)calloc(n_street_links, sizeof(STREET_LINK));
+		etFommIF->GetStreetLinks(streetLinks);
+	} 
+
+	FREEWAY_LINK* freewayLinks;
+	int n_freeway_links = etFommIF->GetNumberOfFreewayLinks();
+	if (n_freeway_links > 0)
+	{
+		freewayLinks = (FREEWAY_LINK*)calloc(n_freeway_links, sizeof(FREEWAY_LINK));
+		etFommIF->GetFreewayLinks(freewayLinks);
+	}
+
+	int n_nodes = 8999;
+	NODE_LOCATION_DATA *nodes = (NODE_LOCATION_DATA*)calloc(n_nodes, sizeof(NODE_LOCATION_DATA));
+	etFommIF->GetNodeCoordinates(nodes);
+
+	ENTRYNODES_DATA* entryNodes;
+	int n_EntryNodes = etFommIF->GetNumberOfEntrynodes();
+	if (n_EntryNodes > 0)
+	{
+		entryNodes = (ENTRYNODES_DATA*)calloc(n_EntryNodes, sizeof(ENTRYNODES_DATA));
+		int typedist = 0, erlanga = 0;
+		float minsep = 0;
+		etFommIF->GetEntrynodes(&typedist, &erlanga, &minsep, entryNodes);
+	}
+
+	// create link connections to find intermediate/interface nodes
+	// std::map<std::pair<usn, receivingDSN>, dsn >
+	std::map<std::pair<int, int>, int > connections;
+	CreateLinkConnections(n_freeway_links, freewayLinks, n_street_links, streetLinks, connections);
+
+	minTimeStep = 9999.0;
+	std::map<std::vector<int>, int > pathIDs;
+	int pathID = 1;
+
+	for (std::vector<DTALiteNameSpace::VehiclePath>::iterator it = pDTALite->m_VehiclePaths.begin();
+		it != pDTALite->m_VehiclePaths.end(); ++it)
+	{
+		DTALiteNameSpace::VehiclePath* pVeh = &(*it);
+		AddedVehicle vp = {pVeh->timestep, pVeh->id, pVeh->srcNode, pVeh->dstNode, 
+			pVeh->type, pVeh->fleet, pathID};
+		std::vector<int> pathNodes;
+			
+		bool isValidPath = true;
+		for(int i = 0; i< pVeh->nNodes; i++)  // for all nodes
+		{
+			std::vector<int>& pnodes = pVeh->pathNodes;
+			int curNode = pnodes[i];
+			if (curNode <= n_nodes && nodes[curNode-1].is_defined == 1)
+			{
+				if (i > 0)
+				{
+					int preNode = pnodes[i-1];
+					int linkIdx = FindFreewayLinkIdx(n_freeway_links, freewayLinks, preNode, curNode);
+					if (linkIdx < 0)
+					{
+						linkIdx = FindStreetLinkIdx(n_street_links, streetLinks, preNode, curNode);
+						if (linkIdx < 0)
+						{
+							std::pair<int, int> linkKey(preNode, curNode);
+							if (connections.find(linkKey) != connections.end())
+							{
+								pathNodes.push_back(connections[linkKey]);
+							} else
+							{
+								isValidPath = false;
+								break;
+							}
+						}
+					}
+				}
+
+				pathNodes.push_back(pVeh->pathNodes[i]);
+			} else
+			{
+				isValidPath = false;
+				break;
+			}
+		}
+		if (!pathNodes.empty())
+		{
+			vp.srcNode = pathNodes.front();
+			vp.dstNode = pathNodes.back();
+			int src = pathNodes.front();
+			int dst = pathNodes.back();
+			int tmp = 0;
+		} else
+		{
+			isValidPath = false;
+		}
+
+		if (isValidPath)
+		{
+			if (pathIDs.find(pathNodes) != pathIDs.end())
+			{
+				vp.pathID = pathIDs[pathNodes];
+			} else
+			{
+				bool IsStartFromEntry = IsEntryNode(n_freeway_links, freewayLinks, n_street_links, streetLinks, vp.srcNode);
+				bool IsEndToExit = IsExitNode(n_freeway_links, freewayLinks, n_street_links, streetLinks,vp.dstNode);
+				////////////
+				///////////////
+				if (!IsStartFromEntry || !IsEndToExit)
+				{
+
+					continue;
+				}
+
+				pathIDs[pathNodes] = pathID;
+				paths.push_back(pathNodes);
+
+				pathID++;
+			}
+		} else
+		{
+
+				continue;
+		}
+
+		
+		vehicles.push_back(vp);
+
+		if (vp.timestep < minTimeStep)
+			minTimeStep = vp.timestep;
+	}
+
+}
+
+int FindFreewayLinkIdx(int nLinks, FREEWAY_LINK* links, int usn, int dsn)
+{
+	for (int i = 0; i < nLinks; ++i)
+	{
+		if (links[i].usn == usn && links[i].dsn==dsn)
+			return i;
+	}
+	return -1;
+}
+
+int FindStreetLinkIdx(int nLinks, STREET_LINK* links, int usn, int dsn)
+{
+	for (int i = 0; i < nLinks; ++i)
+	{
+		if (links[i].usn == usn && links[i].dsn==dsn)
+			return i;
+	}
+	return -1;
+}
+
+void CreateLinkConnections(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks,
+						   std::map<std::pair<int, int>, int >& connections)
+{
+
+	for (int i = 0; i < nFLinks; ++i)
+	{
+		FREEWAY_LINK* pLink = &(FLinks[i]); 
+		for (int j = 0; j < nFLinks; ++j)
+		{
+			FREEWAY_LINK* pNLink = &(FLinks[j]); 
+			if (InsertConnections(pLink->usn, pLink->dsn, pNLink->usn, pNLink->dsn, connections))
+			{
+
+			}
+
+			
+		}
+
+		for (int j = 0; j < nSLinks; ++j)
+		{
+			STREET_LINK* pNLink = &(SLinks[j]); 
+			if (InsertConnections(pLink->usn, pLink->dsn, pNLink->usn, pNLink->dsn, connections))
+			{
+
+			}
+		}
+
+
+	}
+
+	for (int i = 0; i < nSLinks; ++i)
+	{
+		STREET_LINK* pLink = &(SLinks[i]); 
+		
+		for (int j = 0; j < nFLinks; ++j)
+		{
+			FREEWAY_LINK* pNLink = &(FLinks[j]); 
+			if (InsertConnections(pLink->usn, pLink->dsn, pNLink->usn, pNLink->dsn, connections))
+			{
+
+			}
+
+			
+		}
+
+		for (int j = 0; j < nSLinks; ++j)
+		{
+			STREET_LINK* pNLink = &(SLinks[j]); 
+			if (InsertConnections(pLink->usn, pLink->dsn, pNLink->usn, pNLink->dsn, connections))
+			{
+
+			}
+		}
+	}
+
+
+}
+
+bool InsertConnections(int usn, int dsn, int nusn, int ndsn, std::map<std::pair<int, int>, int >& connections)
+{
+	if (nusn == dsn && ndsn != usn)
+	{
+		connections[std::pair<int, int>(usn, ndsn)] = dsn;
+		return true;
+	} else
+	{
+		return false;
+	}
+}
+
+bool IsEntryNode(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks, int node)
+{
+	for (int i = 0; i < nFLinks; ++i)
+	{
+		FREEWAY_LINK* pLink = &(FLinks[i]); 
+		if (pLink->dsn == node && pLink->usn >=8000)
+			return true;
+	}
+
+	for (int i = 0; i < nSLinks; ++i)
+	{
+		STREET_LINK* pLink = &(SLinks[i]); 
+		if (pLink->dsn == node && pLink->usn >=8000)
+			return true;
+	}
+
+	return false;
+}
+
+bool IsExitNode(int nFLinks, FREEWAY_LINK* FLinks, int nSLinks, STREET_LINK* SLinks, int node)
+{
+	for (int i = 0; i < nFLinks; ++i)
+	{
+		FREEWAY_LINK* pLink = &(FLinks[i]); 
+		if (pLink->usn == node && pLink->dsn >=8000)
+			return true;
+	}
+
+	for (int i = 0; i < nSLinks; ++i)
+	{
+		STREET_LINK* pLink = &(SLinks[i]); 
+		if (pLink->usn == node && pLink->dsn >=8000)
+			return true;
+	}
+
+	return false;
 }

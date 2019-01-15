@@ -1033,7 +1033,8 @@ namespace WCFServer
 			System::Array::Resize(server_parking_inputs, wcf_parking_inputs->Length);
 			for (int i = 0; i < wcf_parking_inputs->Length; ++i)
 			{
-				server_parking_inputs[i].link = wcf_parking_inputs[i].link;
+				server_parking_inputs[i].usn = wcf_parking_inputs[i].usn;
+				server_parking_inputs[i].dsn = wcf_parking_inputs[i].dsn;
 				server_parking_inputs[i].duration = wcf_parking_inputs[i].duration;
 				server_parking_inputs[i].freq = wcf_parking_inputs[i].freq;
 				server_parking_inputs[i].left_start = wcf_parking_inputs[i].left_start;

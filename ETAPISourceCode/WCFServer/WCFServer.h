@@ -462,7 +462,8 @@ namespace WCFServer
 		int begin_time;
 		int end_time;
 		int lane;
-		int link;
+		int usn;
+		int dsn;
 		int location;
 		int speed_reduction;
 		int length;
@@ -471,7 +472,8 @@ namespace WCFServer
 
 	public value struct WCF_PARKING_DATA
 	{
-		int link;
+		int usn;
+		int dsn;
 		int duration;
 		int freq;
 		int left_start;
@@ -482,7 +484,8 @@ namespace WCFServer
 
 	public value struct WCF_INCIDENT_DATA
 	{
-		int link;
+		int usn;
+		int dsn;
 		int begin_point;
 		int begin_time;
 		int end_point;

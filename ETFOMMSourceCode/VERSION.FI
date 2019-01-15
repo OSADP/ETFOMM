@@ -1,2 +1,2 @@
       CHARACTER KVER*4
-      DATA KVER /'1.4'/
+      DATA KVER /'2.00'/

@@ -619,7 +619,7 @@
   
 ! --- Define the area of all freeway internal links.
 
-  DO CONCURRENT (IL = 1: N_FREEWAY_LINKS)
+  DO IL = 1, N_FREEWAY_LINKS
 
 ! --- Store interface links.
 
@@ -1398,6 +1398,7 @@
           CALL SENDTEXTMSG(M_ERROR)
         ELSE
           NUMBER_OF_TURNING_WAYS = NUMBER_OF_TURNING_WAYS + 1
+          NUMBER_TURNINGWAYS(IL) = NUMBER_TURNINGWAYS(IL) + 1
           RTW_RECEIVING_LINK(IL) = ILINK
           RTW_EXIT_POINT(IL) = IBUF(28)
           RTW_ENTRY_POINT(RTW_RECEIVING_LINK(IL)) = IBUF(29)
@@ -1753,58 +1754,7 @@
   ENDIF
   RETURN
   END 
-      
-! ==================================================================================================
-  SUBROUTINE READ_RT119(STRING)
-! ----------------------------------------------------------------------
-! --- Extended Freeway Lane Inputs.
-! ----------------------------------------------------------------------
-  USE FREEWAY_LINKS
-  USE CORSIM_NODES
-  USE GLOBAL_DATA
-  USE NODE_TABLE
-  USE SIMPARAMS
-  USE TEXT
-  IMPLICIT NONE
-  CHARACTER*80, INTENT(IN) :: STRING
-  INTEGER :: IBUF(19), IAUX, IL, I, N
-! ----------------------------------------------------------------------
-  READ(STRING, '(2I4,2X,2I2,5(1X,I2,I1,I6))') IBUF
-  CALL FIND_FREEWAY_LINK(IBUF(1), IBUF(2), IL)
-  IF(IL .EQ. 0) THEN
-    CALL NEW_ERROR
-    WRITE(MSGTEXT, '(A, 2I5)') 'RT 119: SPECIFIED LINK NOT FOUND ', IBUF(1), IBUF(2)
-    CALL SENDTEXTMSG(M_ERROR)
-    RETURN
-  ELSE
-    FNUMLANES(IL) = IBUF(3)
-    IF(IBUF(4) .EQ. 1) THEN
-      IAUX = 0
-    ELSEIF(IBUF(4) .EQ. 2) THEN
-      IAUX = 5
-    ELSE
-      CALL NEW_ERROR
-      WRITE(MSGTEXT, '(A, I2)') 'RT 119: INVALID SEQUENCE IDENTIFIER ', IBUF(4)
-      CALL SENDTEXTMSG(M_ERROR)
-      RETURN
-    ENDIF
- 
-! --- Process auxiliary lane inputs.
- 
-    N = 5
-    DO I = 1, 5
-      IF(IBUF(N) .EQ. 0) EXIT
-      IAUX = IAUX + 1
-      AUX_LANE_ID(IL, IAUX) = IBUF(N)
-      AUX_LANE_CODE(IL, IAUX) = IBUF(N + 1)
-      AUX_LANE_LENGTH(IL, IAUX) = IBUF(N + 2)
-      N = N + 3
-    ENDDO
-  ENDIF
-  RETURN
-  END
-  
-    
+         
 ! ==================================================================================================
   SUBROUTINE PROCESS_RT19(STRING)
 ! ----------------------------------------------------------------------
@@ -2263,7 +2213,7 @@
     FDETECTOR(N_FREEWAY_DETECTORS)%LANE1 = IBUF(3)
     FDETECTOR(N_FREEWAY_DETECTORS)%LOCATION = IBUF(4)
     FDETECTOR(N_FREEWAY_DETECTORS)%ZONE_LENGTH = MAX(1, IBUF(5))
-    FDETECTOR(N_FREEWAY_DETECTORS)%TYPE_CODE = 1
+    FDETECTOR(N_FREEWAY_DETECTORS)%TYPE_CODE = 0
     FDETECTOR(N_FREEWAY_DETECTORS)%STATION_ID = IBUF(8)
     IF(FFIRST_DETECTOR(IL) .EQ. 0) THEN
       FFIRST_DETECTOR(IL) = N_FREEWAY_DETECTORS
@@ -2309,12 +2259,12 @@
     INCIDENT_CODE(NINC, 3) = IBUF(5)
     INCIDENT_CODE(NINC, 4) = IBUF(6)
     INCIDENT_CODE(NINC, 5) = IBUF(7)
-    INCIDENT_CODE(NINC, 8) = IBUF(8)
-    INCIDENT_CODE(NINC, 7) = IBUF(9)
-    INCIDENT_CODE(NINC, 6) = IBUF(10)
-    INCIDENT_CODE(NINC, 9) = IBUF(11)
-    INCIDENT_CODE(NINC, 10) = IBUF(12)
-    INCIDENT_CODE(NINC, 11) = IBUF(13)
+    INCIDENT_CODE(NINC, 13) = IBUF(8)
+    INCIDENT_CODE(NINC, 12) = IBUF(9)
+    INCIDENT_CODE(NINC, 11) = IBUF(10)
+    INCIDENT_CODE(NINC, 18) = IBUF(11)
+    INCIDENT_CODE(NINC, 17) = IBUF(12)
+    INCIDENT_CODE(NINC, 16) = IBUF(13)
     INCIDENT_BEGIN_POINT(NINC) = IBUF(14)
     INCIDENT_END_POINT(NINC) = IBUF(14) + IBUF(15)
     INCIDENT_BEGIN_TIME(NINC) = IBUF(16)
@@ -2379,7 +2329,7 @@
       ENDIF
       ADDDROP_LANE(IL, 1) = IBUF(4)
       ADDDROP_DIST(IL, 1) = IBUF(5)
-      ADDDROP_WARN(IL, 1) = IBUF(6)
+      IF(IBUF(6) .NE. 0) ADDDROP_WARN(IL, 1) = IBUF(6)
     ENDIF
     IF(IBUF(7) .NE. 0) THEN
       IF(IBUF(7) .EQ. 1) THEN
@@ -2389,7 +2339,7 @@
       ENDIF
       ADDDROP_LANE(IL, 2) = IBUF(8)
       ADDDROP_DIST(IL, 2) = IBUF(9)
-      ADDDROP_WARN(IL, 2) = IBUF(10)
+      IF(IBUF(10) .NE. 0) ADDDROP_WARN(IL, 2) = IBUF(10)
     ENDIF
     IF(IBUF(11) .NE. 0) THEN
       IF(IBUF(11) .EQ. 1) THEN
@@ -2399,7 +2349,7 @@
       ENDIF
       ADDDROP_LANE(IL, 3) = IBUF(12)
       ADDDROP_DIST(IL, 3) = IBUF(13)
-      ADDDROP_WARN(IL, 3) = IBUF(14)
+      IF(IBUF(14) .NE. 0) ADDDROP_WARN(IL, 3) = IBUF(14)
     ENDIF
   ENDIF
   RETURN
@@ -2749,64 +2699,7 @@
     ENDIF
   ENDIF
   RETURN
-  END      
-! ==================================================================================================
-  SUBROUTINE READ_RT136(STRING)
-! ----------------------------------------------------------------------
-! --- Extended Sign or Signal Control Codes.
-! ----------------------------------------------------------------------
-  USE STREET_LINKS
-  USE TIMED_CONTROLLERS
-  USE SIMPARAMS
-  USE TEXT
-  IMPLICIT NONE
-  CHARACTER*80, INTENT(IN) :: STRING
-  INTEGER :: IBUF(73), IL, AL, NODE, INTERVAL, I, ISIG
-! ----------------------------------------------------------------------
-  READ(STRING, '(I4, 1X, 72I1)') IBUF
-  IF(IBUF(1) .GE. 7000) THEN
-    CALL NEW_ERROR
-    WRITE(MSGTEXT, '(A, I4)') 'RT 136: INVALID NODE SPECIFIED ', IBUF(1)
-    CALL SENDTEXTMSG(M_ERROR)
-  ELSE
-    NODE = IBUF(1)
-    IF(NODE .NE. 0) THEN
-      ISIG = 0
-      DO I = 1, NUMBER_OF_FTCS
-        IF(FTC_SIGNALS(I)%NODE .EQ. NODE) THEN
-          ISIG = I
-          EXIT
-        ENDIF
-      ENDDO
-      IF(ISIG .NE. 0) THEN
- 
-  ! --- Store up to 12 intervals for up to 6 approach links.
- 
-        I = 1
-        DO INTERVAL = 1, FTC_SIGNALS(ISIG)%ACTIVE_INTERVALS
-          DO AL = 1, 6
-            I = I + 1
-            IF(AL .GT. FTC_SIGNALS(ISIG)%APPROACHES) CYCLE
-            IL = FTC_SIGNALS(ISIG)%APPROACH(AL)
-            IF(IL .NE. 0) THEN
-              SIGNAL_CODE(IL) = FTC_SIGNALS(ISIG)%SIGNAL_CODE(AL, 1)
-              IF(FTC_SIGNALS(ISIG)%ACTIVE_INTERVALS .EQ. 1) THEN
-                IF(IBUF(I) .EQ. 0) IBUF(I) = S_YIELD
-                IF(IBUF(I) .EQ. 1) IBUF(I) = S_GREEN
-                IF(IBUF(I) .EQ. 5) IBUF(I) = S_STOP
-                SIGNAL_CODE(IL) = IBUF(I)
-              ELSE
-                IF(INTERVAL .EQ. 1) SIGNALIZED(IL) = .TRUE.
-              ENDIF
-            ENDIF
-            FTC_SIGNALS(ISIG)%SIGNAL_CODE(AL, INTERVAL) = IBUF(I)
-          ENDDO
-        ENDDO
-      ENDIF
-    ENDIF
-  ENDIF
-  RETURN
-  END 
+  END  
       
 ! ==================================================================================================
   SUBROUTINE READ_RT37(STRING)
@@ -2845,11 +2738,12 @@
       ENDIF
       RAMPMETERS(NUMBER_OF_RAMPMETERS)%CONTROL = IBUF(2)
       RAMPMETERS(NUMBER_OF_RAMPMETERS)%ONSET = IBUF(3)
+      !RAMPMETERS(NUMBER_OF_RAMPMETERS)%UPDINT = 60
       IF(IBUF(4) .NE. 0) THEN
         IF(IBUF(2) .EQ. 1) THEN
           RAMPMETERS(NUMBER_OF_RAMPMETERS)%HEADWAY(1) = FLOAT(IBUF(4)) / 10.
-        ELSE
-          RAMPMETERS(NUMBER_OF_RAMPMETERS)%UPDINT = FLOAT(IBUF(4)) / 10.
+        !ELSE
+        !  RAMPMETERS(NUMBER_OF_RAMPMETERS)%UPDINT = FLOAT(IBUF(4)) / 10.
         ENDIF
       ENDIF
       IF(IBUF(2) .EQ. 2) THEN
@@ -2860,7 +2754,7 @@
           RAMPMETERS(NUMBER_OF_RAMPMETERS)%HEADWAY(I) = FLOAT(IBUF(2*(I-1)+7)) / 10.
         ENDDO
       ENDIF
-      RAMPMETERS(NUMBER_OF_RAMPMETERS)%TWO_PERGREEN = IBUF(19) .EQ. 2
+      IF(IBUF(2) .EQ. 1) RAMPMETERS(NUMBER_OF_RAMPMETERS)%TWO_PERGREEN = IBUF(19) .EQ. 2
       IF(IBUF(19) .LT. 0 .OR. IBUF(19) .GT. 2) THEN
         WRITE(MSGTEXT, '(A, I4)') 'INVALID NUMBER OF VEHICLES PER GREEN PER LANE FOR RAMPMETER AT NODE ', IBUF(1)
         CALL SENDTEXTMSG(M_WARNING)
@@ -3525,34 +3419,47 @@
 ! --- Pedestrian operations for actuated controllers.
 ! ----------------------------------------------------------------------
   USE STREET_LINKS
+  USE STREET_VEHICLES
   USE ACTUATED_CONTROLLERS
+  USE SEEDS
+  USE SIMPARAMS
   IMPLICIT NONE
   CHARACTER*80, INTENT(IN) :: STRING
   INTEGER :: IBUF(19), NODE, PHASE, IACT
+  REAL :: RNDNUM
 ! ----------------------------------------------------------------------
   READ(STRING, '(19I4)') IBUF
   NODE = IBUF(1)
   PHASE = IBUF(2)
   DO IACT = 1, NUMBER_OF_ACS
     IF(AC_SIGNALS(IACT)%NODE(1) .EQ. NODE) THEN
-      AC_SIGNALS(IACT)%GUI_NEW_PED_WALK_TIMES(PHASE) = IBUF(3)
-      AC_SIGNALS(IACT)%GUI_NEW_PED_CLEARANCE_TIMES(PHASE) = IBUF(4)
-      AC_SIGNALS(IACT)%GUI_PED_PHASE = .TRUE.
-      AC_SIGNALS(IACT)%GUI_PED_INTENSITY = IBUF(5)
-      AC_SIGNALS(IACT)%GUI_PED_HEADWAY = IBUF(6)
-      AC_SIGNALS(IACT)%GUI_ARRIVAL_TIME = IBUF(7)
-      AC_SIGNALS(IACT)%GUI_PED_RECALL_CODE = IBUF(8)
-      AC_SIGNALS(IACT)%GUI_PED_REST_CODE = IBUF(9)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_BEGIN(1) = IBUF(10)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_END(1) = IBUF(11)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_BEGIN(2) = IBUF(12)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_END(2) = IBUF(13)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_BEGIN(3) = IBUF(14)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_END(3) = IBUF(15)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_BEGIN(4) = IBUF(16)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_END(4) = IBUF(17)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_BEGIN(5) = IBUF(18)
-      AC_SIGNALS(IACT)%GUI_CONST_DEMAND_PERIOD_END(5) = IBUF(19)
+      AC_SIGNALS(IACT)%PED_PHASE(PHASE) = .TRUE.
+      AC_SIGNALS(IACT)%NEW_PED_WALK_TIMES(PHASE) = IBUF(3)
+      AC_SIGNALS(IACT)%NEW_PED_CLEARANCE_TIMES(PHASE) = IBUF(4)
+      AC_SIGNALS(IACT)%PED_INTENSITY(PHASE) = IBUF(5)
+      AC_SIGNALS(IACT)%PED_HEADWAY(PHASE) = IBUF(6)
+      AC_SIGNALS(IACT)%PED_RECALL_CODE(PHASE) = IBUF(8)
+      !AC_SIGNALS(IACT)%PED_REST_CODE(PHASE) = IBUF(9)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_BEGIN(1) = IBUF(10)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_END(1) = IBUF(11)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_BEGIN(2) = IBUF(12)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_END(2) = IBUF(13)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_BEGIN(3) = IBUF(14)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_END(3) = IBUF(15)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_BEGIN(4) = IBUF(16)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_END(4) = IBUF(17)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_BEGIN(5) = IBUF(18)
+      !AC_SIGNALS(IACT)%CONST_DEMAND_PERIOD_END(5) = IBUF(19)
+      IF(TIME_PERIOD .EQ. 1) THEN
+        IF(IBUF(5) .GT. 0) THEN
+          AC_SIGNALS(IACT)%PED_TYPE(PHASE) = 1
+          CALL STREET_RANDOM(SSEED, RNDNUM)  
+          AC_SIGNALS(IACT)%NEXT_PED_ARRIVAL(PHASE) = (3600.0 / IBUF(5)) * (-LOG(RNDNUM))
+        ELSEIF(IBUF(6) .GT. 0) THEN
+          AC_SIGNALS(IACT)%PED_TYPE(PHASE) = 2
+          AC_SIGNALS(IACT)%NEXT_PED_ARRIVAL(PHASE) = IBUF(6) + IBUF(7)
+        ENDIF
+      ENDIF
     ENDIF
   ENDDO
   RETURN
@@ -4199,6 +4106,114 @@
   END
             
 ! ==================================================================================================
+  SUBROUTINE READ_RT119(STRING)
+! ----------------------------------------------------------------------
+! --- Extended Freeway Lane Inputs.
+! ----------------------------------------------------------------------
+  USE FREEWAY_LINKS
+  USE CORSIM_NODES
+  USE GLOBAL_DATA
+  USE NODE_TABLE
+  USE SIMPARAMS
+  USE TEXT
+  IMPLICIT NONE
+  CHARACTER*80, INTENT(IN) :: STRING
+  INTEGER :: IBUF(19), IAUX, IL, I, N
+! ----------------------------------------------------------------------
+  READ(STRING, '(2I4,2X,2I2,5(1X,I2,I1,I6))') IBUF
+  CALL FIND_FREEWAY_LINK(IBUF(1), IBUF(2), IL)
+  IF(IL .EQ. 0) THEN
+    CALL NEW_ERROR
+    WRITE(MSGTEXT, '(A, 2I5)') 'RT 119: SPECIFIED LINK NOT FOUND ', IBUF(1), IBUF(2)
+    CALL SENDTEXTMSG(M_ERROR)
+    RETURN
+  ELSE
+    FNUMLANES(IL) = IBUF(3)
+    IF(IBUF(4) .EQ. 1) THEN
+      IAUX = 0
+    ELSEIF(IBUF(4) .EQ. 2) THEN
+      IAUX = 5
+    ELSE
+      CALL NEW_ERROR
+      WRITE(MSGTEXT, '(A, I2)') 'RT 119: INVALID SEQUENCE IDENTIFIER ', IBUF(4)
+      CALL SENDTEXTMSG(M_ERROR)
+      RETURN
+    ENDIF
+ 
+! --- Process auxiliary lane inputs.
+ 
+    N = 5
+    DO I = 1, 5
+      IF(IBUF(N) .EQ. 0) EXIT
+      IAUX = IAUX + 1
+      AUX_LANE_ID(IL, IAUX) = IBUF(N)
+      AUX_LANE_CODE(IL, IAUX) = IBUF(N + 1)
+      AUX_LANE_LENGTH(IL, IAUX) = IBUF(N + 2)
+      N = N + 3
+    ENDDO
+  ENDIF
+  RETURN
+  END
+  
+! ==================================================================================================
+  SUBROUTINE READ_RT136(STRING)
+! ----------------------------------------------------------------------
+! --- Extended Sign or Signal Control Codes.
+! ----------------------------------------------------------------------
+  USE STREET_LINKS
+  USE TIMED_CONTROLLERS
+  USE SIMPARAMS
+  USE TEXT
+  IMPLICIT NONE
+  CHARACTER*80, INTENT(IN) :: STRING
+  INTEGER :: IBUF(73), IL, AL, NODE, INTERVAL, I, ISIG
+! ----------------------------------------------------------------------
+  READ(STRING, '(I4, 1X, 72I1)') IBUF
+  IF(IBUF(1) .GE. 7000) THEN
+    CALL NEW_ERROR
+    WRITE(MSGTEXT, '(A, I4)') 'RT 136: INVALID NODE SPECIFIED ', IBUF(1)
+    CALL SENDTEXTMSG(M_ERROR)
+  ELSE
+    NODE = IBUF(1)
+    IF(NODE .NE. 0) THEN
+      ISIG = 0
+      DO I = 1, NUMBER_OF_FTCS
+        IF(FTC_SIGNALS(I)%NODE .EQ. NODE) THEN
+          ISIG = I
+          EXIT
+        ENDIF
+      ENDDO
+      IF(ISIG .NE. 0) THEN
+ 
+  ! --- Store up to 12 intervals for up to 6 approach links.
+ 
+        I = 1
+        DO INTERVAL = 1, FTC_SIGNALS(ISIG)%ACTIVE_INTERVALS
+          DO AL = 1, 6
+            I = I + 1
+            IF(AL .GT. FTC_SIGNALS(ISIG)%APPROACHES) CYCLE
+            IL = FTC_SIGNALS(ISIG)%APPROACH(AL)
+            IF(IL .NE. 0) THEN
+              SIGNAL_CODE(IL) = FTC_SIGNALS(ISIG)%SIGNAL_CODE(AL, 1)
+              IF(FTC_SIGNALS(ISIG)%ACTIVE_INTERVALS .EQ. 1) THEN
+                IF(IBUF(I) .EQ. 0) IBUF(I) = S_YIELD
+                IF(IBUF(I) .EQ. 1) IBUF(I) = S_GREEN
+                IF(IBUF(I) .EQ. 5) IBUF(I) = S_STOP
+                SIGNAL_CODE(IL) = IBUF(I)
+              ELSE
+                IF(INTERVAL .EQ. 1) SIGNALIZED(IL) = .TRUE.
+              ENDIF
+            ENDIF
+            FTC_SIGNALS(ISIG)%SIGNAL_CODE(AL, INTERVAL) = IBUF(I)
+          ENDDO
+        ENDDO
+      ENDIF
+    ENDIF
+  ENDIF
+  RETURN
+  END 
+  
+! ==================================================================================================
   SUBROUTINE READ_RT140(STRING)
 ! ----------------------------------------------------------------------
 ! --- Left and Right Turning Speeds.
@@ -4238,6 +4253,8 @@
     INDEX = IBUF(13)
     LT_JUMPER_PROB(INDEX) = IBUF(14) / 100.
   ENDIF
+  
+  !Apply the turning speed limitations to all links
   IF(IBUF(15) .NE. 0) LT_SPEED = IBUF(15)
   IF(IBUF(16) .NE. 0) RT_SPEED = IBUF(16)
   RETURN
@@ -4686,7 +4703,7 @@
 ! --- Store shoulder width and lane widths for freeway links.
  
     IF(IBUF(3) .NE. 0) FSHOULDER_WIDTH(IL) = IBUF(3)
-    DO I = 1, N_FREEWAY_LANES
+    DO I = 1, 11
       IF(IBUF(I+3) .NE. 0) FLANE_WIDTH(IL, I) = IBUF(I+3)
     ENDDO
  
@@ -4697,7 +4714,7 @@
 ! --- Store shoulder width and lane widths for street links.
  
       IF(IBUF(3) .NE. 0) SSHOULDER_WIDTH(IL) = IBUF(3)
-      DO I = 1, N_STREET_LANES
+      DO I = 1, 7
         IF(IBUF(I+3) .NE. 0) SLANE_WIDTH(IL, I) = IBUF(I+3)
       ENDDO
       
@@ -4815,7 +4832,8 @@
   READ(STRING, '(I2,1X,I1,3I4,2(1X,I1))') IBUF
   IF(.NOT. ALLOCATED(BUS_STATION_LIST)) THEN
 ! --- The station number is limited to 99 because of the CORSIM input record structure.
-    ALLOCATE(BUS_STATION_LIST(99))
+    NUMBER_OF_BUSSTATIONS = 99
+    CALL ALLOCATE_BUS_STATION_ARRAYS
   ENDIF
   NS = IBUF(1)
   IF(NS .LT. 1 .OR. NS .GT. 99) THEN
@@ -5085,25 +5103,6 @@
     WRITE(MSGTEXT, '(A,I2)') 'RT 202: UNRECOGNIZED CAR FOLLOWING MODEL TYPE ', IBUF(1)
     CALL SENDTEXTMSG(M_ERROR)
   ENDIF
-  RETURN
-  END
-      
-! ==================================================================================================
-  SUBROUTINE PROCESS_INCIDENTS
-! ----------------------------------------------------------------------
-! --- Convert relative inputs to specific locations.
-! ----------------------------------------------------------------------
-  USE FREEWAY_LINKS
-  USE INCIDENTS
-  IMPLICIT NONE
-  INTEGER :: NINC, IL
-! ----------------------------------------------------------------------
-  DO NINC = 1, NUMBER_OF_INCIDENTS
-    IL = INCIDENT_LINK(NINC)
-    INCIDENT_BEGIN_POINT(NINC) = USN_TO_SEG_END(IL) - INCIDENT_BEGIN_POINT(NINC)
-    INCIDENT_END_POINT(NINC) = INCIDENT_BEGIN_POINT(NINC) - INCIDENT_END_POINT(NINC)
-    INCIDENT_WARN_POINT(NINC) = INCIDENT_BEGIN_POINT(NINC) + INCIDENT_WARN_POINT(NINC)
-  ENDDO
   RETURN
   END
       
@@ -5423,35 +5422,35 @@
                                       
 ! --- Check input for times that are not in the current period.
  
-    IF(T(1) .EQ. 0) THEN
-      IF(TPCOUNT .NE. 1) THEN
-        WRITE(MSGTEXT, '(A, I4)') 'TIME BEFORE START OF PERIOD ON CARD TYPE', CARDTYPE
-        CALL SENDTEXTMSG(M_ERROR)
-        MSGTEXT = LINE
-        CALL SENDTEXTMSG(M_ERROR)
-        CALL NEW_ERROR
-        GOTO 2
-      ENDIF
-    ENDIF
-    DO I = 2, 8
-      IF(T(I) .EQ. 0) EXIT
-      IF(T(I) .LT. ENDOFPERIOD(TPCOUNT-1)) THEN
-        WRITE(MSGTEXT, '(A, I4)') 'TIME BEFORE START OF PERIOD ON CARD TYPE', CARDTYPE
-        CALL SENDTEXTMSG(M_ERROR)
-        MSGTEXT = LINE
-        CALL SENDTEXTMSG(M_ERROR)
-        CALL NEW_ERROR
-        GOTO 2
-      ENDIF
-      IF(T(I) .GT. ENDOFPERIOD(TPCOUNT)) THEN
-        WRITE(MSGTEXT, '(A, I4)') 'TIME BEYOND END OF PERIOD ON CARD TYPE', CARDTYPE
-        CALL SENDTEXTMSG(M_ERROR)
-        MSGTEXT = LINE
-        CALL SENDTEXTMSG(M_ERROR)
-        CALL NEW_ERROR
-        GOTO 2
-      ENDIF
-    ENDDO
+    !IF(T(1) .EQ. 0) THEN
+    !  IF(TPCOUNT .NE. 1) THEN
+    !    WRITE(MSGTEXT, '(A, I4)') 'TIME BEFORE START OF PERIOD ON CARD TYPE', CARDTYPE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    MSGTEXT = LINE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    CALL NEW_ERROR
+    !    GOTO 2
+    !  ENDIF
+    !ENDIF
+    !DO I = 2, 8
+    !  IF(T(I) .EQ. 0) EXIT
+    !  IF(T(I) .LT. ENDOFPERIOD(TPCOUNT-1)) THEN
+    !    WRITE(MSGTEXT, '(A, I4)') 'TIME BEFORE START OF PERIOD ON CARD TYPE', CARDTYPE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    MSGTEXT = LINE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    CALL NEW_ERROR
+    !    GOTO 2
+    !  ENDIF
+    !  IF(T(I) .GT. ENDOFPERIOD(TPCOUNT)) THEN
+    !    WRITE(MSGTEXT, '(A, I4)') 'TIME BEYOND END OF PERIOD ON CARD TYPE', CARDTYPE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    MSGTEXT = LINE
+    !    CALL SENDTEXTMSG(M_ERROR)
+    !    CALL NEW_ERROR
+    !    GOTO 2
+    !  ENDIF
+    !ENDDO
  
 ! --- Check input for vehicle count or vehicles/hour.
  
@@ -5818,7 +5817,7 @@
   USE STREET_LINKS
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IL
-  INTEGER :: ILN, KLN
+  INTEGER :: ILN, KLN, ILUP
 ! ----------------------------------------------------------------------
   FIRST_FULL_LANE(IL) = FIRST_FULL_LANE(IL) + 1
   LAST_FULL_LANE(IL) = LAST_FULL_LANE(IL) + 1
@@ -5844,6 +5843,13 @@
     RT_ARC_LENGTH(IL, 1, KLN) = 0.
     LD_ARC_LENGTH(IL, 1, KLN) = 0.
     RD_ARC_LENGTH(IL, 1, KLN) = 0.
+  ENDDO
+  SALIGNMENT_LANE(IL) = SALIGNMENT_LANE(IL) + 1
+  DO ILUP = 1, N_STREET_LINKS
+    IF(STHRU_LINK(ILUP) .EQ. IL) THEN
+      STHRU_ALIGNMENT_LANE(ILUP) = STHRU_ALIGNMENT_LANE(ILUP) + 1
+      EXIT
+    ENDIF
   ENDDO
   RETURN
   END

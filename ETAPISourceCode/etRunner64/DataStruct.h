@@ -27,6 +27,7 @@
 #include <map>
 #include <sstream>
 #include <malloc.h>
+#include <vector>
 
 //#define _UseController 1
 
@@ -109,6 +110,7 @@
 #define MAX_PERIOD 3
 #define NUMBER_OF_AC_APPROACHES  20
 #define N_AUXLANES 10
+#define N_ADDDROPLANES 3
 #define N_ENTRYLANES 10
 #define N_TIME_PERIODS 19
 #define NUMBER_OF_APPROACHES 6
@@ -155,9 +157,6 @@ struct AC_INPUTS
 	int indirect_approach_DSN[5];		//DSN of indirect approaches
 	float cycle_length;					// for coordination
 	float offset;						// for coordination
-	float walk_time[8];					// for pedestrian
-	float walk_clearance_time[8];		// for pedestrian
-										//int ring_phase[4][2];	//the phase ring setting
 	int ring_phase[8];					//the phase ring setting //Sept7
 	int detector_count;					// number of detectors, including scope and dcs, Number of detectors assigned to the signal
 	int detector_list[64];				//the list of detectors, List of detectors assigned to the signal
@@ -169,6 +168,15 @@ struct AC_INPUTS
 	float max_subtract;					//April29 // for coordination, depending on transition method
 	float force_off_times[8];			//April29 // for coordination
 	float splits[8];					//July16
+	   int ped_omit[8];
+	   int ped_intensity[8];
+	   int ped_headway[8];
+	   int ped_start_time[8];
+	   int ped_recall_code[8];
+	float walk_time[8];					// for pedestrian
+	float walk_clearance_time[8];		// for pedestrian
+										//int ring_phase[4][2];	//the phase ring setting
+
 };
 
 struct ANIMATION_DATA
@@ -211,10 +219,10 @@ struct FREEWAY_LINK
 	//int offramp_alignment_lane;//offramp_sending_lane //ID number of the lane on this link that feeds lane 1 of the downstream off-ramp/diverging link
 	
 	int fulllanes;
-	int adddrop_code[3];                  
-	int adddrop_lane[3];                  
-	int adddrop_dist[3];                  
-	int adddrop_warn[3];                  
+	int adddrop_code[N_ADDDROPLANES];                  
+	int adddrop_lane[N_ADDDROPLANES];                  
+	int adddrop_dist[N_ADDDROPLANES];                  
+	int adddrop_warn[N_ADDDROPLANES];                  
 	int auxlaneid[N_AUXLANES];
 	int auxlanecode[N_AUXLANES];
 	int auxlanelength[N_AUXLANES];
@@ -227,7 +235,7 @@ struct FREEWAY_LINK
 	int hov_begin;
 	int hov_end;
 	int hov_code;
-	int hov_lanes[3];
+	//int hov_lanes[3];
 	int hov_offramp_warn_distance;
 	int hov_side;
 	int hov_type;
@@ -305,21 +313,34 @@ struct STREET_LINK
    float multiplier_right[NTYPES];
    float multiplier_diag[NTYPES];
 	float multiplier_rdiag[NTYPES];
+   int lt_speed;
+   int rt_speed;
+   float lt_limited_speed_dist;
+   float rt_limited_speed_dist;
+   int crosswalk_width;
 };
 
 
 struct ENTRYNODES_DATA
 {
-	float carpool_pct;
+	int Node_ID;
 	int flowrate;
+	float carpool_pct;
+	float truck_pct;
 	int hov_violators_per10000;
 	int lane_pct[N_ENTRYLANES];
-	int Node_ID;
-	float truck_pct;
-	int SS_USN;
-	int SS_DSN;
 };
 
+struct SOURCE_SINK_DATA
+{
+	int ss_usn;
+	int ss_dsn;
+	int centroid_label;
+	float carpool_pct;
+	float truck_pct;
+	int flowrate;
+	int hov_violators_per10000;
+};
 struct NETWORK_INPUTS
 {
 	int run_init;
@@ -330,6 +351,8 @@ struct NETWORK_INPUTS
 	int type_of_run;
 	int sim_start_time;   
 	int max_node_number;
+	float dlc_mult;
+	float dlc_threshold;
 };
 
 struct FREEWAY_NETWORK_INPUTS
@@ -345,41 +368,39 @@ struct FREEWAY_NETWORK_INPUTS
 	int idm_sep;
 	float freeway_pct_coop;
 	float lc_time;
-	float dlc_mult;
 };
 
 
 struct STREET_NETWORK_INPUTS
 {
-	float additional_gap[10];
-	int amber_decel[10];
-	int lt_speed;
-	int rt_speed;
-	int pdelay_weak[10];
-	int pdelay_strong[10];
-	int ped_duration[3];
-	float acceptable_gap[10];
-	float acceptable_ltg[10];
-	float acceptable_rtg[10];
-	float dwell_multiplier[10][6];
-	float ffspeed_adj[10];
-	float zfoll_pitt[10];
-	float zfoll_idm[10];
-	int pitt_sep;
-	int idm_sep;
-	float lc_time;
-	float lt_jumper_prob[N_STREET_LANES];
-	float lt_lagger_prob[3];
-	float spillback_prob[4];
-	float stop_spd;
-	float street_pct_coop;
-	float yield_spd;
-	float driver_fampct;
-	float qfactor[5];
-	float ste_mult[10];
-	float turnsignal_prob[10];
-	float turnsignal_dist;
+       float additional_gap[10];
+       int amber_decel[10];
+       int pdelay_weak[10];
+       int pdelay_strong[10];
+       int ped_duration[3];
+       float acceptable_gap[10];
+       float acceptable_ltg[10];
+       float acceptable_rtg[10];
+       float dwell_multiplier[6][10];
+       float ffspeed_adj[10];
+       float zfoll_pitt[10];
+	   float zfoll_idm[10];
+	   int pitt_sep;
+	   int idm_sep;
+       float lc_time;
+       float lt_jumper_prob[N_STREET_LANES];
+       float lt_lagger_prob[3];
+       float spillback_prob[4];
+       float stop_spd;
+       float street_pct_coop;
+       float yield_spd;
+       float driver_fampct;
+       float qfactor[5];
+       float ste_mult[10];
+       float turnsignal_prob[10];
+       float turnsignal_dist;
 };
+
 
 struct RM_DATA
 {
@@ -393,8 +414,8 @@ struct RM_DATA
 	int speed[6];
 	float headway[6];
 	float timer;
-	float updint;
-	int twopergreen;
+	int updint;
+	bool twopergreen;
 };
 
 struct FTC_DATA
@@ -417,10 +438,11 @@ struct FTC_DATA
 struct BUSROUTE_DATA
 {
 	int number;
+        int number_of_tramcars;
 	int hdwy;
 	int offset;
 	int nodes;
-	int route_nodes[100];
+	int route_nodes[200];
 	int stationlist[100]; 
 	int persontrips;
 	int timer;
@@ -430,6 +452,7 @@ struct BUSROUTE_DATA
 
 struct BUSSTATION_DATA
 {
+	int station_number;
 	int block_code;
 	int usn;
 	int dsn;
@@ -464,6 +487,7 @@ struct DETECTOR_INPUTS
 	float zone_length;
 	int associated_phase;
 	int detection_zone;
+	int next_det;
 };
 
 struct DETECTOR_OUTPUTS
@@ -485,19 +509,24 @@ struct DETECTOR_OUTPUTS
 
 struct EVENT_DATA
 {
+	int usn;
+	int dsn;
+	int lane;
 	int begin_time;
 	int end_time;
-	int lane;
-	int link;
 	int location;
 	int speed_reduction;
 	int length;
 	int code; // 0=blockage, 1=speed reduction
+	int group_id;
+	int approach_usn;
+	int approach_dsn;
 };
 
 struct PARKING_DATA
 {
-	int link;
+	int usn;
+	int dsn;
 	int duration;
 	int freq;
 	int left_start;
@@ -508,7 +537,8 @@ struct PARKING_DATA
 
 struct INCIDENT_DATA
 {
-	int link;
+	int usn;
+	int dsn;
 	int begin_point;
 	int begin_time;
 	int end_point;
@@ -534,13 +564,13 @@ struct VEHICLE_TYPE_DATA
 	int length;
 	float headway_factor;
 	float average_occupancy;
-	float emergency_decel;
+	float non_emergency_decel;
 	int fleet_freeway_auto;
 	int fleet_freeway_truck;
 	int fleet_freeway_carpool;
 	int fleet_freeway_bus;
 	int fleet_freeway_ev;
-	int fleet_freeway_bike;
+	//int fleet_freeway_bike; // removed 05/25/2018
 	int fleet_street_auto;
 	int fleet_street_truck;
 	int fleet_street_carpool;
@@ -796,13 +826,20 @@ struct RABT_API_DATA
 
 struct TURNING_WAY
 {
-	int USN;
-	int DSN;
-	int USN2;
-	int DSN2;
-	int RTW_EXIT_POINT;
-	int RTW_ENTRY_POINT;
-	float RTW_LENGTH;
+	int usn;
+	int dsn;
+	int usn2;
+	int dsn2;
+	float rtw_exit_point; // distance from usn at the exit link
+	float rtw_entry_point; // distance from usn at the entry link
+	float rtw_length;
+	float rtw_ffspeed; // free flow speed
+	int rtw_control_code; // stop sign (5) or yield sign (0)
+	int rtw_lanes;
 };
 
+struct SUPER_CONTROLLER_IDS
+{
+	std::vector<int> super_controler_ids;
+};
 #endif

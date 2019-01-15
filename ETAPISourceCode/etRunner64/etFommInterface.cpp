@@ -369,6 +369,13 @@ int etFommInterface::Init() {
 	SET_PHASES = (FPTR_PATH)GetProcAddress(hDLL, "set_phases");
 	ADD_VEHICLE = (FPTR_VADD)GetProcAddress(hDLL, "add_vehicle");
 	
+	SET_NUMBER_OF_ROUNDABOUTS = (FPTR_INT)GetProcAddress(hDLL, "set_number_of_roundabouts");
+	DEFINE_ROUNDABOUTS = (FPTR_RABT)GetProcAddress(hDLL, "define_roundabouts");
+	GET_ROUNDABOUTS = (FPTR_RABT)GetProcAddress(hDLL, "get_roundabouts");
+	SET_NUMBER_OF_TURNING_WAYS = (FPTR_INT)GetProcAddress(hDLL, "set_number_of_turning_ways");
+	GET_NUMBER_OF_TURNING_WAYS = (FPTR_VOID)GetProcAddress(hDLL, "get_number_of_turning_ways");
+	DEFINE_TURNING_WAYS = (FPTR_TW)GetProcAddress(hDLL, "define_turning_ways");
+	GET_TURNING_WAYS = (FPTR_TW)GetProcAddress(hDLL, "get_turning_ways");
 
 	return  0;
 };
@@ -884,6 +891,30 @@ void etFommInterface::SetIntersectionData(std::vector<IntersectionDimensions>& i
 	}
 }
 
+void etFommInterface::SetNumberOfRoundabouts(int n_rabts)
+{
+	m_status = SET_NUMBER_OF_ROUNDABOUTS(n_rabts);
+	CheckStatus("SET_NUMBER_OF_ROUNDABOUTS", m_status);
+}
+
+void etFommInterface::SetRoundabouts(RABT_API_DATA* roundabout_inputs)
+{
+	m_status = DEFINE_ROUNDABOUTS(roundabout_inputs);
+	CheckStatus("DEFINE_ROUNDABOUTS", m_status);
+}
+
+void etFommInterface::SetNumberOfTurningWays(int n_rtws)
+{
+	m_status = SET_NUMBER_OF_TURNING_WAYS(n_rtws);
+	CheckStatus("SET_NUMBER_OF_TURNING_WAYS", m_status);
+}
+
+void etFommInterface::SetTurningWays(TURNING_WAY* turningway_inputs)
+{
+	m_status = DEFINE_TURNING_WAYS(turningway_inputs);
+	CheckStatus("DEFINE_TURNING_WAYS", m_status);
+}
+
 void etFommInterface::ProcessFreewayInputs(void)
 {
 	m_status = PROCESS_FREEWAYINPUTS();
@@ -918,8 +949,15 @@ int etFommInterface::SetSVehicle(VSData *vsdata)
 int etFommInterface::AddPath(int NofNodes, int *nodes)
 {
 	int PID = ADD_PATH(NofNodes, nodes);
-	CheckStatus("SET_SVEHICLE_STRUCT", PID); 
+	CheckStatus("ADD_PATH", PID); 
 	return PID;
+}
+
+int etFommInterface::AddVehicle(float timeStep, int srcNode, int pathID, int driverType, int fleet, int type, int overSpeed, int range)
+{
+	int VID = ADD_VEHICLE(timeStep, srcNode, pathID, driverType, fleet, type, overSpeed, range);
+	CheckStatus("ADD_VEHICLE", VID); 
+	return VID;
 }
 
 int etFommInterface::GetNumberOfVehicleTypes(void)
@@ -1279,6 +1317,9 @@ void etFommInterface::CheckStatus(const std::string &fName, int status)
 	bool IsError = 
 		( fName == "SIMULATE" || fName == "INITIALIZE") ? (status == 1) : (status > 0);
 	
+	if (fName == "ADD_VEHICLE")
+		IsError = (status == 0);
+
 	if (IsError) 
 	{
 		throw(InterfaceException(" Error in " + fName + ": " + msg));
@@ -2582,6 +2623,22 @@ int etFommInterface::GetPhaseCalls(int iact, int* phase_calls)
 	return m_status;
 }
 
+void etFommInterface::GetRoundabouts(RABT_API_DATA* roundabout_inputs)
+{
+	m_status = GET_ROUNDABOUTS(roundabout_inputs);
+	CheckStatus("GET_ROUNDABOUTS", m_status);
+}
+
+int etFommInterface::GetNumberOfTurningWays()
+{
+	return GET_NUMBER_OF_TURNING_WAYS();
+}
+
+void etFommInterface::GetTurningWays(TURNING_WAY* turningway_inputs)
+{
+	m_status = GET_TURNING_WAYS(turningway_inputs);
+	CheckStatus("GET_TURNING_WAYS", m_status);
+}
 
 void etFommInterface::PrintFVehicleData(std::ostream &outFile, int n_fvehicles, VFData *fvehicle_data)
 {
@@ -2805,15 +2862,6 @@ void etFommInterface::PrintFreewayLinkData(std::ostream &outFile, int n_freeway_
 		outFile << "hov_begin = " << freeway_link_data[il].hov_begin << "\n";
 		outFile << "hov_end = " << freeway_link_data[il].hov_end << "\n";
 		outFile << "hov_code = " << freeway_link_data[il].hov_code << "\n";
-		outFile << "hov_lanes:";
-		for(int ihov = 0; ihov < MAX_HOV_LANE; ++ihov)
-		{
-			if(freeway_link_data[il].hov_lanes[ihov] != 0)
-			{
-				outFile  << "\t" << freeway_link_data[il].hov_lanes[ihov];				
-			}
-		}
-		outFile << endl;
 		outFile << "hov_offramp_warn_distance = " << freeway_link_data[il].hov_offramp_warn_distance << "\n";
 		outFile << "hov_side = " << freeway_link_data[il].hov_side << "\n";
 		outFile << "hov_type = " << freeway_link_data[il].hov_type << "\n";
@@ -3096,8 +3144,6 @@ void etFommInterface::PrintEntryNodes(std::ostream &outFile, int n_entrynodes, E
 		outFile << "carpool_pct = " << entrynode_data[i].carpool_pct << "\n";
 		outFile << "flowrate = " << entrynode_data[i].flowrate << "\n";
 		outFile << "hov_violators_per10000 = " << entrynode_data[i].hov_violators_per10000 << "\n";
-		outFile << "SS_USN = " << entrynode_data[i].SS_USN << "\n";
-		outFile << "SS_DSN = " << entrynode_data[i].SS_DSN << "\n";
 		outFile << "lane_pct:";
 		for (int j = 0; j < N_ENTRYLANES; ++j)
 		{
@@ -3210,8 +3256,7 @@ void etFommInterface::PrintFNetworkInputs(std::ostream &outFile, const FREEWAY_N
 
 	outFile << "freeway_pct_coop = " << FNetwork_Inputs.freeway_pct_coop << std::endl;
 	outFile << "lc_time = " << FNetwork_Inputs.lc_time << std::endl;
-	outFile << "dlc_mult = " << FNetwork_Inputs.dlc_mult << std::endl;
-
+	
 	outFile << std::endl;
 }
 
@@ -3234,9 +3279,6 @@ void etFommInterface::PrintSNetworkInputs(std::ostream &outFile, const STREET_NE
 		    outFile << "\t" << SNetwork_Inputs.amber_decel[i];
 	}
 	outFile << std::endl;
-
-	outFile << "lt_speed = " << SNetwork_Inputs.lt_speed << std::endl;
-	outFile << "rt_speed = " << SNetwork_Inputs.rt_speed << std::endl;
 
 	outFile << "pdelay_weak:" ;
 	for (int i =0; i < PDELAY_WEAK; ++i)
@@ -3373,13 +3415,11 @@ void etFommInterface::PrintVTypeInputs(std::ostream &outFile, int n_vehicletype,
 		outFile << "length = " << Vehicle_Type_Inputs[i].length << std::endl;
 		outFile << "headway_factor = " << Vehicle_Type_Inputs[i].headway_factor << std::endl;
 		outFile << "average_occupancy = " << Vehicle_Type_Inputs[i].average_occupancy << std::endl;
-		outFile << "emergency_decel = " << Vehicle_Type_Inputs[i].emergency_decel << std::endl;
 		outFile << "fleet_freeway_auto = " << Vehicle_Type_Inputs[i].fleet_freeway_auto << std::endl;
 		outFile << "fleet_freeway_truck = " << Vehicle_Type_Inputs[i].fleet_freeway_truck << std::endl;
 		outFile << "fleet_freeway_carpool = " << Vehicle_Type_Inputs[i].fleet_freeway_carpool << std::endl;
 		outFile << "fleet_freeway_bus = " << Vehicle_Type_Inputs[i].fleet_freeway_bus << std::endl;
 		outFile << "fleet_freeway_ev = " << Vehicle_Type_Inputs[i].fleet_freeway_ev << std::endl;
-		outFile << "fleet_freeway_bike = " << Vehicle_Type_Inputs[i].fleet_freeway_bike << std::endl;
 		outFile << "fleet_street_auto = " << Vehicle_Type_Inputs[i].fleet_street_auto << std::endl;
 		outFile << "fleet_street_truck = " << Vehicle_Type_Inputs[i].fleet_street_truck << std::endl;
 		outFile << "fleet_street_carpool = " << Vehicle_Type_Inputs[i].fleet_street_carpool << std::endl;
@@ -3538,7 +3578,8 @@ void etFommInterface::PrintIncidentInputs(std::ostream &outFile, int n_incident,
 	for (int i = 0; i < n_incident; ++i)
 	{
 		outFile << "#" << i+1 << std::endl;
-		outFile << "link = " << incident_inputs[i].link << std::endl;
+		outFile << "usn = " << incident_inputs[i].usn << std::endl;
+		outFile << "dsn = " << incident_inputs[i].dsn << std::endl;
 		outFile << "begin_point = " << incident_inputs[i].begin_point << std::endl;
 		outFile << "begin_time = " << incident_inputs[i].begin_time << std::endl;
 		outFile << "end_point = " << incident_inputs[i].end_point << std::endl;
@@ -3588,7 +3629,8 @@ void etFommInterface::PrintParkingZones(std::ostream &outFile, int n_parkingzone
 	for (int i = 0; i < n_parkingzones; ++i)
 	{
 		outFile << "#" << i+1 << std::endl;
-		outFile << "link = " << parkingzone_inputs[i].link << std::endl;
+		outFile << "usn = " << parkingzone_inputs[i].usn << std::endl;
+		outFile << "dsn = " << parkingzone_inputs[i].dsn << std::endl;
 		outFile << "duration = " << parkingzone_inputs[i].duration << std::endl;
 		outFile << "freq = " << parkingzone_inputs[i].freq << std::endl;
 		outFile << "left_start = " << parkingzone_inputs[i].left_start << std::endl;
@@ -3610,7 +3652,8 @@ void etFommInterface::PrintEvents(std::ostream &outFile, int n_events, EVENT_DAT
 		outFile << "begin_time = " << event_inputs[i].begin_time << std::endl;
 		outFile << "end_time = " << event_inputs[i].end_time << std::endl;
 		outFile << "lane = " << event_inputs[i].lane << std::endl;
-		outFile << "link = " << event_inputs[i].link << std::endl;
+		outFile << "usn = " << event_inputs[i].usn << std::endl;
+		outFile << "dsn = " << event_inputs[i].dsn << std::endl;
 		outFile << "location = " << event_inputs[i].location << std::endl;
 		//outFile << "type = " << event_inputs[i].type << std::endl;
 		
@@ -4188,6 +4231,14 @@ void etFommInterface::ImportIntersectionModel()
 	double m_MeterToFeet = 3.28084;
 	std::map<std::pair<int,int>, int> UsnDsnToSLinkIDXMap;
 
+	DETECTOR_INPUTS* sdets = NULL;
+	int n_sdets = GetNumberOfStreetDetectors();
+	if (n_sdets > 0)
+	{
+		sdets = (DETECTOR_INPUTS*)calloc(n_sdets, sizeof(DETECTOR_INPUTS));
+		GetStreetDetectorInputs(sdets);
+	}
+
 	STREET_LINK* streetLinks;
 	int n_street_links = GetNumberOfStreetLinks();
 	if (n_street_links > 0)
@@ -4198,17 +4249,26 @@ void etFommInterface::ImportIntersectionModel()
 	{
 		return;
 	}
-	/*FREEWAY_LINK* freewayLinks;
+
+	FREEWAY_LINK* freewayLinks;
 	int n_freeway_links = GetNumberOfFreewayLinks();
 	if (n_freeway_links > 0)
 	{
 		freewayLinks = (FREEWAY_LINK*)calloc(n_freeway_links, sizeof(FREEWAY_LINK));
 		GetFreewayLinks(freewayLinks);
-	}*/
+	}
 
 	int n_nodes = 8999;
 	NODE_LOCATION_DATA *xy_coords = (NODE_LOCATION_DATA*)calloc(n_nodes, sizeof(NODE_LOCATION_DATA));
 	GetNodeCoordinates(xy_coords);
+
+	TURNING_WAY *turningWays;
+	int n_rtws = GetNumberOfTurningWays();
+	if (n_rtws > 0)
+	{
+		turningWays = (TURNING_WAY*)calloc(n_rtws, sizeof(TURNING_WAY));
+		GetTurningWays(turningWays);
+	}
 	////////////////////* sending */
 	{
 		char delimiter = ',';
@@ -4221,6 +4281,8 @@ void etFommInterface::ImportIntersectionModel()
 		for (int il = 0; il < n_street_links; ++il)
 		{
 			STREET_LINK* data = &(streetLinks[il]);
+			int usn = data->usn;
+			int dsn = data->dsn;
 			IntersectionDimensions newIntDim = {data->usn, data->dsn};
 			IntersectionDimensions_Inputs.push_back(newIntDim);
 			if (!IsInternalNode(data->usn) || !IsInternalNode(data->dsn))
@@ -4250,16 +4312,107 @@ void etFommInterface::ImportIntersectionModel()
 			ConcatIMIntStr(str_LINK, NumOfRightTPs);
 				
 			//should retrieve from GET_TURNING_WAYS; not defined in TRF; use default value
-			TURNING_WAY turningWay = {0, 0, 0, 0, 0, 0, 0};
+			TURNING_WAY* pRTW = NULL;
+			for (int iw = 0; iw < n_rtws; ++iw)
+			{
+				if (turningWays[iw].usn == usn && turningWays[iw].dsn == dsn)
+				{
+					pRTW = &(turningWays[iw]);
+					break;
+				}
+			}
+			if (pRTW)
+			{
+				int TurningWayX = data->length - pRTW->rtw_exit_point;
+				ConcatIMIntStr(str_LINK, pRTW->rtw_lanes);
+				ConcatIMDoubleStr(str_LINK, double(TurningWayX) / m_MeterToFeet);
+				ConcatIMDoubleStr(str_LINK, double(pRTW->rtw_entry_point) / m_MeterToFeet);
+				ConcatIMIntStr(str_LINK, pRTW->usn2);
+				ConcatIMIntStr(str_LINK, pRTW->dsn2);
+			} else
+			{
+				ConcatIMIntStr(str_LINK, 0);
+				ConcatIMDoubleStr(str_LINK, 0);
+				ConcatIMDoubleStr(str_LINK, 0);
+				ConcatIMIntStr(str_LINK, 0);
+				ConcatIMIntStr(str_LINK, 0);
+			}
+
+			int roundaboutID = 0; // not defined in TRF; use default value
+			double x = 0;
+			double y = 0;
+			ConcatIMIntStr(str_LINK, roundaboutID);
+			ConcatIMDoubleStr(str_LINK, x / m_MeterToFeet);
+			ConcatIMDoubleStr(str_LINK, y / m_MeterToFeet);
+			
+			// get lane related values from second records if there is right turning way
+			int firstIdx = (pRTW) ? 1: 0;
+
+			for (int ilane = firstIdx; ilane < NumOfLanes + firstIdx; ++ilane)
+			{
+				ConcatIMDoubleStr(str_LINK, data->lane_width[ilane] / m_MeterToFeet);
+			}
+			
+			for (int ilane = firstIdx; ilane < NumOfLanes + firstIdx; ++ilane)
+			{
+				ConcatIMDoubleStr(str_LINK, data->laneLength[ilane] / m_MeterToFeet);
+			}
+
+			// pass in intermediate shape points (without from point and to point)
+			ConcatIMIntStr(str_LINK, 0);
+			
+			m_LINKS.push_back(str_LINK);
+		}
+
+		for (int il = 0; il < n_freeway_links; ++il)
+		{
+			FREEWAY_LINK* data = &(freewayLinks[il]);
+			int usn = data->usn;
+			int dsn = data->dsn;
+			
+			if (data->usn >= 8000 || data->dsn>=8000)
+				continue;
+			nodes.insert(data->usn);
+			nodes.insert(data->dsn);
+			
+			std::string str_LINK;
+			str_LINK += std::to_string(il+n_street_links); // link number
+			str_LINK += delimiter + std::string(""); // link name
+			ConcatIMIntStr(str_LINK, data->usn);
+			ConcatIMIntStr(str_LINK, data->dsn);
+				
+			// stopbar offset
+			double stopBarOffset = 4.0; // not defined in TRF; use default value
+			ConcatIMDoubleStr(str_LINK, stopBarOffset/ m_MeterToFeet);
+				
+			int medianWidth = 0; // not defined in TRF; use default value
+			ConcatIMDoubleStr(str_LINK, medianWidth/ m_MeterToFeet);
+				
+			
+			std::set<int> auxLanes; // there could be duplicate aux lane IDs
+			for (int iaux = 0; iaux < N_AUXLANES; ++iaux)
+			{
+				if (data->auxlaneid[iaux] > 0)
+					auxLanes.insert(data->auxlaneid[iaux]);;
+			}
+			int NumOfLanes = data->fulllanes + auxLanes.size();
+			int NumOfLeftTPs = 0;
+			int NumOfRightTPs = 0;
+			ConcatIMIntStr(str_LINK, NumOfLanes);
+			ConcatIMIntStr(str_LINK, NumOfLeftTPs);
+			ConcatIMIntStr(str_LINK, NumOfRightTPs);
+				
+			//should retrieve from GET_TURNING_WAYS; not defined in TRF; use default value
+			TURNING_WAY turningWay = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			int NumTurningWayLanes = 0;
-			float TurningWayX = data->length - turningWay.RTW_EXIT_POINT;
-			float TurningWayY = turningWay.RTW_ENTRY_POINT;
+			float TurningWayX = data->length - turningWay.rtw_exit_point;
+			float TurningWayY = turningWay.rtw_entry_point;
 
 			ConcatIMIntStr(str_LINK, NumTurningWayLanes);
 			ConcatIMDoubleStr(str_LINK, TurningWayX / m_MeterToFeet);
 			ConcatIMDoubleStr(str_LINK, TurningWayY / m_MeterToFeet);
-			ConcatIMIntStr(str_LINK, turningWay.USN2);
-			ConcatIMIntStr(str_LINK, turningWay.DSN2);
+			ConcatIMIntStr(str_LINK, turningWay.usn2);
+			ConcatIMIntStr(str_LINK, turningWay.dsn2);
 				
 			int roundaboutID = 0; // not defined in TRF; use default value
 			double x = 0;
@@ -4275,7 +4428,7 @@ void etFommInterface::ImportIntersectionModel()
 			
 			for (int ilane = 0; ilane < NumOfLanes; ++ilane)
 			{
-				ConcatIMDoubleStr(str_LINK, data->laneLength[ilane] / m_MeterToFeet);
+				ConcatIMDoubleStr(str_LINK, data->length / m_MeterToFeet);
 			}
 
 			// pass in intermediate shape points (without from point and to point)
@@ -4288,12 +4441,19 @@ void etFommInterface::ImportIntersectionModel()
 		{
 			NODE_LOCATION_DATA* node = &(xy_coords[*it-1]);
 			std::string str_NODE;
-			str_NODE += std::to_string(*it); // node number
+			int nodeNumber = *it;
+			str_NODE += std::to_string(nodeNumber); // node number
 			str_NODE += delimiter + std::string(""); // node name
 			ConcatIMDoubleStr(str_NODE, node->x / m_MeterToFeet);
 			ConcatIMDoubleStr(str_NODE, node->y / m_MeterToFeet);
 			ConcatIMDoubleStr(str_NODE, node->elevation / m_MeterToFeet);
-			ConcatIMDoubleStr(str_NODE, 0); // TurnRadius
+			int turnRadius = 0;
+			if ((nodeNumber == 4 || nodeNumber == 5 || nodeNumber == 7)
+				&& (DefaultTrfFile.find("VA123") != std::string::npos) )
+			{
+				turnRadius = 15;
+			}
+			ConcatIMDoubleStr(str_NODE, turnRadius); // TurnRadius
 			m_NODES.push_back(str_NODE);
 		}
 
@@ -4562,11 +4722,14 @@ void etFommInterface::ImportIntersectionModel()
 		int usn = data[pos++];
 		int dsn = data[pos++];
 
+		STREET_LINK* pLink = NULL;
+		int linkIdx = -1;
 		std::pair<int, int> linkKey = std::pair<int, int>(usn, dsn);
-		if (UsnDsnToSLinkIDXMap.find(linkKey) == UsnDsnToSLinkIDXMap.end())
-			continue;
-		int linkIdx = UsnDsnToSLinkIDXMap[linkKey];
-		STREET_LINK* pLink = &(streetLinks[linkIdx]);
+		if (UsnDsnToSLinkIDXMap.find(linkKey) != UsnDsnToSLinkIDXMap.end())
+		{
+			linkIdx = UsnDsnToSLinkIDXMap[linkKey];
+			pLink = &(streetLinks[linkIdx]);
+		}
 
 		// stop bar distance in upstream thru link
 		int upStopBarDist = 0; // not defined in TRF; use default
@@ -4579,7 +4742,10 @@ void etFommInterface::ImportIntersectionModel()
 
 		int Direction = data[pos++];
 		// convert intersection model's direction to editor's direction
-		Direction = GetETFOMMDirection(pLink, ReceivingDSN, Direction);
+		if (pLink)
+			Direction = GetETFOMMDirection(pLink, ReceivingDSN, Direction);
+		else
+			Direction = ConvertIntersectionModelDirection(Direction);
 		
 		int IMUpIntWidth = ConvertIMDoubleToInt( data[pos++] , m_MeterToFeet);
 
@@ -4612,10 +4778,26 @@ void etFommInterface::ImportIntersectionModel()
 		}
 		int ANILaneLength = IMLaneLength - stopBarDist;
 
-		//int NumOfLanes = pLink->fulllanes + pLink->leftturnbays + pLink->rightturnbays;
-		int LaneWidth = pLink->lane_width[LaneID];
-		int ChannelizationCode = pLink->channelization[LaneID];
+		TURNING_WAY* pRTW = NULL;
+		for (int iw = 0; iw < n_rtws; ++iw)
+		{
+			if (turningWays[iw].usn == usn && turningWays[iw].dsn == dsn
+				&& turningWays[iw].usn2 == ReceivingUSN && turningWays[iw].dsn2 == ReceivingDSN)
+			{
+				pRTW = &(turningWays[iw]);
+				break;
+			}
+		}
 
+		int LaneWidth = 12;
+		int ChannelizationCode = 0;
+		if (pLink)
+		{
+			int realLaneID = (pRTW)? LaneID + 1 : LaneID;
+			LaneWidth = pLink->lane_width[realLaneID];
+			ChannelizationCode = pLink->channelization[realLaneID];
+		}
+		
 		newAniIntersection += std::to_string(usn) 
 				+	delimiter	+ std::to_string(	dsn	)
 				+	delimiter	+ std::to_string(	ReceivingDSN	)
@@ -4676,10 +4858,11 @@ void etFommInterface::ImportIntersectionModel()
 		/////// branch for turning way and regular entries
 		///////////////////////////////////
 		INTERSECTION_DIMENSIONS* pNewIntDim = NULL;
-		if (Direction != ET_RIGHTTURNWAY)
+		if (pLink && Direction != ET_RIGHTTURNWAY)
 		{
 			// regular entry
-			pLink->laneLength[LaneID] = ANILaneLength; // temporary value for calculating link length
+			int realLaneID = (pRTW)? LaneID+1 : LaneID;
+			pLink->laneLength[realLaneID] = ANILaneLength; // temporary value for calculating link length
 
 			pNewIntDim = &(IntersectionDimensions_Inputs[linkIdx].intDim);
 			pNewIntDim->lane_center[LaneID] = LaneCenter;
@@ -4688,8 +4871,13 @@ void etFommInterface::ImportIntersectionModel()
 				pNewIntDim->up_int_width = UpIntWidth;
 		} else
 		{
-			// find the turning way with matched usn, dsn, usn2, dsn2
 			// update RTW_EXIT_POINT, RTW_ENTRY_POINT, RTW_LENGTH
+			if (pRTW)
+			{
+				pRTW->rtw_length = TurningWayLength;
+				pRTW->rtw_exit_point = TurningWayX; // need to update when updating link length  
+				pRTW->rtw_entry_point = TurningWayY;
+			}
 		}
 
 		int LaneShapeSize = data[pos++];
@@ -4866,19 +5054,67 @@ void etFommInterface::ImportIntersectionModel()
 			totalLength += pLink->laneLength[ilane];
 		}
 		pLink->length = totalLength / pLink->fulllanes + IntersectionDimensions_Inputs[il].intDim.up_int_width;
-		if (pLink->length < 50)
-			pLink->length = 50;
-
+		
 		// update full lane lengths
 		for (int ilane = pLink->rightturnbays; ilane < pLink->rightturnbays + pLink->fulllanes; ++ilane)
 		{
 			pLink->laneLength[ilane] = pLink->length;
 		}
-	}
 
-	
+		// update right turning way exit point
+		TURNING_WAY* pRTW = NULL;
+		for (int iw = 0; iw < n_rtws; ++iw)
+		{
+			if (turningWays[iw].usn == pLink->usn && turningWays[iw].dsn == pLink->dsn)
+			{
+				pRTW = &(turningWays[iw]);
+				pRTW->rtw_exit_point = pLink->length - pRTW->rtw_exit_point ;
+
+				std::pair<int, int> linkKey = std::pair<int, int>(pRTW->usn2, pRTW->dsn2);
+				if (UsnDsnToSLinkIDXMap.find(linkKey) != UsnDsnToSLinkIDXMap.end())
+				{
+					int linkIdx = UsnDsnToSLinkIDXMap[linkKey];
+					STREET_LINK* pReceivingLink = &(streetLinks[linkIdx]);
+					pRTW->rtw_entry_point += IntersectionDimensions_Inputs[linkIdx].intDim.up_int_width; 
+					pRTW->rtw_length -= pReceivingLink->lane_width[0];
+				}
+			}
+		}
+	}
+		
 	SetIntersectionData(IntersectionDimensions_Inputs);
 	SetStreetLinks(streetLinks);
+
+	if (n_sdets > 0)
+	{
+		for (int i = 0; i < n_sdets; ++i)
+		{
+			DETECTOR_INPUTS* pSDET = &(sdets[i]);
+			std::pair<int, int> linkKey = std::pair<int, int>(pSDET->usn, pSDET->dsn);
+			if (UsnDsnToSLinkIDXMap.find(linkKey) != UsnDsnToSLinkIDXMap.end())
+			{
+				int linkIdx = UsnDsnToSLinkIDXMap[linkKey];
+				STREET_LINK* pLink = &(streetLinks[linkIdx]);
+				float linkLen = pLink->laneLength[pLink->rightturnbays];
+				if (linkLen < pSDET->location)
+				{
+					//FreeDLL();
+					std::string errMsg("Street link [" + std::to_string(pLink->usn)
+						+ "," + std::to_string(pLink->dsn)
+						+ "]: Detector location " + std::to_string(pSDET->location)
+						+ "ft is longer than link length " + std::to_string(linkLen) + "ft.");
+					throw(InterfaceException(errMsg));
+				}
+			}
+		}
+		
+		SetSDetectors(sdets);
+	}
+	
+	if (n_rtws > 0)
+	{
+		SetTurningWays(turningWays);
+	}
 }
 
 int etFommInterface::GetETFOMMDirection(STREET_LINK* pLink, int ReceivingDSN, int dir)

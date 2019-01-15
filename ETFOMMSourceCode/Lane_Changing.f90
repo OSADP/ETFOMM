@@ -171,7 +171,14 @@
   IF(SLOCATION(IV) - SVLENGTH(IV) .GE. MINDIST) THEN
     IF(ILANE .GT. 0) THEN
       IGOAL = 0
-      IF(STURNCODE(IV) .EQ. TC_LEFT .AND. ILANE .EQ. LAST_FULL_LANE(IL) .AND. NUMBER_LEFTPOCKETS(IL) .GT. 0) THEN
+      IF(STURNCODE(IV) .EQ. TC_RIGHT .AND. RTW_EXIT_POINT(IL) .GT. 0 .AND. &
+        ILANE .EQ. NUMBER_TURNINGWAYS(IL) + 1 .AND. ILANE .LT. FIRST_FULL_LANE(IL)) THEN
+        
+! --- Try to enter the turning way from the turn pocket.
+ 
+        CALL ENTER_TURNING_WAY(IV)
+        
+      ELSEIF(STURNCODE(IV) .EQ. TC_LEFT .AND. ILANE .EQ. LAST_FULL_LANE(IL) .AND. NUMBER_LEFTPOCKETS(IL) .GT. 0) THEN
 
 ! --- Try to enter the first left turn pocket lane.
 
@@ -323,7 +330,7 @@
       ENDIF
     ENDIF
   ELSEIF(STURNCODE(IV) .EQ. TC_RIGHT) THEN
-    IPL = NUMBER_RIGHTPOCKETS(IL)
+    IPL = NUMBER_RIGHTPOCKETS(IL) + NUMBER_TURNINGWAYS(IL)
  
 ! --- Determine if the subject vehicle has reached the beginning
 ! --- of the pocket lane.
@@ -475,7 +482,7 @@
     RIGHT = SLANE(IV) - 1
     IF(RIGHT .GT. 0) THEN
       DO ILANE = RIGHT, FIRST_FULL_LANE(IL), -1
-        IF(SLANECODES(IV, ILANE) .NE. LC_NULL) THEN
+        IF(SLANECODES(IV, ILANE) .EQ. LC_GOOD) THEN
           NRIGHT = NRIGHT + 1
           IF(FIRSTRIGHT .EQ. 0) FIRSTRIGHT = ILANE
         ENDIF
@@ -492,7 +499,7 @@
       LEFT = 0
     ELSE
       DO ILANE = LEFT, LAST_FULL_LANE(IL)
-        IF(SLANECODES(IV, ILANE) .NE. LC_NULL) THEN
+        IF(SLANECODES(IV, ILANE) .EQ. LC_GOOD) THEN
           NLEFT = NLEFT + 1
           IF(FIRSTLEFT .EQ. 0) FIRSTLEFT = ILANE
         ENDIF
@@ -501,11 +508,11 @@
  
 ! --- Choose a goal lane and direction.
    
-    IF(LEFT .NE. 0 .AND. RIGHT .EQ. 0) THEN
+    IF(FIRSTLEFT .NE. 0 .AND. FIRSTRIGHT .EQ. 0) THEN
       GOAL = FIRSTLEFT
-    ELSEIF(LEFT .EQ. 0 .AND. RIGHT .NE. 0) THEN
+    ELSEIF(FIRSTLEFT .EQ. 0 .AND. FIRSTRIGHT .NE. 0) THEN
       GOAL = FIRSTRIGHT
-    ELSEIF(LEFT .NE. 0 .AND. RIGHT .NE. 0) THEN
+    ELSEIF(FIRSTLEFT .NE. 0 .AND. FIRSTRIGHT .NE. 0) THEN
       IF(NLEFT .LT. NRIGHT) THEN
         GOAL = FIRSTLEFT
       ELSEIF(NLEFT .GT. NRIGHT) THEN
@@ -787,7 +794,7 @@
   INTEGER, INTENT(IN) :: IV
   INTEGER, INTENT(IN) :: GOAL
   REAL PD, AD, D1, D2
-  INTEGER :: IL, ILD, IFL, MANDATORY_FLAG
+  INTEGER :: IL, ILD, IFL, MANDATORY_FLAG, ILINK
   LOGICAL :: WBLOCK
 ! ----------------------------------------------------------------------
 #ifdef DebugVersion
@@ -820,10 +827,21 @@
   
   WBLOCK = .FALSE.
   IF(ILD .NE. 0) THEN
-    IF(SLOCATION(ILD) - SVLENGTH(ILD) .LT. SLOCATION(IV)) WBLOCK = .TRUE.
+    IF(SLOCATION(ILD) - SVLENGTH(ILD) .LT. SLOCATION(IV) + 5) WBLOCK = .TRUE.
   ENDIF
   IF(IFL .NE. 0) THEN
-    IF(SLOCATION(IV) - SVLENGTH(IV) .LT. SLOCATION(IFL)) WBLOCK = .TRUE.
+    IF(SLOCATION(IV) - SVLENGTH(IV) .LT. SLOCATION(IFL) - 5) WBLOCK = .TRUE.
+  ENDIF
+
+  IF(IFL .EQ. 0 .AND. ROUNDABOUT_ID(IL) .GT. 0 .AND. ROUNDABOUT_APPROACH_NUM(IL) .EQ. 0) THEN
+    DO ILINK = 1, N_STREET_LINKS
+      IF(STHRU_LINK(ILINK) .EQ. IL) THEN
+        IF(FIRST_VEHICLE(ILINK, GOAL) .NE. 0) THEN
+          IF(SLENGTH(ILINK) - SLOCATION(FIRST_VEHICLE(ILINK, GOAL)) .LT. 50) WBLOCK = .TRUE.
+        ENDIF
+        EXIT
+      ENDIF
+    ENDDO
   ENDIF
   D1 = 0.
   D2 = 0.
@@ -834,7 +852,7 @@
     IF(ILD .NE. 0) THEN
       IF(SLINK(ILD) .NE. 0) THEN
         IF(SUSN(SLINK(ILD)) .EQ. SDSN(IL)) THEN
-          IF(SLOCATION(ILD) - SVLENGTH(ILD) .LT. SLENGTH(IL) - SLOCATION(IV)) THEN
+          IF(SLOCATION(ILD) - SVLENGTH(ILD) .LT. SLOCATION(IV) - SLENGTH(IL)) THEN
             WBLOCK = .TRUE.
           ELSE
             CALL STREET_CAR_FOLLOW(IV, ILD, D1)
@@ -947,6 +965,11 @@
     ELSEIF(FDIVERTED(IV)) THEN
  
 ! --- Vehicle is being diverted from the freeway.      
+      D = MAX_DEC
+ 
+    ELSEIF(HOV_URGENT(IV)) THEN
+ 
+! --- Vehicle is trying to avoid an exclusive HOV lane or trying to get into avoid an exclusive HOV lane.      
       D = MAX_DEC
  
     ELSEIF(REMAINING_DIST(IV) .LE. MAX_DIST) THEN
@@ -1328,6 +1351,23 @@
       ENDIF
     ENDIF
  
+! --- Do not allow a lane change into an exclusive HOV lane from
+! --- a lane that is not within the HOV facility.
+ 
+    IF(NHOV_LANES(IL) .NE. 0) THEN
+      IF(HOV_TYPE(IL) .EQ. 1) THEN
+        IF(FLANE(IV) .NE. HOV_LANES(IL, 1) .AND. &
+           FLANE(IV) .NE. HOV_LANES(IL, 2) .AND. &
+           FLANE(IV) .NE. HOV_LANES(IL, 3)) THEN
+          IF(LEFT .EQ. HOV_LANES(IL, 1) .OR. &
+             LEFT .EQ. HOV_LANES(IL, 2) .OR. &
+             LEFT .EQ. HOV_LANES(IL, 3)) THEN
+            LEFT = 0
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+ 
 ! --- Do not allow a lane change across a barrier.
  
     IF(BARRIER(IL, 1) .EQ. FLANE(IV)) LEFT = 0
@@ -1364,6 +1404,23 @@
       ENDIF
     ENDIF
  
+! --- Do not allow a lane change into an exclusive HOV lane from
+! --- a lane that is not within the HOV facility.
+ 
+    IF(NHOV_LANES(IL) .NE. 0) THEN
+      IF(HOV_TYPE(IL) .EQ. 1) THEN
+        IF(FLANE(IV) .NE. HOV_LANES(IL, 1) .AND. &
+           FLANE(IV) .NE. HOV_LANES(IL, 2) .AND. &
+           FLANE(IV) .NE. HOV_LANES(IL, 3)) THEN
+          IF(RIGHT .EQ. HOV_LANES(IL, 1) .OR. &
+             RIGHT .EQ. HOV_LANES(IL, 2) .OR. &
+             RIGHT .EQ. HOV_LANES(IL, 3)) THEN
+            RIGHT = 0
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+
 ! --- Do not allow a lane change across a barrier.
  
     IF(BARRIER(IL, 1) .EQ. RIGHT) RIGHT = 0
@@ -1697,8 +1754,12 @@
   USE GLOBAL_DATA
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: IV
-  INTEGER :: ICODE, IL, ILN, I, ITURN
+  INTEGER :: ICODE, IL, ILN, I, ITURN, ILINK
 ! ----------------------------------------------------------------------
+#ifdef DebugVersion
+  integer :: temp
+  temp = sid(iv)
+#endif
  
 ! --- When a vehicle reaches the end of its link and has failed to get
 ! --- into a correct lane for its assigned turn movement, choose
@@ -1800,15 +1861,32 @@
   GOAL_LANE(IV) = 0
   
   IF(STURNCODE(IV) .EQ. TC_THRU) THEN
+    IF(ROUNDABOUT_ID(IL) .NE. 0 .AND. ROUNDABOUT_APPROACH_NUM(IL) .EQ. 0) THEN
+      ILINK = STHRU_LINK(IL)
+      DO WHILE(ILINK .NE. 0 .AND. ILINK .NE. IL)
+        IF(RIGHT_LINK(ILINK) .NE. 0) THEN
+          TURN_LINK(IV) = ILINK
+          TURN_CODE(IV) = TC_RIGHT
+          EXIT
+        ELSEIF(RIGHT_DIAG_LINK(ILINK) .NE. 0) THEN
+          TURN_LINK(IV) = ILINK
+          TURN_CODE(IV) = TC_RDIAG
+          EXIT
+        ELSE
+          ILINK = STHRU_LINK(ILINK)
+        ENDIF
+      ENDDO
+    ELSE
  
 ! --- Temporarily set the link to the thru receiving link to find
 ! --- the next turn link. After finding the next turn link and turn code
 ! --- set link and turn code back.
  
-    SLINK(IV) = STHRU_LINK(IL)
-    CALL FIND_NEXT_TURN(IV)
-    SLINK(IV) = IL
-    STURNCODE(IV) = TC_THRU
+      SLINK(IV) = STHRU_LINK(IL)
+      CALL FIND_NEXT_TURN(IV)
+      SLINK(IV) = IL
+      STURNCODE(IV) = TC_THRU
+    ENDIF
   ENDIF
   RETURN
   END
@@ -1858,3 +1936,7 @@
   ENDIF
   RETURN
   END
+
+  
+  
+

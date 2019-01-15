@@ -1,8 +1,31 @@
 Welcome to Enhanced Transportation Flow Open-source Microscopic Model (ETFOMM) project. 
 
-ETFOMM inherits 40 years of FHWA development of traffic simulation algorithms and flow theories while overcoming CORSIM’s limitations in supporting research. For more detail functions about ETFOMM, please refer to https://www.fhwa.dot.gov/publications/research/operations/17028/17028.pdf. For tutoring and technical support, please visit ETFOMM.org or email ngsim@ngsim.com.
+ETFOMM inherits 40 years of FHWA development of traffic simulation algorithms and flow theories while overcoming CORSIM’s limitations in supporting research. For more detail functions about ETFOMM, please refer to https://www.fhwa.dot.gov/publications/research/operations/17028/17028.pdf. For tutoring, technical support and future updates, please visit ETFOMM.org or email etfomm@ngsim.com.
 
 This project also includes ETFOMM Application Programming Interface (ETAPI) that provides communications between ETFOMM core simulation engine and user-developed applications (Apps) through ETRunner, a Windows console program.
+
+What's new in (2.1) since last update
+
++Integration of open source dynamic traffic assignment DTA Lite/ETFOMM/SSAM
++Directly add roadway geometric and elevation data
++Automatically build highway, light rail, tram  and surface street networks
++Export to 3D Max
++Explicitly model pedestrians
++Push button to traffic signal controller functions
++Tram/Light rail signal controller and priority
++NTCIP Based Transit Priority and preemption (work in progress)
++V2I Tram/Light rail control to reduce/eliminate stop at highway crossing/intersections (work in progress)
++Explicitly model tram/light rail and movement
++Feet/mile/meter/GPS Coordinates
++Large network editing: Cut/merge Networks
++HOV/Buses (Routes on Freeway)
++Dilemma zone safety (Decision control system)
++Ramp Meters/Freeway Detectors
++Advanced/Mixed Car Following logic with CAV
++Import/Export TRF files: CORSIM/SIMTRAFFIC-Synchro
++Direct Import DTA Lite Files
++Many improvements to Vehicle Movement, Intersection Model and Animation
++Multiple Run SSAM Summary for Project Level Safety Analysis
 
 Here are the folders included in this project:
 

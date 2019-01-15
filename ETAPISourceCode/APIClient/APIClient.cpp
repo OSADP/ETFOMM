@@ -2672,7 +2672,8 @@ void printIncidentInputs(StreamWriter^ outFile, array<WCF_INCIDENT_DATA>^ wcf_in
 	for (int i = 0; i < wcf_incident_inputs->Length; ++i)
 	{
 		outFile->WriteLine("#{0}", i+1);
-		outFile->WriteLine("link = {0}", wcf_incident_inputs[i].link);
+		outFile->WriteLine("usn = {0}", wcf_incident_inputs[i].usn);
+		outFile->WriteLine("dsn = {0}", wcf_incident_inputs[i].dsn);
 		outFile->WriteLine("begin_point = {0}", wcf_incident_inputs[i].begin_point);
 		outFile->WriteLine("begin_time = {0}", wcf_incident_inputs[i].begin_time);
 		outFile->WriteLine("end_point = {0}", wcf_incident_inputs[i].end_point);
@@ -2723,7 +2724,8 @@ void printParkingZones(StreamWriter^ outFile, array<WCF_PARKING_DATA>^ wcf_parki
 	for (int i = 0; i < wcf_parking_zones->Length; ++i)
 	{
 		outFile->WriteLine("#{0}", i+1);
-		outFile->WriteLine("link = {0}", wcf_parking_zones[i].link);
+		outFile->WriteLine("usn = {0}", wcf_parking_zones[i].usn);
+		outFile->WriteLine("dsn = {0}", wcf_parking_zones[i].dsn);
 		outFile->WriteLine("duration = {0}", wcf_parking_zones[i].duration);
 		outFile->WriteLine("freq = {0}", wcf_parking_zones[i].freq);
 		outFile->WriteLine("left_start = {0}", wcf_parking_zones[i].left_start);
@@ -2747,7 +2749,8 @@ void printEvents(StreamWriter^ outFile, array<WCF_EVENT_DATA>^ wcf_events)
 		outFile->WriteLine("begin_time = {0}", wcf_events[i].begin_time);
 		outFile->WriteLine("end_time = {0}", wcf_events[i].end_time);
 		outFile->WriteLine("lane = {0}", wcf_events[i].lane);
-		outFile->WriteLine("link = {0}", wcf_events[i].link);
+		outFile->WriteLine("usn = {0}", wcf_events[i].usn);
+		outFile->WriteLine("dsn = {0}", wcf_events[i].dsn);
 		outFile->WriteLine("location = {0}", wcf_events[i].location);
 		//outFile->WriteLine("type = {0}", wcf_events[i].type);
 		

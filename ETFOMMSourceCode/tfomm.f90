@@ -73,6 +73,10 @@
 ! --- Read the input records.
  
   CALL GET_NETWORK_DATA
+  IF(N_FREEWAY_LINKS .GT. 0 .AND. N_STREET_LINKS .GT. 0) THEN
+    CALL ALLOCATE_FREEWAY_INTERFACE_ARRAYS
+    CALL ALLOCATE_STREET_INTERFACE_ARRAYS
+  ENDIF
 
 #ifdef DebugVersion
 #ifndef TSIS_COMPATIBLE
@@ -166,6 +170,7 @@
   IF((TYPE_OF_RUN .EQ. 0 .OR. TYPE_OF_RUN .EQ. 1) .AND. .NOT. SKIP_INIT) THEN
     INITMODE = .TRUE.
     SIMTIME = 0.
+    CALL GET_PBV_INPUTS
  
   ! --- Run the initialization phase for the requested time.
  
@@ -180,6 +185,7 @@
   ! --- as scheduled. Also check for delayed vehicles in the queue.
  
       CALL CHECK_ENTRY_QUEUES
+      CALL CHECK_PBV_QUEUE
       CALL CHECK_BUS_ROUTES
       CALL CHECK_BUS_QUEUES
       CALL STEP_SIMULATION(NSTEPS)
@@ -226,7 +232,8 @@
   INITIALIZE = 0
   IF((TYPE_OF_RUN .EQ. 0 .OR. TYPE_OF_RUN .EQ. 1) .AND. .NOT. SKIP_INIT) THEN
     INITMODE = .TRUE.
- 
+    IF(SIMTIME .EQ. 0.0) CALL GET_PBV_INPUTS
+
   ! --- Run the initialization phase for one time step.
  
     IF(SIMTIME .LE. INITIALIZATION_END) THEN
@@ -240,6 +247,7 @@
   ! --- as scheduled. Also check for delayed vehicles in the queue.
  
       CALL CHECK_ENTRY_QUEUES
+      CALL CHECK_PBV_QUEUE
       CALL CHECK_BUS_ROUTES
       CALL CHECK_BUS_QUEUES
       CALL STEP_SIMULATION(NSTEPS)
