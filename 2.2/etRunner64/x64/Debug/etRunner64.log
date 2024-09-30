@@ -1,0 +1,127 @@
+﻿  stdafx.cpp
+C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll : warning C4945: 'HttpRequestMessageExtensionMethods': cannot import symbol from 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll': as 'System::ServiceModel::Channels::HttpRequestMessageExtensionMethods' has already been imported from another assembly 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.Channels.dll'
+  (compiling source file 'stdafx.cpp')
+  C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll(0,1):
+  first seen type is used; re-order imported assemblies to use the current type
+  C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll(0,1):
+  This diagnostic occurred while importing type 'System.ServiceModel.Channels.HttpRequestMessageExtensionMethods' from assembly 'System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.
+  
+  Display.cpp
+  etFommInterface.cpp
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(425,24): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(444,27): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(441,2): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1507,48): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1507,48): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1507,68): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1507,68): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1564,42): warning C4552: '<': result of expression not used
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1637,44): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1637,44): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1638,17): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1638,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1638,41): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1638,41): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1748,44): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1748,44): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1749,17): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1749,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1749,41): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1749,41): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1931,41): warning C4552: '<': result of expression not used
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(1956,45): warning C4552: '<': result of expression not used
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(2446,19): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(2450,14): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(2502,19): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(2506,14): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(3972,5): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(4289,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(4291,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(4327,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/etFommInterface.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etFommInterface.cpp(4329,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  (compiling source file '/etFommInterface.cpp')
+  
+  etRunner64.cpp
+D:\ETFOMM\0917\ETFOMM\etRunner64\etRunner64.cpp(216,1): warning C4102: 'SimulateRun': unreferenced label
+  (compiling source file '/etRunner64.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etRunner64.cpp(102,7): warning C4101: 'user_input': unreferenced local variable
+  (compiling source file '/etRunner64.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etRunner64.cpp(329,10): warning C4101: 'timestep': unreferenced local variable
+  (compiling source file '/etRunner64.cpp')
+  
+D:\ETFOMM\0917\ETFOMM\etRunner64\etRunner64.cpp(345,8): warning C4101: 'structsize': unreferenced local variable
+  (compiling source file '/etRunner64.cpp')
+  
+  Generating Code...
+  .NETFramework,Version=v4.7.2.AssemblyAttributes.cpp
+C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll : warning C4945: 'HttpRequestMessageExtensionMethods': cannot import symbol from 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll': as 'System::ServiceModel::Channels::HttpRequestMessageExtensionMethods' has already been imported from another assembly 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.Channels.dll'
+  (compiling source file 'x64/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cpp')
+  C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll(0,1):
+  first seen type is used; re-order imported assemblies to use the current type
+  C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ServiceModel.dll(0,1):
+  This diagnostic occurred while importing type 'System.ServiceModel.Channels.HttpRequestMessageExtensionMethods' from assembly 'System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.
+  
+  Display.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
+  etRunner64.vcxproj -> D:\ETFOMM\0917\ETFOMM\x64\Debug\etRunner64.exe

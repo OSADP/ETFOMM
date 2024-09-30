@@ -1,0 +1,2440 @@
+      KEND = 0
+      STRING='&
+     &<?xml version="1.0" encoding="UTF-8"?>&
+     &<MOE_LIST>&
+     &<CLASS name="BUSROUTE" label="Bus_Route" function="GetBusRouteMoeD&
+     &ata" numargs="1" arg1label="ID">&
+     &<MOE name="PersonTravelTime" display="Person Travel Time" units="H&
+     &ours" description="Total time that persons spent traversing the ro&
+     &ute.  Calculated as Travel Time Total times the average bus occupa&
+     &ncy." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTrips" display="Person Trips" units="" descriptio&
+     &n="Number of persons that have completely traversed the route in a&
+     & bus.  Calculated as Bus Trips times the average bus occupancy." /&
+     &>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerBus" display="Travel Time Per Bus" units="&
+     &Minutes/Bus" description="Average time a bus spent traversing the &
+     &route.  Calculated as Travel Time Total divided by Bus Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DwellTimeTotal" display="Dwell Time Total" units="Minut&
+     &es" description="Total dwell time of all stations along the route.&
+     &" />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DwellTimePerBus" display="Dwell Time Per Bus" units="Mi&
+     &nutes/Bus" description="Total dwell time divided by the number of &
+     &buses that entered the station." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ControlDelayTotal" display="Control Delay Total" units=&
+     &"Minutes" description="Total control delay for all intersections a&
+     &long the route." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ControlDelayPerBus" display="Control Delay Per Bus" uni&
+     &ts="Minutes/Bus" description="Total control delay divided by the n&
+     &umber of buses that entered the station." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Min&
+     &utes" description="Total time that buses spent traversing the rout&
+     &e.  Accumulated Accumulated every time step." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance that buses traveled along &
+     &the route.  Accumulated every time step." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Trips" display="Trips" units="" description="Number of &
+     &buses that have completely traversed all links in the route.  Accu&
+     &mulated when a bus exits the last link of a route." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="AverageSpeed" display="Average Speed" units="Miles/Hour&
+     &" description="Average speed of all buses that completed trips alo&
+     &ng the route." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="AverageTravelSpeed" display="Average Travel Speed" unit&
+     &s="Miles/Hour" description="Average speed of all buses that comple&
+     &ted trips along the route, excluding dwell time." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="AverageFreeflowSpeed" display="Average Freeflow Speed" &
+     &units="Miles/Hour" description="Distance weighted average freeflow&
+     & speed over all links in the route." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="FreeflowSpeedTravelTime" display="Freeflow Speed Travel&
+     & Time" units="Minutes" description="Time required to travel the ro&
+     &ute at the freeflow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTime" display="Delay Time" units="Minutes" descrip&
+     &tion="Travel Time Total minus Freeflow Speed Travel Time." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="BUSSTATION" label="BusStation" function="GetBusStatio&
+     &nMoeData" numargs="1" arg1label="Number" >&
+     &<MOE name="BusesServicedTotal" display="Buses Serviced Total" unit&
+     &s="" description="The total number of buses that serviced the stat&
+     &ion.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="CapacityExceededTimeTotal" display="Capacity Exceeded T&
+     &ime Total" units="Minutes" description="Total time that the capaci&
+     &ty of the station was exceeded.  Accumulated when buses cannot ent&
+     &er the station because the station is full." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DwellTimeTotal" display="Dwell Time Total" units="Minut&
+     &es" description="Total time that buses dwelled in the station.  Ac&
+     &cumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmptyTimeTotal" display="Empty Time Total" units="Minut&
+     &es" description="Total time that the station was empty (no buses d&
+     &welling in the station).  Accumulated during the evaluation interv&
+     &al." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TotalTravelTime" display="Total Travel Time" units="Min&
+     &utes" description="Total time that vehicles spent traveling from t&
+     &he previous station to the current station.  Accumulated during th&
+     &e evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="AverageTravelTime" display="Average Travel Time" units=&
+     &"Minutes/Bus" description="Total time that vehicles spent travelin&
+     &g from the previous station to the current station divided by the &
+     &number of vehicles servicing the station.  Accumulated during the &
+     &evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Distance" display="Distance" units="Feet" description="&
+     &Distance from the previous station, or from the entry point for th&
+     &e first station on the route." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Speed" display="Speed" units="Miles/Hour" description="&
+     &Distance from previous station times the number of vehicles servic&
+     &ing the station divided by total time that vehicles spent travelin&
+     &g from the previous station to the current station.  Accumulated d&
+     &uring the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="DATASTATION" label="Data_Station" function="GetDatast&
+     &ationMoeData" numargs="3" arg1label="USN" arg2label="DSN" arg3labe&
+     &l="Lane" >&
+     &<MOE name="HeadwayAverage" display="Headway Average" units="Second&
+     &s" description="Average time between vehicles crossing the data st&
+     &ation.  Calculated as the sum of the headways of all vehicles cros&
+     &sing the data station divided by the number of vehicles crossing t&
+     &he data station." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Feet/Secon&
+     &d" description="Average speed of vehicles crossing the data statio&
+     &n.  Calculated as the sum of the speeds of all vehicles crossing t&
+     &he data station divided by the number of vehicles crossing the dat&
+     &a station." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="SIGNALPHASES" label="Signal Phases" function="GetSign&
+     &alPhasesMoeData" numargs="2" arg1label="Number" arg2label = "Phase&
+     &" >&
+     &<MOE name="GreenTimeTotal" display="Green Time Total" units="Minut&
+     &es" description="The total time that the phase was green.  Accumul&
+     &ated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MaxoutsTotal" display="Maxouts Total" units="" descript&
+     &ion="The total number of times that the phase was terminated due t&
+     &o reaching the Maxout time.  Accumulated during the evaluation int&
+     &erval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MinimumGreensTotal" display="Minimum Greens Total" unit&
+     &s="" description="The total number of times that the phase was ter&
+     &minated at the Minimum Green time.  Accumulated during the evaluat&
+     &ion interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PercentageOfMaxouts" display="Percentage Of Maxouts" un&
+     &its="" description="The total number of times that the phase was t&
+     &erminated due to reaching the Maxout time divided by the total num&
+     &ber of times that the phase was started.  Accumulated during the e&
+     &valuation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PercentageOfMinimumGreens" display="Percentage Of Minim&
+     &um Greens" units="" description="The total number of times that th&
+     &e phase was terminated at the Minimum Green time divided by the to&
+     &tal number of times that the phase was started.  Accumulated durin&
+     &g the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="NumberOfCyclesTotal" display="Number Of Cycles Total" u&
+     &nits="" description="The total number of times that the phase was &
+     &started.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="RedLightRunnersTotal" display="Red Light Runners Total"&
+     & units="" description="The total number of vehicles that entered t&
+     &he intersection during the time the phase was red.  Accumulated du&
+     &ring the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedTotal" display="Vehicles Discharged T&
+     &otal" units="" description="The total number of vehicles that were&
+     & discharged from the link during the phase.  Accumulated during th&
+     &e evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesInDilemmaZoneTotal" display="Vehicles In Dilemm&
+     &a Zone Total" units="" description="The total number of vehicles t&
+     &hat were in the dilemma zone when the signal turned yellow.  Accum&
+     &ulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="FREEWAY_DETECTOR" label="Freeway_Detector" function="&
+     &GetFreewayDetectorMoeData" numargs="3" arg1label="USN" arg2label="&
+     &DSN" arg3label="ID" >&
+     &<MOE name="HeadwayAverage" display="Headway Average" units="Second&
+     &s" description="Average headway of vehicles crossing the detector.&
+     &  Calculated as the sum of vehicle headways divided by the vehicle&
+     & count." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="OccupancyPercent" display="Occupancy Percent" units="%"&
+     & description="Ratio of the detector on time to the duration of the&
+     & evaluation interval, scaled to a point value and expressed as a p&
+     &ercent.  Calculated as the detector on time divided by the duratio&
+     &n of the evaluation interval and multiplied by the ratio of the av&
+     &erage vehicle length divided by the sum of the average vehicle len&
+     &gth plus the detector length." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="OnTime" display="On Time" units="Seconds" description="&
+     &Total time that the detector was activated. Accumulated over all l&
+     &anes covered by the detector during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of vehicles crossing the detector.  C&
+     &alculated as the sum of the speeds of all vehicles crossing the de&
+     &tector divided by the vehicle count." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Volume" display="Volume" units="Vehicles/Hour" descript&
+     &ion="Number of vehicles crossing the detector, converted to an hou&
+     &rly count.  Calculated as the vehicle count divided by the length &
+     &of the evaluation interval and scaled to one hour." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="STREET_DETECTOR" label="Street_Detector" function="Ge&
+     &tStreetDetectorMoeData" numargs="3" arg1label="USN" arg2label="DSN&
+     &" arg3label="ID" >&
+     &<MOE name="HeadwayAverage" display="Headway Average" units="Second&
+     &s" description="Average headway of vehicles crossing the detector.&
+     &  Calculated as the sum of vehicle headways divided by the vehicle&
+     & count." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="OccupancyPercent" display="Occupancy Percent" units="%"&
+     & description="Ratio of the detector on time to the duration of the&
+     & evaluation interval, scaled to a point value and expressed as a p&
+     &ercent.  Calculated as the detector on time divided by the duratio&
+     &n of the evaluation interval and multiplied by the ratio of the av&
+     &erage vehicle length divided by the sum of the average vehicle len&
+     &gth plus the detector length." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="OnTime" display="On Time" units="Seconds" description="&
+     &Total time that the detector was activated. Accumulated over all l&
+     &anes covered by the detector during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of vehicles crossing the detector.  C&
+     &alculated as the sum of the speeds of all vehicles crossing the de&
+     &tector divided by the vehicle count." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Volume" display="Volume" units="Vehicles/Hour" descript&
+     &ion="Number of vehicles crossing the detector, converted to an hou&
+     &rly count.  Calculated as the vehicle count divided by the length &
+     &of the evaluation interval and scaled to one hour." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="ENTRYLINK" label="EntryLink" function="GetEntryLinkMo&
+     &eData" numargs="2" arg1label="USN" arg2label="DSN">&
+     &<MOE name="DelayedVehicles" display="Delayed Vehicles" units="Vehi&
+     &cles" description="Total number of vehicles that were unable to en&
+     &ter the network at their scheduled time." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayPerVehicle" display="Delay Per Vehicle" units="Sec&
+     &onds/Vehicle" description="Total delay experienced by all vehicles&
+     & waiting to enter the network divided by the number of vehicles wa&
+     &iting to enter the network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTotal" display="Delay Total" units="Seconds" descr&
+     &iption="Total delay experienced by all vehicles waiting to enter t&
+     &he network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedTotal" display="Vehicles Discharged T&
+     &otal" units="Vehicles" description="Total number of vehicles disch&
+     &arged from the link during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesInQueueCurrent" display="Vehicles In Queue Curr&
+     &ent" units="Vehicles" description="Total number of vehicles that a&
+     &re currently in queue at the entry link because they were unable t&
+     &o enter the network at their scheduled time." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="LANE_FREEWAY" label="Freeway Lane" function="GetFreew&
+     &ayLaneMoeData" numargs="3" arg1label="USN" arg2label="DSN" arg3lab&
+     &el="Lane" >&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="A snapshot of the current number of vehicles in t&
+     &he lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicle" display="Delay Travel Per Vehicl&
+     &e" units="Seconds/Vehicle" description="Average time a vehicle was&
+     & delayed in the lane.  Calculated as Travel Time Per Vehicle minus&
+     & Move Time Per Vehicle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="M&
+     &inutes" description="Total time vehicles were delayed in the lane.&
+     &  Accumulated per vehicle during the evaluation interval, using ea&
+     &ch vehicle#s travel time, distance traveled in the lane, and desir&
+     &ed free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerVehicle" display="Move Time Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Theoretical time for a vehicle t&
+     &o travel the length of the lane if it were moving unimpeded at the&
+     & free-flow speed.  Calculated as (Travel Time Total minus Delay Tr&
+     &avel Total) divided by Travel Time Total times Travel Time Per Veh&
+     &icle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonDelayPerPerson" display="Person Delay Per Person"&
+     & units="Seconds/Person" description="Average time a person is dela&
+     &yed in the lane.  Calculated as (Travel Time Total divided by Pers&
+     &on Travel Time Total) times Delay Time Per Vehicle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonMoveTimePerPerson" display="Person Move Time Per &
+     &Person" units="Seconds/Person" description="Move Time Per Vehicle &
+     &times average content divided by average occupancy per vehicle, us&
+     &ing data accumulated per lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimePerPerson" display="Person Travel Time &
+     &Per Person" units="Seconds/Person" description="Average time a per&
+     &son travels in the lane.  Calculated as Person Delay Per Person pl&
+     &us Person MoveTime Per Person" />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimeTotal" display="Person Travel Time Tota&
+     &l" units="Minutes" description="Total time that people were travel&
+     &ing in the lane.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of the vehicles in the lane.  Calcula&
+     &ted as Travel Distance Total divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by vehicles while&
+     & they were in the lane.  Accumulated during the evaluation interva&
+     &l." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicle" display="Travel Time Per Vehicle"&
+     & units="Seconds/Vehicle" description="Average time for a vehicle t&
+     &o traverse the entire lane.  Calculated as the length of the lane &
+     &divided by Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Min&
+     &utes" description="Total time that vehicles were in the lane.  Acc&
+     &umulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedPerHour" display="Vehicles Discharged&
+     & Per Hour" units="Vehicles/Hour" description="Number of vehicles d&
+     &ischarged from the lane, converted to an hourly rate." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedTotal" display="Vehicles Discharged T&
+     &otal" units="Vehicles" description="Total number of vehicles disch&
+     &arged from the lane during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Volume" display="Volume" units="Vehicles/Hour" descript&
+     &ion="Number of vehicles using the lane, expressed as an hourly val&
+     &ue.  Calculated as the lane density times Speed Average for the la&
+     &ne.  Lane density is determined by dividing the average content fo&
+     &r the lane by the length of the lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="LANE_STREET" label="Street Lane" function="GetStreetL&
+     &aneMoeData" numargs="3" arg1label="USN" arg2label="DSN" arg3label=&
+     &"Lane" >&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="A snapshot of the current number of vehicles in t&
+     &he lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicle" display="Delay Travel Per Vehicl&
+     &e" units="Seconds/Vehicle" description="Average time a vehicle was&
+     & delayed in the lane.  Calculated as Travel Time Per Vehicle minus&
+     & Move Time Per Vehicle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="M&
+     &inutes" description="Total time vehicles were delayed in the lane.&
+     &  Accumulated per vehicle during the evaluation interval, using ea&
+     &ch vehicle#s travel time, distance traveled in the lane, and desir&
+     &ed free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerVehicle" display="Move Time Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Theoretical time for a vehicle t&
+     &o travel the length of the lane if it were moving unimpeded at the&
+     & free-flow speed.  Calculated as (Travel Time Total minus Delay Tr&
+     &avel Total) divided by Travel Time Total times Travel Time Per Veh&
+     &icle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonDelayPerPerson" display="Person Delay Per Person"&
+     & units="Seconds/Person" description="Average time a person is dela&
+     &yed in the lane.  Calculated as (Travel Time Total divided by Pers&
+     &on Travel Time Total) times Delay Time Per Vehicle." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonMoveTimePerPerson" display="Person Move Time Per &
+     &Person" units="Seconds/Person" description="Move Time Per Vehicle &
+     &times average content divided by average occupancy per vehicle, us&
+     &ing data accumulated per lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimePerPerson" display="Person Travel Time &
+     &Per Person" units="Seconds/Person" description="Average time a per&
+     &son travels in the lane.  Calculated as Person Delay Per Person pl&
+     &us Person MoveTime Per Person" />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimeTotal" display="Person Travel Time Tota&
+     &l" units="Minutes" description="Total time that people were travel&
+     &ing in the lane.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="QueueAverageNumberVehicles" display="Queue Average Numb&
+     &er Vehicles" units="Vehicles" description="Average number of vehic&
+     &les in queue in the lane.  Calculated as the number of vehicles in&
+     & queue, accumulated every second, divided by the duration of the e&
+     &valuation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="QueueCurrentLength" display="Queue Current Length" unit&
+     &s="Feet" description="A snapshot of the distance from the stop lin&
+     &e to the end of the current queue in lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="QueueCurrentNumberVehicles" display="Queue Current Numb&
+     &er Vehicles" units="Vehicles" description="A snapshot of the curre&
+     &nt number of vehicles in queue in the lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="QueueMaximumNumberVehicles" display="Queue Maximum Numb&
+     &er Vehicles" units="Vehicles" description="Largest number of vehic&
+     &les in queue in the lane during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of the vehicles in the lane.  Calcula&
+     &ted as Travel Distance Total divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by vehicles while&
+     & they were in the lane.  Accumulated during the evaluation interva&
+     &l." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicle" display="Travel Time Per Vehicle"&
+     & units="Seconds/Vehicle" description="Average time for a vehicle t&
+     &o traverse the entire lane.  Calculated as the length of the lane &
+     &divided by Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Min&
+     &utes" description="Total time that vehicles were in the lane.  Acc&
+     &umulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedPerHour" display="Vehicles Discharged&
+     & Per Hour" units="Vehicles/Hour" description="Number of vehicles d&
+     &ischarged from the lane, converted to an hourly rate." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedTotal" display="Vehicles Discharged T&
+     &otal" units="Vehicles" description="Total number of vehicles disch&
+     &arged from the lane during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Volume" display="Volume" units="Vehicles/Hour" descript&
+     &ion="Number of vehicles using the lane, expressed as an hourly val&
+     &ue.  Calculated as the lane density times Speed Average for the la&
+     &ne.  Lane density is determined by dividing the average content fo&
+     &r the lane by the length of the lane." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="LINK_FREEWAY" label="Link Freeway" function="GetFreew&
+     &ayLinkMoeData" numargs="2" arg1label="USN" arg2label="DSN" >&
+     &<MOE name="BusDelayPerVehicle" display="Bus Delay Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Average time that a bus was dela&
+     &yed on the link.  Calculated as Bus Delay Total divided by Bus Tri&
+     &ps." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusDelayTotal" display="Bus Delay Total" units="Minutes&
+     &" description="Total time that buses were delayed on the link.  Ca&
+     &lculated as Bus Travel Time Total minus Bus Move Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusMoveTimePerTravelTimeRatio" display="Bus Move Time P&
+     &er Travel Time Ratio" units="" description="Ratio of the theoretic&
+     &al move time to the actual travel time for buses on the link.  Cal&
+     &culated as Bus Move Time Total divided by Bus Travel Time Total." &
+     &/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusMoveTimeTotal" display="Bus Move Time Total" units="&
+     &Minutes" description="Total theoretical time for discharged buses &
+     &to travel the length of the link if moving unimpeded at the free-f&
+     &low speed.  Calculated as Bus Trips times the length of the link d&
+     &ivided by the link free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusPersonTrips" display="Bus Person Trips" units="" des&
+     &cription="Number of persons that have completely traversed the lin&
+     &k in a bus.  Calculated as Bus Trips times the average bus occupan&
+     &cy." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusSpeedAverage" display="Bus Speed Average" units="Mil&
+     &es/Hour" description="Average speed at which a bus traverses the l&
+     &ink.  Calculated as Bus Trips times the length of the link divided&
+     & by Bus Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTravelTimePerVehicle" display="Bus Travel Time Per V&
+     &ehicle" units="Seconds/Vehicle" description="Average time for a bu&
+     &s to traverse the link.  Calculated as Bus Travel Time Total divid&
+     &ed by Bus Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTravelTimeTotal" display="Bus Travel Time Total" uni&
+     &ts="Minutes" description="Total time that discharged buses spent t&
+     &raversing the link.  Accumulated whenever a bus discharges the lin&
+     &k during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTrips" display="Bus Trips" units="" description="Num&
+     &ber of buses that have completely traversed the link during the ev&
+     &aluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentAverage" display="Content Average" units="Vehicl&
+     &es" description="Average number of vehicles on the link during the&
+     & evaluation interval.  Calculated as the Travel Time Total divided&
+     & by the duration of the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="A snapshot of the current number of vehicles on t&
+     &he link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerDistanceTraveled" display="Delay Travel P&
+     &er Distance Traveled" units="Minutes/Mile" description="Average ti&
+     &me vehicles were delayed per each mile of travel.  Calculated as D&
+     &elay Travel Per Vehicle divided by Travel Time Per Vehicle multipl&
+     &ied by Travel Time Per Distance Traveled." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicle" display="Delay Travel Per Vehicl&
+     &e" units="Seconds/Vehicle" description="Average time that a vehicl&
+     &e was delayed on the link.  Calculated as the Delay Travel Total d&
+     &ivided by Vehicles Discharged." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="M&
+     &inutes" description="Total time that all vehicles were delayed on &
+     &the link.  Calculated as the Travel Time Total minus Move Time Tot&
+     &al for the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DensityPerLane" display="Density Per Lane" units="Vehic&
+     &les/Mile/Lane" description="Average number of vehicles per mile pe&
+     &r lane.  Calculated as Content Average divided by link area.  Link&
+     & area is the sum of the lengths of the lanes in the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalCO" display="Emissions Total CO" units="G&
+     &rams" description="The total CO emissions produced by all vehicles&
+     & on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalHC" display="Emissions Total HC" units="G&
+     &rams" description="The total HC emissions produced by all vehicles&
+     & on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalNOx" display="Emissions Total NOx" units=&
+     &"Grams" description="The total NOx emissions produced by all vehic&
+     &les on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="FuelConsumptionTotal" display="Fuel Consumption Total" &
+     &units="Gallons" description="Total fuel consumed by all vehicles o&
+     &n the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="LaneChangesTotal" display="Lane Changes Total" units=""&
+     & description="Total number of lane changes that have been complete&
+     &d on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatio" display="Move Time Per Trav&
+     &el Time Ratio" units="" description="Ratio of the theoretical move&
+     & time to the actual travel time for vehicles on the link.  Calcula&
+     &ted as Move Time Total divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerVehicle" display="Move Time Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Theoretical time for a vehicle t&
+     &o travel the length of the link if it were moving unimpeded at the&
+     & free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotal" display="Move Time Total" units="Minutes&
+     &" description="Total theoretical time for discharged vehicles to t&
+     &ravel the length of the link if moving unimpeded at the free-flow &
+     &speed.  Calculated as Travel Distance Total divided by the free-fl&
+     &ow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonDelayTotal" display="Person Delay Total" units="P&
+     &erson-Minutes" description="Total delay to persons completely trav&
+     &ersing the link.  Calculated as Person Travel Time Total minus the&
+     & division of Person Travel Distance Total by the free-flow speed o&
+     &n the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelDistanceTotal" display="Person Travel Dista&
+     &nce Total" units="" description="Total distance traveled by person&
+     &s on the link.  Calculated as Travel Distance Total times the aver&
+     &age number of persons per vehicle for vehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimeTotal" display="Person Travel Time Tota&
+     &l" units="Minutes" description="Total time that people were travel&
+     &ing the link.  Calculated as Travel Time Total times the average n&
+     &umber of persons per vehicle for vehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTripsTotal" display="Person Trips Total" units=""&
+     & description="Total number of people traversing the link.  Calcula&
+     &ted as Trips times the average number of persons per vehicle for v&
+     &ehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of a vehicle that has completely trav&
+     &ersed the link.  Calculated as Travel Distance Total divided by th&
+     &e Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by vehicles on th&
+     &e link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerDistanceTraveled" display="Travel Time Per&
+     & Distance Traveled" units="Minutes/Mile" description="Average time&
+     & for a vehicle to travel one mile.  Calculated as Travel Time Tota&
+     &l divided by Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicle" display="Travel Time Per Vehicle"&
+     & units="Seconds/Vehicle" description="Average time for a vehicle t&
+     &o traverse the link.  Calculated as the length of the link divided&
+     & by Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Min&
+     &utes" description="Total time that all vehicles were on the link. &
+     & Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischarged" display="Vehicles Discharged" units&
+     &="Vehicles" description="Number of vehicles that have been dischar&
+     &ged from the link.  Accumulated during the evaluation interval." /&
+     &>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesEnteringLink" display="Vehicles Entering Link" &
+     &units="Vehicles" description="Number of vehicles that have entered&
+     & the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VolumePerLane" display="Volume Per Lane" units="Vehicle&
+     &s/Hour/Lane" description="Average number of vehicles traversing ea&
+     &ch lane, converted to an hourly value.  Calculated as Density time&
+     &s Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDiverted" display="Vehicles Diverted" units="Ve&
+     &hicles" description="Total number of vehicles that have been diver&
+     &ted from the freeway." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="LINK_STREET" label="Link Street" function="GetStreetL&
+     &inkMoeData" numargs="2" arg1label="USN" arg2label="DSN" >&
+     &<MOE name="BusDelayPerVehicle" display="Bus Delay Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Average time that a bus was dela&
+     &yed on the link.  Calculated as Bus Delay Total divided by Bus Tri&
+     &ps." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusDelayTotal" display="Bus Delay Total" units="Minutes&
+     &" description="Total time that buses were delayed on the link.  Ca&
+     &lculated as Bus Travel Time Total minus Bus Move Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusesThatStopped" display="Buses That Stopped" units=""&
+     & description="Number of buses that stopped at least once on the li&
+     &nk.  Accumulated during the evaluation interval when a bus stops, &
+     &provided the bus has not previously stopped." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusMoveTimePerTravelTimeRatio" display="Bus Move Time P&
+     &er Travel Time Ratio" units="" description="Ratio of the theoretic&
+     &al move time to the actual travel time for buses on the link.  Cal&
+     &culated as Bus Move Time Total divided by Bus Travel Time Total." &
+     &/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusMoveTimeTotal" display="Bus Move Time Total" units="&
+     &Minutes" description="Total theoretical time for discharged buses &
+     &to travel the length of the link if moving unimpeded at the free-f&
+     &low speed.  Calculated as Bus Trips times the length of the link d&
+     &ivided by the link free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusPersonTrips" display="Bus Person Trips" units="" des&
+     &cription="Number of persons that have completely traversed the lin&
+     &k in a bus.  Calculated as Bus Trips times the average bus occupan&
+     &cy." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusSpeedAverage" display="Bus Speed Average" units="Mil&
+     &es/Hour" description="Average speed at which a bus traverses the l&
+     &ink.  Calculated as Bus Trips times the length of the link divided&
+     & by Bus Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTravelTimePerVehicle" display="Bus Travel Time Per V&
+     &ehicle" units="Seconds/Vehicle" description="Average time for a bu&
+     &s to traverse the link.  Calculated as Bus Travel Time Total divid&
+     &ed by Bus Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTravelTimeTotal" display="Bus Travel Time Total" uni&
+     &ts="Minutes" description="Total time that discharged buses spent t&
+     &raversing the link.  Accumulated whenever a bus discharges the lin&
+     &k during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="BusTrips" display="Bus Trips" units="" description="Num&
+     &ber of buses that have completely traversed the link during the ev&
+     &aluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentAverage" display="Content Average" units="Vehicl&
+     &es" description="Average number of vehicles on the link during the&
+     & evaluation interval.  Calculated as the Travel Time Total divided&
+     & by the duration of the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="A snapshot of the current number of vehicles on t&
+     &he link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlPerVehicle" display="Delay Control Per Vehi&
+     &cle" units="Seconds/Vehicle" description="Average time that a vehi&
+     &cle was delayed due to signals on the link.  Calculated as Delay C&
+     &ontrol Total divided by the sum of Trips and Content Current." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlPerVehicleDiag" display="Delay Control Per &
+     &Vehicle Diag" units="Seconds/Vehicle" description="Average time th&
+     &at a diagonal vehicle was delayed due to signals on the link.  Cal&
+     &culated as Delay Control Total Diag divided by the sum of Trips Di&
+     &ag and Content Current Diag." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlPerVehicleLeft" display="Delay Control Per &
+     &Vehicle Left" units="Seconds/Vehicle" description="Average time th&
+     &at a left-turning vehicle was delayed due to signals on the link. &
+     & Calculated as Delay Control Total Left divided by the sum of Trip&
+     &s Left and Content Current Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlPerVehicleRight" display="Delay Control Per&
+     & Vehicle Right" units="Seconds/Vehicle" description="Average time &
+     &that a right-turning vehicle was delayed due to signals on the lin&
+     &k.  Calculated as Delay Control Total Right divided by the sum of &
+     &Trips Right and Content Current Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlPerVehicleThrough" display="Delay Control P&
+     &er Vehicle Through" units="Seconds/Vehicle" description="Average t&
+     &ime that a through-moving vehicle was delayed due to signals on th&
+     &e link.  Calculated as Delay Control Total Through divided by the &
+     &sum of Trips Through and Content Current Through." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlTotal" display="Delay Control Total" units=&
+     &"Minutes" description="The total time vehicles are delayed due to &
+     &signals on the link.  The CORSIM User#s Guide contains a detailed &
+     &description of control delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlTotalDiag" display="Delay Control Total Dia&
+     &g" units="Minutes" description="The total time diagonal vehicles a&
+     &re delayed due to signals on the link.  The CORSIM User#s Guide co&
+     &ntains a detailed description of control delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlTotalLeft" display="Delay Control Total Lef&
+     &t" units="Minutes" description="The total time left-turning vehicl&
+     &es are delayed due to signals on the link.  The CORSIM User#s Guid&
+     &e contains a detailed description of control delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlTotalRight" display="Delay Control Total Ri&
+     &ght" units="Minutes" description="The total time right-turning veh&
+     &icles are delayed due to signals on the link.  The CORSIM User#s G&
+     &uide contains a detailed description of control delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayControlTotalThrough" display="Delay Control Total &
+     &Through" units="Minutes" description="The total time through-movin&
+     &g vehicles are delayed due to signals on the link.  The CORSIM Use&
+     &r#s Guide contains a detailed description of control delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueuePerVehicle" display="Delay Queue Per Vehicle"&
+     & units="Seconds/Vehicle" description="Average time that a vehicle &
+     &was queued on the link.  Calculated as Delay Queue Total divided b&
+     &y the sum of Trips and Content Current." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotal" display="Delay Queue Total" units="Min&
+     &utes" description="Total time that vehicles were queued on the lin&
+     &k.  The CORSIM User#s Guide contains a detailed description of que&
+     &ue delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotalDiag" display="Delay Queue Total Diag" u&
+     &nits="Minutes" description="Total time that diagonal vehicles were&
+     & queued on the link.  The CORSIM User#s Guide contains a detailed &
+     &description of queue delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotalLeft" display="Delay Queue Total Left" u&
+     &nits="Minutes" description="Total time that left-turning vehicles &
+     &were queued on the link.  The CORSIM User#s Guide contains a detai&
+     &led description of queue delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotalRight" display="Delay Queue Total Right"&
+     & units="Minutes" description="Total time that right-turning vehicl&
+     &es were queued on the link.  The CORSIM User#s Guide contains a de&
+     &tailed description of queue delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotalThrough" display="Delay Queue Total Thro&
+     &ugh" units="Minutes" description="Total time that through-moving v&
+     &ehicles were queued on the link.  The CORSIM User#s Guide contains&
+     & a detailed description of queue delay." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopPerVehicle" display="Delay Stop Per Vehicle" u&
+     &nits="Seconds/Vehicle" description="Average time that a vehicle wa&
+     &s stopped on the link.  Calculated as Delay Stop Total divided by &
+     &the sum of Trips and Content Current." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotal" display="Delay Stop Total" units="Minut&
+     &es" description="Total time that vehicles were stopped on the link&
+     &.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotalDiag" display="Delay Stop Total Diag" uni&
+     &ts="Minutes" description="Total time that diagonal vehicles were s&
+     &topped on the link.  Accumulated during the evaluation interval." &
+     &/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotalLeft" display="Delay Stop Total Left" uni&
+     &ts="Minutes" description="Total time that left-turning vehicles we&
+     &re stopped on the link.  Accumulated during the evaluation interva&
+     &l." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotalRight" display="Delay Stop Total Right" u&
+     &nits="Minutes" description="Total time that right-turning vehicles&
+     & were stopped on the link.  Accumulated during the evaluation inte&
+     &rval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotalThrough" display="Delay Stop Total Throug&
+     &h" units="Minutes" description="Total time that through-moving veh&
+     &icles were stopped on the link.  Accumulated during the evaluation&
+     & interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerDistanceTraveled" display="Delay Travel P&
+     &er Distance Traveled" units="Minutes/Mile" description="Average ti&
+     &me vehicles were delayed per each mile of travel.  Calculated as D&
+     &elay Travel Per Vehicle divided by Travel Time Per Vehicle multipl&
+     &ied by Travel Time Per Distance Traveled." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicle" display="Delay Travel Per Vehicl&
+     &e" units="Seconds/Vehicle" description="Average time that a vehicl&
+     &e was delayed on the link.  Calculated as the Delay Travel Total d&
+     &ivided by Vehicles Discharged." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicleDiag" display="Delay Travel Per Ve&
+     &hicle Diag" units="Seconds/Vehicle" description="Average time that&
+     & a diagonal vehicle was delayed on the link.  Calculated as Delay &
+     &Travel Total Diag divided by Trips Diag." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicleLeft" display="Delay Travel Per Ve&
+     &hicle Left" units="Seconds/Vehicle" description="Average time that&
+     & a left-turning vehicle was delayed on the link.  Calculated as De&
+     &lay Travel Total Left divided by Trips Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicleRight" display="Delay Travel Per V&
+     &ehicle Right" units="Seconds/Vehicle" description="Average time th&
+     &at a right-turning vehicle was delayed on the link.  Calculated as&
+     & Delay Travel Total Right divided by Trips Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerVehicleThrough" display="Delay Travel Per&
+     & Vehicle Through" units="Seconds/Vehicle" description="Average tim&
+     &e that a through-moving vehicle was delayed on the link.  Calculat&
+     &ed as Delay Travel Total Through divided by Trips Through." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotalDiag" display="Delay Travel Total Diag"&
+     & units="Minutes" description="Total time that diagonal vehicles we&
+     &re delayed on the link.  Calculated as Travel Time Total Diag minu&
+     &s Move Time Total Diag." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotalLeft" display="Delay Travel Total Left"&
+     & units="Minutes" description="Total time that left-turning vehicle&
+     &s were delayed on the link.  Calculated as Travel Time Total Left &
+     &minus Move Time Total Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotalRight" display="Delay Travel Total Righ&
+     &t" units="Minutes" description="Total time that right-turning vehi&
+     &cles were delayed on the link.  Calculated as Travel Time Total Ri&
+     &ght minus Move Time Total Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotalThrough" display="Delay Travel Total Th&
+     &rough" units="Minutes" description="Total time that through-moving&
+     & vehicles were delayed on the link.  Calculated as Travel Time Tot&
+     &al Through minus Move Time Total Through." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="M&
+     &inutes" description="Total time that all vehicles were delayed on &
+     &the link.  Calculated as the Travel Time Total minus Move Time Tot&
+     &al for the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DensityPerLane" display="Density Per Lane" units="Vehic&
+     &les/Mile/Lane" description="Average number of vehicles per mile pe&
+     &r lane.  Calculated as Content Average divided by link area.  Link&
+     & area is the sum of the lengths of the lanes in the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalCO" display="Emissions Total CO" units="G&
+     &rams" description="The total CO emissions produced by all vehicles&
+     & on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalHC" display="Emissions Total HC" units="G&
+     &rams" description="The total HC emissions produced by all vehicles&
+     & on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalNOx" display="Emissions Total NOx" units=&
+     &"Grams" description="The total NOx emissions produced by all vehic&
+     &les on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="FuelConsumptionTotal" display="Fuel Consumption Total" &
+     &units="Gallons" description="Total fuel consumed by all vehicles o&
+     &n the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="LaneChangesTotal" display="Lane Changes Total" units=""&
+     & description="Total number of lane changes that have been complete&
+     &d on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatio" display="Move Time Per Trav&
+     &el Time Ratio" units="" description="Ratio of the theoretical move&
+     & time to the actual travel time for vehicles on the link.  Calcula&
+     &ted as Move Time Total divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatioDiag" display="Move Time Per &
+     &Travel Time Ratio Diag" units="" description="Ratio of the theoret&
+     &ical move time to the actual travel time for diagonal vehicles on &
+     &the link.  Calculated as Move Time Total Diag divided by Travel Ti&
+     &me Total Diag." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatioLeft" display="Move Time Per &
+     &Travel Time Ratio Left" units="" description="Ratio of the theoret&
+     &ical move time to the actual travel time for left-turning vehicles&
+     & on the link.  Calculated as Move Time Total Left divided by Trave&
+     &l Time Total Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatioRight" display="Move Time Per&
+     & Travel Time Ratio Right" units="" description="Ratio of the theor&
+     &etical move time to the actual travel time for right-turning vehic&
+     &les on the link.  Calculated as Move Time Total Right divided by T&
+     &ravel Time Total Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatioThrough" display="Move Time P&
+     &er Travel Time Ratio Through" units="" description="Ratio of the t&
+     &heoretical move time to the actual travel time for through-moving &
+     &vehicles on the link.  Calculated as Move Time Total Through divid&
+     &ed by Travel Time Total Through." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerVehicle" display="Move Time Per Vehicle" uni&
+     &ts="Seconds/Vehicle" description="Theoretical time for a vehicle t&
+     &o travel the length of the link if it were moving unimpeded at the&
+     & free-flow speed." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotal" display="Move Time Total" units="Minutes&
+     &" description="Total theoretical time for discharged vehicles to t&
+     &ravel the length of the link if moving unimpeded at the free-flow &
+     &speed.  Calculated as Travel Distance Total divided by the free-fl&
+     &ow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotalDiag" display="Move Time Total Diag" units&
+     &="Minutes" description="Total theoretical time for discharged diag&
+     &onal vehicles to travel the length of the link if moving unimpeded&
+     & at the free-flow speed.  Calculated as Travel Distance Total Diag&
+     & divided by the free-flow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotalLeft" display="Move Time Total Left" units&
+     &="Minutes" description="Total theoretical time for discharged left&
+     &-turning vehicles to travel the length of the link if moving unimp&
+     &eded at the free-flow speed.  Calculated as Travel Distance Total &
+     &Left divided by the free-flow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotalRight" display="Move Time Total Right" uni&
+     &ts="Minutes" description="Total theoretical time for discharged ri&
+     &ght-turning vehicles to travel the length of the link if moving un&
+     &impeded at the free-flow speed.  Calculated as Travel Distance Tot&
+     &al Right divided by the free-flow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotalThrough" display="Move Time Total Through"&
+     & units="Minutes" description="Total theoretical time for discharge&
+     &d through-moving vehicles to travel the length of the link if movi&
+     &ng unimpeded at the free-flow speed.  Calculated as Travel Distanc&
+     &e Total Through divided by the free-flow speed on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonDelayTotal" display="Person Delay Total" units="P&
+     &erson-Minutes" description="Total delay to persons completely trav&
+     &ersing the link.  Calculated as Person Travel Time Total minus the&
+     & division of Person Travel Distance Total by the free-flow speed o&
+     &n the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelDistanceTotal" display="Person Travel Dista&
+     &nce Total" units="" description="Total distance traveled by person&
+     &s on the link.  Calculated as Travel Distance Total times the aver&
+     &age number of persons per vehicle for vehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTravelTimeTotal" display="Person Travel Time Tota&
+     &l" units="Minutes" description="Total time that people were travel&
+     &ing the link.  Calculated as Travel Time Total times the average n&
+     &umber of persons per vehicle for vehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PersonTripsTotal" display="Person Trips Total" units=""&
+     & description="Total number of people traversing the link.  Calcula&
+     &ted as Trips times the average number of persons per vehicle for v&
+     &ehicles on the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PhaseFailuresTotal" display="Phase Failures Total" unit&
+     &s="" description="Total number of phase failures on the link.  A p&
+     &hase failure occurs when vehicles queued at a signal are not all d&
+     &ischarged in one cycle during the phase serving the queue.  Accumu&
+     &lated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="RedLightRunnersTotal" display="Red Light Runners Total"&
+     & units="" description="Total number of red light runners on the li&
+     &nk." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of a vehicle that has completely trav&
+     &ersed the link.  Calculated as Travel Distance Total divided by th&
+     &e Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverageLeft" display="Speed Average Left" units="M&
+     &iles/Hour" description="Average speed of a left-turning vehicle th&
+     &at has completely traversed the link.  Calculated as Travel Distan&
+     &ce Total Left divided by the Travel Time Total Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverageRight" display="Speed Average Right" units=&
+     &"Miles/Hour" description="Average speed of a right-turning vehicle&
+     & that has completely traversed the link.  Calculated as Travel Dis&
+     &tance Total Right divided by the Travel Time Total Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverageThrough" display="Speed Average Through" un&
+     &its="Miles/Hour" description="Average speed of a through-moving ve&
+     &hicle that has completely traversed the link.  Calculated as Trave&
+     &l Distance Total Through divided by the Travel Time Total Through.&
+     &" />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="StoppedVehicles" display="Stopped Vehicles" units="Vehi&
+     &cles" description="Number of discharged vehicles that stopped at l&
+     &east once on the link.  Accumulated during the evaluation interval&
+     &." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="StoppedVehiclesPercent" display="Stopped Vehicles Perce&
+     &nt" units="%" description="Percentage of vehicles that have comple&
+     &tely traversed the link that were forced to stop at least once whi&
+     &le on the link.  Calculated as Stopped Vehicles divided by Trips."&
+     & />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="StoragePercent" display="Storage Percent" units="%" des&
+     &cription="Average percentage of link length that vehicles occupied&
+     &.  Calculated as Content Average times the average vehicle length &
+     &divided by the link area.  Link area is the sum of the lengths of &
+     &the lanes in the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by vehicles on th&
+     &e link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotalDiag" display="Travel Distance Total&
+     & Diag" units="Miles" description="Total distance traveled by diago&
+     &nal vehicles on the link.  Calculated as Travel Distance Total tim&
+     &es Trips Diag divided by Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotalLeft" display="Travel Distance Total&
+     & Left" units="Miles" description="Total distance traveled by left-&
+     &turning vehicles on the link.  Calculated as Travel Distance Total&
+     & times Trips Left divided by Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotalRight" display="Travel Distance Tota&
+     &l Right" units="Miles" description="Total distance traveled by rig&
+     &ht-turning vehicles on the link.  Calculated as Travel Distance To&
+     &tal times Trips Right divided by Trips." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotalThrough" display="Travel Distance To&
+     &tal Through" units="Miles" description="Total distance traveled by&
+     & through-moving vehicles on the link.  Calculated as Travel Distan&
+     &ce Total times Trips Through divided by Trips."/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerDistanceTraveled" display="Travel Time Per&
+     & Distance Traveled" units="Minutes/Mile" description="Average time&
+     & for a vehicle to travel one mile.  Calculated as Travel Time Tota&
+     &l divided by Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicle" display="Travel Time Per Vehicle"&
+     & units="Seconds/Vehicle" description="Average time for a vehicle t&
+     &o traverse the link.  Calculated as the length of the link divided&
+     & by Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicleDiag" display="Travel Time Per Vehi&
+     &cle Diag" units="Seconds/Vehicle" description="Average time for a &
+     &diagonal vehicle to traverse the link.  Calculated as Travel Time &
+     &Total Diag divided by Trips Diag." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicleLeft" display="Travel Time Per Vehi&
+     &cle Left" units="Seconds/Vehicle" description="Average time for a &
+     &left-turning vehicle to traverse the link.  Calculated as Travel T&
+     &ime Total Left divided by Trips Left." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicleRight" display="Travel Time Per Veh&
+     &icle Right" units="Seconds/Vehicle" description="Average time for &
+     &a right-turning vehicle to traverse the link.  Calculated as Trave&
+     &l Time Total Right divided by Trips Right." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerVehicleThrough" display="Travel Time Per V&
+     &ehicle Through" units="Seconds/Vehicle" description="Average time &
+     &for a through-moving vehicle to traverse the link.  Calculated as &
+     &Travel Time Total Through divided by Trips Through." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Min&
+     &utes" description="Total time that all vehicles were on the link. &
+     & Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Trips" display="Trips" units="" description="Total numb&
+     &er of vehicles that have traversed the link.  A vehicle that compl&
+     &etely traverses the link counts as one full trip.  A vehicle that &
+     &enters at the upstream end of the link but is extracted at a sink &
+     &node counts as half of a trip, and a vehicle that enters from a so&
+     &urce node and discharges at the downstream end of the link is coun&
+     &ted as half a trip.  Accumulated during the evaluation interval wh&
+     &en a vehicle exits the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TripsDiag" display="Trips Diag" units="" description="T&
+     &otal number of diagonal vehicles that have traversed the link.  A &
+     &vehicle that completely traverses the link counts as one full trip&
+     &.  A vehicle that enters at the upstream end of the link but is ex&
+     &tracted at a sink node counts as half of a trip, and a vehicle tha&
+     &t enters from a source node and discharges at the downstream end o&
+     &f the link is counted as half a trip.  Accumulated during the eval&
+     &uation interval when a vehicle exits the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TripsLeft" display="Trips Left" units="" description="T&
+     &otal number of left-turning vehicles that have traversed the link.&
+     &  A vehicle that completely traverses the link counts as one full &
+     &trip.  A vehicle that enters at the upstream end of the link but i&
+     &s extracted at a sink node counts as half of a trip, and a vehicle&
+     & that enters from a source node and discharges at the downstream e&
+     &nd of the link is counted as half a trip.  Accumulated during the &
+     &evaluation interval when a vehicle exits the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TripsRight" display="Trips Right" units="" description=&
+     &"Total number of right-turning vehicles that have traversed the li&
+     &nk.  A vehicle that completely traverses the link counts as one fu&
+     &ll trip.  A vehicle that enters at the upstream end of the link bu&
+     &t is extracted at a sink node counts as half of a trip, and a vehi&
+     &cle that enters from a source node and discharges at the downstrea&
+     &m end of the link is counted as half a trip.  Accumulated during t&
+     &he evaluation interval when a vehicle exits the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TripsThrough" display="Trips Through" units="" descript&
+     &ion="Total number of through-moving vehicles that have traversed t&
+     &he link.  A vehicle that completely traverses the link counts as o&
+     &ne full trip.  A vehicle that enters at the upstream end of the li&
+     &nk but is extracted at a sink node counts as half of a trip, and a&
+     & vehicle that enters from a source node and discharges at the down&
+     &stream end of the link is counted as half a trip.  Accumulated dur&
+     &ing the evaluation interval when a vehicle exits the link." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischarged" display="Vehicles Discharged" units&
+     &="Vehicles" description="Number of vehicles that have been dischar&
+     &ged from the link.  Accumulated during the evaluation interval." /&
+     &>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedDiag" display="Vehicles Discharged Di&
+     &agonal" units="Vehicles" description="Number of vehicles that have&
+     & been discharged from the link exiting to the diagonal receiving l&
+     &ink.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedLeft" display="Vehicles Discharged Le&
+     &ft" units="Vehicles" description="Number of vehicles that have bee&
+     &n discharged from the link exiting to the left.  Accumulated durin&
+     &g the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedRight" display="Vehicles Discharged R&
+     &ight" units="Vehicles" description="Number of vehicles that have b&
+     &een discharged from the link exiting to the right.  Accumulated du&
+     &ring the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischargedThrough" display="Vehicles Discharged&
+     & Through" units="Vehicles" description="Number of vehicles that ha&
+     &ve been discharged from the link continuing through.  Accumulated &
+     &during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesEnteringLink" display="Vehicles Entering Link" &
+     &units="Vehicles" description="Number of vehicles that have entered&
+     & the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesInDilemmaZoneTotal" display="VehiclesInDilemmaZ&
+     &oneTotal" units="Vehicles" description="Number of vehicles that ar&
+     &e in the dilemma zone when the signal turns yellow.  Accumulated d&
+     &uring the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Volume" display="Volume" units="Vehicles/Hour" descript&
+     &ion="Average number of vehicles traversing the link, converted to &
+     &an hourly value.  Calculated as Trips divided by the duration of t&
+     &he evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VolumePerLane" display="Volume Per Lane" units="Vehicle&
+     &s/Hour/Lane" description="Average number of vehicles traversing ea&
+     &ch lane, converted to an hourly value.  Calculated as Density time&
+     &s Speed Average." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="NETWORK_FREEWAY" label="Network_Freeway" function="Ge&
+     &tNetworkFreewayMoeData" numargs="0" >&
+     &<MOE name="ContentAverage" display="Content Average" units="Vehicl&
+     &es" description="Average number of vehicles in the freeway sub-net&
+     &work during the evaluation interval.  Calculated as the sum of Con&
+     &tent Average for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="Snapshot of the current number of vehicles in the&
+     & freeway sub-network.  Calculated as the sum of Content Current fo&
+     &r all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerDistanceTraveled" display="Delay Travel P&
+     &er Distance Traveled" units="Minutes/Mile" description="Average de&
+     &lay per mile traveled.  Calculated as Delay Travel Total divided b&
+     &y Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="H&
+     &ours" description="Total time that all vehicles were delayed in th&
+     &e freeway sub-network.  Calculated as the sum of Delay Travel Tota&
+     &l for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalCO" display="Emissions Total CO" units="G&
+     &rams" description="The total CO emissions produced by all vehicles&
+     & in the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalHC" display="Emissions Total HC" units="G&
+     &rams" description="The total HC emissions produced by all vehicles&
+     & in the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalNOx" display="Emissions Total NOx" units=&
+     &"Grams" description="The total NOx emissions produced by all vehic&
+     &les in the network.  Accumulated during the evaluation interval." &
+     &/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="FuelConsumptionTotal" display="Fuel Consumption Total" &
+     &units="Gallons" description="Total fuel consumed by all vehicles i&
+     &n the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="LaneChangesTotal" display="Lane Changes Total" units=""&
+     & description="Total number of lane changes that have been complete&
+     &d on all links in the freeway sub-network.  Calculated as the sum &
+     &of Lane Changes Total for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatio" display="Move Time Per Trav&
+     &el Time Ratio" units="" description="Ratio of the theoretical move&
+     & time to the actual travel time for vehicles in the freeway sub-ne&
+     &twork.  Calculated as (Travel Time Total minus Delay Travel Total)&
+     & divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotal" display="Move Time Total" units="Hours" &
+     &description="Total theoretical time for all vehicles traveling in &
+     &the network if moving unimpeded at the free-flow speed.  Calculate&
+     &d as Travel Distance Total divided by the free-flow speed, compute&
+     &d by link and summed for all links in the network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of a vehicle traveling in the freeway&
+     & sub-network.  Calculated as Travel Distance Total divided by Trav&
+     &el Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by all vehicles i&
+     &n the freeway sub-network.  Calculated as the sum of Travel Distan&
+     &ce Total for links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerDistanceTraveled" display="Travel Time Per&
+     & Distance Traveled" units="Minutes/Mile" description="Average time&
+     & for a vehicle to travel one mile in the freeway sub-network.  Cal&
+     &culated as Travel Time Total divided by Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Hou&
+     &rs" description="Total travel time for all vehicles in the freeway&
+     & sub-network.  Calculated as the sum of Travel Time Total for all &
+     &links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="NETWORK_STREET" label="Network_Street" function="GetN&
+     &etworkStreetMoeData" numargs="0" >&
+     &<MOE name="ContentAverage" display="Content Average" units="Vehicl&
+     &es" description="Average number of vehicles in the street sub-netw&
+     &ork during the evaluation interval.  Calculated as the sum of Cont&
+     &ent Average for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="ContentCurrent" display="Content Current" units="Vehicl&
+     &es" description="Snapshot of the current number of vehicles in the&
+     & street sub-network.  Calculated as the sum of Content Current for&
+     & all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayQueueTotal" display="Delay Queue Total" units="Min&
+     &utes" description="Total time that vehicles in the NETSIM sub-netw&
+     &ork were in queue.  Calculated as the sum of Delay Queue Total on &
+     &all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayStopTotal" display="Delay Stop Total" units="Minut&
+     &es" description="Total time that vehicles were stopped in the NETS&
+     &IM sub-network.  Calculated as the sum of Delay Stop Total on all &
+     &links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelPerDistanceTraveled" display="Delay Travel P&
+     &er Distance Traveled" units="Minutes/Mile" description="Average de&
+     &lay per mile traveled.  Calculated as Delay Travel Total divided b&
+     &y Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="DelayTravelTotal" display="Delay Travel Total" units="H&
+     &ours" description="Total time that all vehicles were delayed in th&
+     &e street sub-network.  Calculated as the sum of Delay Travel Total&
+     & for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalCO" display="Emissions Total CO" units="G&
+     &rams" description="The total CO emissions produced by all vehicles&
+     & in the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalHC" display="Emissions Total HC" units="G&
+     &rams" description="The total HC emissions produced by all vehicles&
+     & in the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="EmissionsTotalNOx" display="Emissions Total NOx" units=&
+     &"Grams" description="The total NOx emissions produced by all vehic&
+     &les in the network.  Accumulated during the evaluation interval." &
+     &/>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="FuelConsumptionTotal" display="Fuel Consumption Total" &
+     &units="Gallons" description="Total fuel consumed by all vehicles i&
+     &n the network.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="LaneChangesTotal" display="Lane Changes Total" units=""&
+     & description="Total number of lane changes that have been complete&
+     &d on all links in the street sub-network.  Calculated as the sum o&
+     &f Lane Changes Total for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimePerTravelTimeRatio" display="Move Time Per Trav&
+     &el Time Ratio" units="" description="Ratio of the theoretical move&
+     & time to the actual travel time for vehicles in the street sub-net&
+     &work.  Calculated as (Travel Time Total minus Delay Travel Total) &
+     &divided by Travel Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="MoveTimeTotal" display="Move Time Total" units="Hours" &
+     &description="Total theoretical time for all vehicles traveling in &
+     &the network if moving unimpeded at the free-flow speed.  Calculate&
+     &d as Travel Distance Total divided by the free-flow speed, compute&
+     &d by link and summed for all links in the network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="PhaseFailuresTotal" display="Phase Failures Total" unit&
+     &s="" description="Total number of phase failures in the NETSIM sub&
+     &-network.  A phase failure occurs when vehicles queued at a signal&
+     & are not all discharged in one cycle during the phase serving the &
+     &queue.  Calculated as the sum of Phase Failures Total on all links&
+     & in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of a vehicle traveling in the street &
+     &sub-network.  Calculated as Travel Distance Total divided by Trave&
+     &l Time Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="StoppedVehiclesPercent" display="Stopped Vehicles Perce&
+     &nt" units="%" description="Percentage of vehicles that have comple&
+     &tely traversed links in the NETSIM sub-network that were forced to&
+     & stop at least once while on a link.  Calculated as the sum of Sto&
+     &pped Vehicles divided by sum of Trips for all links in the sub-net&
+     &work." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="StoragePercent" display="Storage Percent" units="%" des&
+     &cription="Average percentage of total sub-network link length that&
+     & vehicles occupied.  Calculated as the sum of the product of Conte&
+     &nt Average and average vehicle length divided by the sum of link a&
+     &rea for all links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by all vehicles i&
+     &n the street sub-network.  Calculated as the sum of Travel Distanc&
+     &e Total for links in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimePerDistanceTraveled" display="Travel Time Per&
+     & Distance Traveled" units="Minutes/Mile" description="Average time&
+     & for a vehicle to travel one mile in the street sub-network.  Calc&
+     &ulated as Travel Time Total divided by Travel Distance Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Hou&
+     &rs" description="Total travel time for all vehicles in the street &
+     &sub-network.  Calculated as the sum of Travel Time Total for all l&
+     &inks in the sub-network." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="Trips" display="Trips" units="" description="Number of &
+     &vehicles that have left the sub-network via an exit node or sink n&
+     &ode.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="VEHICLETYPE_LINK_FREEWAY" label="VehicleType_Link_Fre&
+     &eway" function="GetVehicleTypeFreewayLinkMoeData" numargs="3" arg1&
+     &label="USN" arg2label="DSN" arg3label="Type" >&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of vehicles of the specified type on &
+     &the link.  Calculated as Travel Distance Total divided by Travel T&
+     &ime Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by all vehicles o&
+     &f the specified type on the link.  Accumulated during the evaluati&
+     &on interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Hou&
+     &rs" description="Total travel time for vehicles of the specified t&
+     &ype on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischarged" display="Vehicles Discharged" units&
+     &="Vehicles" description="Number of vehicles of the specified type &
+     &that have discharged from the link.  Accumulated during the evalua&
+     &tion interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &<CLASS name="VEHICLETYPE_LINK_STREET" label="VehicleType_Link_Stre&
+     &et" function="GetVehicleTypeStreetLinkMoeData" numargs="3" arg1lab&
+     &el="USN" arg2label="DSN" arg3label="Type" >&
+     &<MOE name="SpeedAverage" display="Speed Average" units="Miles/Hour&
+     &" description="Average speed of vehicles of the specified type on &
+     &the link.  Calculated as Travel Distance Total divided by Travel T&
+     &ime Total." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelDistanceTotal" display="Travel Distance Total" un&
+     &its="Miles" description="Total distance traveled by all vehicles o&
+     &f the specified type on the link.  Accumulated during the evaluati&
+     &on interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="TravelTimeTotal" display="Travel Time Total" units="Hou&
+     &rs" description="Total travel time for vehicles of the specified t&
+     &ype on the link.  Accumulated during the evaluation interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &<MOE name="VehiclesDischarged" display="Vehicles Discharged" units&
+     &="Vehicles" description="Number of vehicles of the specified type &
+     &that have discharged from the link.  Accumulated during the evalua&
+     &tion interval." />&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
+      KEND = KEND + IEND
+      STRING='&
+     &</CLASS>&
+     &</MOE_LIST>&
+     &'
+      IEND = LEN_TRIM(STRING)
+      CBUF(KEND+1:KEND+IEND) = STRING(1:IEND)
