@@ -1,0 +1,10 @@
+<net>
+
+    <edge id="0" from="0" to="1" >
+        <lane id="0" speed="10" shape="0,0 10,0"/>
+    </edge>
+
+    <junction id="0" x="0.00" y="0.00" shape="0,0"/>
+    <junction id="1" x="10.00" y="0.00" shape="10,0"/>
+
+</net>

@@ -1,0 +1,362 @@
+!***********************************************************************
+!
+!    Copyright (c) 2002-2004
+!    ITT Industries, Inc., Systems Division
+!
+!    $Revision: 6 $
+!
+!    $Date: 9/14/04 4:41p $
+!
+!    Original Author: Dave Terhune
+!
+!    Description: Include file that defines and imports the shared data
+!                 structures that define the TxD Interface.
+!
+!    $History: TxDInterface.fi $
+!  
+!  *****************  Version 6  *****************
+!  User: Tomich       Date: 9/14/04    Time: 4:41p
+!  Updated in $/TSIS Development/TxDInterface
+!  PR 2072: Added cumulative MOE data in addition to the interval-specific
+!  MOE data in the TID structures.
+!  
+!  *****************  Version 5  *****************
+!  User: Tomich       Date: 6/15/04    Time: 5:19p
+!  Updated in $/TSIS Development/TxDInterface
+!  PR 1415: Added queue delay per vehicle and stop delay per vehicle to
+!  the interface.
+!  
+!  *****************  Version 4  *****************
+!  User: Tomich       Date: 6/01/04    Time: 4:35p
+!  Updated in $/TSIS Development/TxDInterface
+!  PR 2072:  Renamed several elements of the TIDData structure in
+!  conjunction with updates to name changes in the CORSIM MOE processing
+!  logic.  Removed the "Density" MOE because it was removed in the CORSIM
+!  MOE processing logic.
+!  
+!  *****************  Version 3  *****************
+!  User: Tomich       Date: 5/20/04    Time: 9:36a
+!  Updated in $/TSIS Development/TxDInterface
+!  PR 2072:  Renamed the elements of the TIDData structure to conform to
+!  the naming conventions used by the CORSIM MOE processing logic.
+!  
+!  Renamed the imported common, LKINCData, to LKINCDAT for consistency.
+!  Renamed the structure, LKINCDat, to LKINCData for consistency.  Made
+!  several minor formatting changes.
+!  
+!  *****************  Version 2  *****************
+!  User: Tomich       Date: 4/12/04    Time: 11:20a
+!  Updated in $/TSIS Development/TxDInterface
+!  PR 2072:  Removed SectionData structure -- it is no longer used.
+!  
+!  *****************  Version 1  *****************
+!  User: Tomich       Date: 4/10/04    Time: 11:22a
+!  Created in $/TSIS Development/TxDInterface
+!  For consistency, we renamed the project (and associated files) from
+!  TSDIntf to TxDInterface.  This file replaces TSDIntf.fi.
+!  
+!  *****************  Version 6  *****************
+!  User: Tomich       Date: 4/09/04    Time: 4:05p
+!  Updated in $/TSIS Development/TSDIntf
+!  PR 2072:  Updated time interval data structure to account for changes
+!  in the MOE data passed to TRAFVU.  Updated TXD_VERSION to 501 because
+!  of the structure changes.
+!  
+!  *****************  Version 5  *****************
+!  User: Tomich       Date: 7/14/03    Time: 5:06p
+!  Updated in $/TSIS Development/CORSIM/Source
+!  Replaced tabs with spaces.
+!  
+!  *****************  Version 4  *****************
+!  User: Sim20367     Date: 7/18/02    Time: 2:36p
+!  Updated in $/TSIS Development/CORSIM/Source
+!  Aggregation files.
+!  
+!  *****************  Version 2  *****************
+!  User: Ter38377     Date: 3/15/02    Time: 4:07p
+!  Updated in $/TSIS Development/TSDIntf
+!  Renamed to "TxD500" in release mode, and "TxD500d" in debug mode, and
+!  added version constant.
+!  
+!  *****************  Version 1  *****************
+!  User: Ter38377     Date: 2/19/02    Time: 10:18a
+!  Created in $/TSIS Development/TSDIntf
+!  Initial Implementation
+!
+!***********************************************************************
+!
+!     TxD Interface Version:
+  INTEGER*4, PARAMETER::TXD_VERSION = 501
+
+!     Imported data structures:
+  COMMON /VEHDAT[DLLIMPORT]/theVehData
+  COMMON /LNKDAT[DLLIMPORT]/theLinkData
+  COMMON /TIDDAT[DLLIMPORT]/theTIDData
+  COMMON /LKINCDAT[DLLIMPORT]/theLKINCData
+ 
+!     Interface specifications for initialization routines.
+  INTERFACE
+    SUBROUTINE INIT_TIDDAT[DLLIMPORT, STDCALL](LinkID, TimeInterval)
+      INTEGER*4 LinkID, TimeInterval
+    END SUBROUTINE
+  END INTERFACE
+
+!DEC$ OPTIONS /NOWARN
+!     ------------------------------------------------------------------
+!     RWGVector structure (emulates Rogue Wave Vector):
+  structure /RWGVector/
+      INTEGER*2 Count
+      REAL*4    Array(7)
+  end structure
+
+!     ------------------------------------------------------------------
+!     Link Data structure:
+  structure /LinkData/
+      INTEGER*1 ModelType
+      INTEGER*2 USN
+      INTEGER*2 DSN
+      INTEGER*2 NumVehicles
+      INTEGER*1 LTurnMoveCode
+      INTEGER*1 LDiagMoveCode
+      INTEGER*1 ThruMoveCode
+      INTEGER*1 RDiagMoveCode
+      INTEGER*1 RTurnMoveCode
+      INTEGER*1 Signalized
+      INTEGER*2 NumMeters
+      INTEGER*1 SignalState
+  end structure
+  RECORD /LinkData/theLinkData
+
+!     ------------------------------------------------------------------
+!     Vehicle Data structure:
+  structure /VehData/
+      INTEGER*4 VehicleGlobalId
+      INTEGER*1 Fleet
+      INTEGER*1 TypeVeh
+      INTEGER*1 VehicleLength
+      INTEGER*1 DriverType
+      INTEGER*1 LaneNumber
+      INTEGER*4 DistanceFromUSN
+      INTEGER*2 USNPrevLink
+      INTEGER*1 TurnCode
+      INTEGER*1 QueueCode
+      INTEGER*1 Acceleration
+      INTEGER*1 Velocity
+      INTEGER*1 LaneChangeStatus
+      INTEGER*1 TargetLane
+      INTEGER*2 Destination
+      INTEGER*4 LeadVehicleID
+      INTEGER*4 FollowVehicleID
+      INTEGER*1 PrevLane
+  end structure
+  RECORD /VehData/theVehData
+
+!     ------------------------------------------------------------------
+!     Time Interval Data structure:
+  structure /TIDData/
+      INTEGER*4 LinkID
+      INTEGER*4 TimeInterval
+      INTEGER*4 TimeInterval_Cum
+      REAL*4    BusDelayTotal
+      REAL*4    BusDelayTotal_Cum
+      REAL*4    BusMoveTimePerTravelTimeRatio
+      REAL*4    BusMoveTimePerTravelTimeRatio_Cum
+      INTEGER*4 BusPersonTrips
+      INTEGER*4 BusPersonTrips_Cum
+      REAL*4    BusSpeedAverage
+      REAL*4    BusSpeedAverage_Cum
+      REAL*4    BusTravelTimeTotal
+      REAL*4    BusTravelTimeTotal_Cum
+      INTEGER*4 BusTrips
+      INTEGER*4 BusTrips_Cum
+      INTEGER*4 BusesThatStopped
+      INTEGER*4 BusesThatStopped_Cum
+      REAL*4    ContentAverage
+      REAL*4    ContentAverage_Cum
+      INTEGER*4 ContentCurrent
+      INTEGER*4 ContentCurrent_Cum
+      REAL*4    DelayControlPerVehicle
+      REAL*4    DelayControlPerVehicle_Cum
+      REAL*4    DelayControlPerVehicleLeft
+      REAL*4    DelayControlPerVehicleLeft_Cum
+      REAL*4    DelayControlPerVehicleRight
+      REAL*4    DelayControlPerVehicleRight_Cum
+      REAL*4    DelayControlPerVehicleThrough
+      REAL*4    DelayControlPerVehicleThrough_Cum
+      REAL*4    DelayControlTotal
+      REAL*4    DelayControlTotal_Cum
+      REAL*4    DelayControlTotalLeft
+      REAL*4    DelayControlTotalLeft_Cum
+      REAL*4    DelayControlTotalRight
+      REAL*4    DelayControlTotalRight_Cum
+      REAL*4    DelayControlTotalThrough
+      REAL*4    DelayControlTotalThrough_Cum
+      REAL*4    DelayQueuePerVehicle
+      REAL*4    DelayQueuePerVehicle_Cum
+      REAL*4    DelayQueueTotal
+      REAL*4    DelayQueueTotal_Cum
+      REAL*4    DelayQueueTotalLeft
+      REAL*4    DelayQueueTotalLeft_Cum
+      REAL*4    DelayQueueTotalRight
+      REAL*4    DelayQueueTotalRight_Cum
+      REAL*4    DelayQueueTotalThrough
+      REAL*4    DelayQueueTotalThrough_Cum
+      REAL*4    DelayStopPerVehicle
+      REAL*4    DelayStopPerVehicle_Cum
+      REAL*4    DelayStopTotal
+      REAL*4    DelayStopTotal_Cum
+      REAL*4    DelayStopTotalLeft
+      REAL*4    DelayStopTotalLeft_Cum
+      REAL*4    DelayStopTotalRight
+      REAL*4    DelayStopTotalRight_Cum
+      REAL*4    DelayStopTotalThrough
+      REAL*4    DelayStopTotalThrough_Cum
+      REAL*4    DelayTravelPerVehicle
+      REAL*4    DelayTravelPerVehicle_Cum
+      REAL*4    DelayTravelPerVehicleLeft
+      REAL*4    DelayTravelPerVehicleLeft_Cum
+      REAL*4    DelayTravelPerVehicleRight
+      REAL*4    DelayTravelPerVehicleRight_Cum
+      REAL*4    DelayTravelPerVehicleThrough
+      REAL*4    DelayTravelPerVehicleThrough_Cum
+      REAL*4    DelayTravelTotal
+      REAL*4    DelayTravelTotal_Cum
+      REAL*4    DelayTravelTotalLeft
+      REAL*4    DelayTravelTotalLeft_Cum
+      REAL*4    DelayTravelTotalRight
+      REAL*4    DelayTravelTotalRight_Cum
+      REAL*4    DelayTravelTotalThrough
+      REAL*4    DelayTravelTotalThrough_Cum
+      REAL*4    DensityPerLane
+      REAL*4    DensityPerLane_Cum
+      REAL*4    EmissionsRateCO
+      REAL*4    EmissionsRateCO_Cum
+      REAL*4    EmissionsRateHC
+      REAL*4    EmissionsRateHC_Cum
+      REAL*4    EmissionsRateNOx
+      REAL*4    EmissionsRateNOx_Cum
+      REAL*4    EmissionsTotalCO
+      REAL*4    EmissionsTotalCO_Cum
+      REAL*4    EmissionsTotalHC
+      REAL*4    EmissionsTotalHC_Cum
+      REAL*4    EmissionsTotalNOx
+      REAL*4    EmissionsTotalNOx_Cum
+      REAL*4    FuelConsumptionTotal
+      REAL*4    FuelConsumptionTotal_Cum
+      REAL*4    FuelConsumptionTotalAutos
+      REAL*4    FuelConsumptionTotalAutos_Cum
+      REAL*4    FuelConsumptionTotalBuses
+      REAL*4    FuelConsumptionTotalBuses_Cum
+      REAL*4    FuelConsumptionTotalCarpools
+      REAL*4    FuelConsumptionTotalCarpools_Cum
+      REAL*4    FuelConsumptionTotalTrucks
+      REAL*4    FuelConsumptionTotalTrucks_Cum
+      INTEGER*4 LaneChangesTotal
+      INTEGER*4 LaneChangesTotal_Cum
+      REAL*4    MoveTimePerTravelTimeRatio
+      REAL*4    MoveTimePerTravelTimeRatio_Cum
+      REAL*4    MoveTimePerTravelTimeRatioLeft
+      REAL*4    MoveTimePerTravelTimeRatioLeft_Cum
+      REAL*4    MoveTimePerTravelTimeRatioRight
+      REAL*4    MoveTimePerTravelTimeRatioRight_Cum
+      REAL*4    MoveTimePerTravelTimeRatioThrough
+      REAL*4    MoveTimePerTravelTimeRatioThrough_Cum
+      REAL*4    MoveTimeTotal
+      REAL*4    MoveTimeTotal_Cum
+      REAL*4    MoveTimeTotalLeft
+      REAL*4    MoveTimeTotalLeft_Cum
+      REAL*4    MoveTimeTotalRight
+      REAL*4    MoveTimeTotalRight_Cum
+      REAL*4    MoveTimeTotalThrough
+      REAL*4    MoveTimeTotalThrough_Cum
+      REAL*4    PersonDelayTotal
+      REAL*4    PersonDelayTotal_Cum
+      REAL*4    PersonTripsTotal
+      REAL*4    PersonTripsTotal_Cum
+      INTEGER*4 PhaseFailuresTotal
+      INTEGER*4 PhaseFailuresTotal_Cum
+      RECORD /RWGVector/ QueueAverageNumberVehiclesSLT
+      RECORD /RWGVector/ QueueAverageNumberVehiclesSLT_Cum
+      RECORD /RWGVector/ QueueMaximumNumberVehiclesSLT
+      RECORD /RWGVector/ QueueMaximumNumberVehiclesSLT_Cum
+      REAL*4    SpeedAverage
+      REAL*4    SpeedAverage_Cum
+      REAL*4    SpeedAverageLeft
+      REAL*4    SpeedAverageLeft_Cum
+      REAL*4    SpeedAverageRight
+      REAL*4    SpeedAverageRight_Cum
+      REAL*4    SpeedAverageThrough
+      REAL*4    SpeedAverageThrough_Cum
+      INTEGER*4 StoppedVehicles
+      INTEGER*4 StoppedVehicles_Cum
+      REAL*4    StoppedVehiclesPercent
+      REAL*4    StoppedVehiclesPercent_Cum
+      REAL*4    StoragePercent
+      REAL*4    StoragePercent_Cum
+      REAL*4    TravelDistanceTotal
+      REAL*4    TravelDistanceTotal_Cum
+      REAL*4    TravelDistanceTotalLeft
+      REAL*4    TravelDistanceTotalLeft_Cum
+      REAL*4    TravelDistanceTotalRight
+      REAL*4    TravelDistanceTotalRight_Cum
+      REAL*4    TravelDistanceTotalThrough
+      REAL*4    TravelDistanceTotalThrough_Cum
+      REAL*4    TravelTimePerVehicle
+      REAL*4    TravelTimePerVehicle_Cum
+      REAL*4    TravelTimePerVehicleLeft
+      REAL*4    TravelTimePerVehicleLeft_Cum
+      REAL*4    TravelTimePerVehicleRight
+      REAL*4    TravelTimePerVehicleRight_Cum
+      REAL*4    TravelTimePerVehicleThrough
+      REAL*4    TravelTimePerVehicleThrough_Cum
+      REAL*4    TravelTimeTotal
+      REAL*4    TravelTimeTotal_Cum
+      REAL*4    TravelTimeTotalLeft
+      REAL*4    TravelTimeTotalLeft_Cum
+      REAL*4    TravelTimeTotalRight
+      REAL*4    TravelTimeTotalRight_Cum
+      REAL*4    TravelTimeTotalThrough
+      REAL*4    TravelTimeTotalThrough_Cum
+      REAL*4    Trips
+      REAL*4    Trips_Cum
+      REAL*4    TripsLeft
+      REAL*4    TripsLeft_Cum
+      REAL*4    TripsRight
+      REAL*4    TripsRight_Cum
+      REAL*4    TripsThrough
+      REAL*4    TripsThrough_Cum
+      INTEGER*4 VehiclesDischarged
+      INTEGER*4 VehiclesDischarged_Cum
+      INTEGER*4 VehiclesDischargedLeft
+      INTEGER*4 VehiclesDischargedLeft_Cum
+      INTEGER*4 VehiclesDischargedRight
+      INTEGER*4 VehiclesDischargedRight_Cum
+      INTEGER*4 VehiclesDischargedThrough
+      INTEGER*4 VehiclesDischargedThrough_Cum
+      REAL*4    Volume
+      REAL*4    Volume_Cum
+      REAL*4    VolumePerLane
+      REAL*4    VolumePerLane_Cum
+  end structure
+  RECORD /TIDData/theTIDData
+
+!     ------------------------------------------------------------------
+!     Link Incident Data stucture:
+  structure /LKINCData/
+      INTEGER*4 IncidentId
+      INTEGER*4 LinkId
+      INTEGER*2 IncidentType
+      REAL*4    IncidentPosition
+      REAL*4    IncidentLength
+      INTEGER*4 StartTime
+      INTEGER*4 Duration
+      REAL*4    ReactionPoint
+      REAL*4    RubberneckFactor
+      INTEGER*2 ModelType
+      INTEGER*2 mstate
+      INTEGER*2 NumAffectedLanes
+      INTEGER*4 AffectedLaneIdArray(11)
+      INTEGER*2 LaneIncidentCodes(11)
+  end structure
+  RECORD /LKINCData/theLKINCData
+!DEC$ END OPTIONS
