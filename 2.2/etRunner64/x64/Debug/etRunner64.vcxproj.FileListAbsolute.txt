@@ -1,2 +1,0 @@
-D:\ETFOMM\0917\etRunner64\etRunner64\x64\Debug\etRunner64.vcxproj.AssemblyReference.cache
-D:\ETFOMM\0917\ETFOMM\etRunner64\x64\Debug\etRunner64.vcxproj.AssemblyReference.cache
